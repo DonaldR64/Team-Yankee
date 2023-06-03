@@ -6,11 +6,11 @@
 	"sections": [
 		{"name": "Core", "formations": [
 			{"id": 501, "name": "HQ Unit","pts": 6, "units": "1 x T-72B", "upgrades": [1]},
-			{"id": 502, "name": "1st T-72B Tank Company","pts": 0,"upgrades": [10,11,12,13,14,15,16,17,18,19]},
-			{"id": 503, "name": "2nd T-72B Tank Company","pts": 0,"upgrades": [10,11,12,13,14,15,16,17,18,19]}
+			{"id": 502, "name": "1st T-72B Tank Company","pts": 0,"upgrades": [10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]},
+			{"id": 503, "name": "2nd T-72B Tank Company","pts": 0,"upgrades": [10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]}
 		]},
 		{"name": "Additional", "formations": [
-			{"id": 504, "name": "3rd T-72B Tank Company","pts": 0,"upgrades": [10,11,12,13,14,15,16,17,18,19]},			
+			{"id": 504, "name": "3rd T-72B Tank Company","pts": 0,"upgrades": [10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]},			
 			{"id": 505, "name": "BMP-3 Motor Rifle Company","pts": 0,"upgrades": [51,52,53,54,55,56,57,58]},
 			{"id": 506, "name": "BMP-2 Motor Rifle Company","pts": 0,"upgrades": [60,61,62,63,64,65,66,67]},
 			{"id": 507, "name": "BMP-1 Motor Rifle Company","pts": 0,"upgrades": [70,71,72,73,74,75,76,77]},
@@ -49,16 +49,23 @@
 	"upgrades": [
 		{"id": 1, "name": "Add AT-11 Sniper Missile", "pts": 1},
 
-      	{"id": 10, "name": "3 x T-72", "pts": 16},
-      	{"id": 11, "name": "4 x T-72", "pts": 22},
-      	{"id": 12, "name": "5 x T-72", "pts": 28},
-      	{"id": 13, "name": "6 x T-72", "pts": 34},      	
-      	{"id": 14, "name": "7 x T-72", "pts": 40},
-      	{"id": 15, "name": "8 x T-72", "pts": 46},      	
-      	{"id": 16, "name": "9 x T-72", "pts": 52},
-      	{"id": 17, "name": "10 x T-72", "pts": 58},
-      	{"id": 18, "name": "Fit up to 3 T-72s with Mine Clearing Devices", "pts": 1},
-      	{"id": 19, "name": "Add AT-11 Sniper Missiles to all T-72Bs", "pts": 2},
+      	{"id": 10, "name": "3 x T-72", "pts": 15},
+      	{"id": 11, "name": "3 x T-72 with AT-11 Sniper Missiles", "pts": 18},
+      	{"id": 12, "name": "4 x T-72", "pts": 21},
+      	{"id": 13, "name": "4 x T-72 with AT-11 Sniper Missiles", "pts": 25},
+      	{"id": 14, "name": "5 x T-72", "pts": 27},
+      	{"id": 15, "name": "5 x T-72 with AT-11 Sniper Missiles", "pts": 32},
+      	{"id": 16, "name": "6 x T-72", "pts": 33},      	
+      	{"id": 17, "name": "6 x T-72 with AT-11 Sniper Missiles", "pts": 39},      	
+      	{"id": 18, "name": "7 x T-72", "pts": 39},
+      	{"id": 19, "name": "7 x T-72 with AT-11 Sniper Missiles", "pts": 46},
+      	{"id": 20, "name": "8 x T-72", "pts": 45},      	
+      	{"id": 21, "name": "8 x T-72 with AT-11 Sniper Missiles", "pts": 53},      	
+      	{"id": 22, "name": "9 x T-72", "pts": 51},
+      	{"id": 23, "name": "9 x T-72 with AT-11 Sniper Missiles", "pts": 60},
+      	{"id": 24, "name": "10 x T-72", "pts": 57},
+      	{"id": 25, "name": "10 x T-72 with AT-11 Sniper Missiles", "pts": 67},
+      	{"id": 26, "name": "Fit up to 3 T-72s with Mine Clearing Devices", "pts": 1},
 
       	{"id": 30, "name": "2 x SA-13 Gopher SAM", "pts": 2},
       	{"id": 31, "name": "4 x SA-13 Gopher SAM", "pts": 4},
@@ -199,8 +206,8 @@
 
    "upgradeConstraints": [      
    	    {"max": 1, "min": 0, "from": [1], "appliesTo": [501]},
-      	{"max": 1, "min": 1, "from": [10,11,12,13,14,15,16,17], "appliesTo": [502,503,504]},
-      	{"max": 1, "min": 0, "from": [18], "appliesTo": [502,503,504]},
+      	{"max": 1, "min": 1, "from": [10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25], "appliesTo": [502,503,504]},
+      	{"max": 1, "min": 0, "from": [26], "appliesTo": [502,503,504]},
 
    	    {"max": 1, "min": 1, "from": [30,31], "appliesTo": [517,561]},
    	    {"max": 1, "min": 1, "from": [32,33], "appliesTo": [516,562]},
