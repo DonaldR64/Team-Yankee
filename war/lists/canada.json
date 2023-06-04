@@ -1,0 +1,96 @@
+{
+	"id": "Canada",
+	"version": "TYv2",
+	"by": "DR",
+	"notes": ["For any OP Must Field Artillery Unit"],
+	"sections": [
+		{"name": "Core", "formations": [
+			{"id": 501, "name": "Leopard C1 Armoured Squadron","pts": 0,"upgrades": [1,2,3,4,5,6,7,8,9,10,11,15,16,20,25,26]},
+			{"id": 502, "name": "M113 Mechanized Company","pts": 0,"upgrades": [30,15,16,35,36]}
+		]},
+
+	    {"name":"Brigade Support","formations":[
+	    	{"id": 510, "name": "M109 Field Battery","pts": 0,"upgrades": [50,51]},
+	    	{"id": 511, "name": "M113 OP","pts": 1, "units": "1x M113 OP"},
+	    	{"id": 512, "name": "Blowpipe M113 Air Defense","pts": 0,"upgrades": [55,56,57]},
+	    	{"id": 513, "name": "ADATS Air Defense","pts": 0,"upgrades": [60,61]}
+
+  	     
+	    ]}
+
+	],
+
+	"upgrades": [
+
+      	{"id": 1, "name": "HQ - 1 Leopard C1", "pts": 4},
+      	{"id": 2, "name": "HQ - 2 Leopard C1", "pts": 7},
+      	{"id": 3, "name": "HQ - 3 Leopard C1", "pts": 10},
+
+      	{"id": 4, "name": "1st Troop - 3 Leopard C1s", "pts": 10},
+      	{"id": 5, "name": "1st Troop - 4 Leopard C1s", "pts": 13},
+      	{"id": 6, "name": "2nd Troop - 3 Leopard C1s", "pts": 10},
+      	{"id": 7, "name": "2nd Troop - 4 Leopard C1s", "pts": 13},
+      	{"id": 8, "name": "3rd Troop - 3 Leopard C1s", "pts": 10},
+      	{"id": 9, "name": "3rd Troop - 4 Leopard C1s", "pts": 13},
+      	{"id": 10, "name": "4th Troop - 3 Leopard C1s", "pts": 10},
+      	{"id": 11, "name": "4th Troop - 4 Leopard C1s", "pts": 13},
+      	
+      	{"id": 15, "name": "M113 Mechanized Platoon","units": "3x C2 SAW Teams, 3x Carl Gustav Teams, 1x C5 GPMG Team, 1x M19 60mm Mortar Team, 4x M113", "pts": 7},
+      	{"id": 16, "name": "M113 Mechanized Platoon","units": "2x C2 SAW Teams, 2x Carl Gustav Teams, 1x C5 GPMG Team, 1x M19 60mm Mortar Team, 3x M113", "pts": 5},
+
+      	{"id": 20, "name": "Lynx Recce Patrol","units": "2x Lynx", "pts": 2},
+
+      	{"id": 25, "name": "M150 TOW AT Section","units": "2x M-150 TOW", "pts": 3},
+      	{"id": 26, "name": "M150 TOW AT Section","units": "3x M-150 TOW", "pts": 4},
+
+      	{"id": 30, "name": "HQ - C1 Rifle Team & M113", "pts": 1},
+      	{"id": 35, "name": "3 Leopard C1s", "pts": 10},
+      	{"id": 36, "name": "4 Leopard C1s", "pts": 13},
+
+      	{"id": 40, "name": "2x M125 Mortar Platoon", "pts": 1},
+      	{"id": 41, "name": "4x M125 Mortar Platoon", "pts": 3},
+      	{"id": 42, "name": "8x M125 Mortar Platoon", "pts": 7},
+
+      	{"id": 50, "name": "3x M109s", "pts": 7},
+      	{"id": 51, "name": "6x M109s", "pts": 14},
+
+      	{"id": 55, "name": "2x ADATS", "pts": 5},
+      	{"id": 56, "name": "4x ADATS", "pts": 10},
+      	{"id": 57, "name": "6x ADATS", "pts": 15},
+
+      	{"id": 60, "name": "3x M113 Blowpipe", "pts": 4},
+      	{"id": 61, "name": "6x M113 Blowpipe", "pts": 8}
+
+
+	],
+
+
+   	"formationConstraints": [
+    	{"max": 3, "min": 0, "from": [501]},
+    	{"max": 4, "min": 0, "from": [502]}
+
+
+
+    ],
+
+
+
+   "upgradeConstraints": [      
+   	    {"max": 1, "min": 1, "from": [1,2,3], "appliesTo": [501]},
+   	    {"max": 1, "min": 1, "from": [4,5], "appliesTo": [501]},
+   	    {"max": 1, "min": 1, "from": [6,7], "appliesTo": [501]},
+   	    {"max": 1, "min": 0, "from": [8,9], "appliesTo": [501]},
+   	    {"max": 1, "min": 0, "from": [10,11], "appliesTo": [501]},
+   	    {"max": 1, "min": 0, "from": [15,16], "appliesTo": [501]},
+   	    {"max": 3, "min": 0, "from": [20], "appliesTo": [501,502]},
+   	    {"max": 1, "min": 0, "from": [25,26], "appliesTo": [501]},
+   	    {"max": 1, "min": 1, "from": [30], "appliesTo": [502]},
+   	    {"max": 3, "min": 2, "from": [15,16], "appliesTo": [502]},
+   	    {"max": 1, "min": 0, "from": [35,36], "appliesTo": [502]},
+   	    {"max": 3, "min": 0, "from": [25,26], "appliesTo": [502]}
+
+
+
+
+   ]
+}
