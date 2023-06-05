@@ -26,15 +26,18 @@
 			{"id": 517, "name": "SA-13 Gopher SAM Platoon", "pts": 0,"upgrades": [30,31]}
 		]},
 	    {"name":"Support","formations":[
-	       {"id":550,"name":"2S1 Carnation SP Howitzer Battery","pts": 0, "upgrades":[49,50]},	     
+	       {"id":550,"name":"2S1 Carnation SP Howitzer Battery","pts": 0, "upgrades":[49,50]},	   
+	       {"id":567,"name":"2S9 NONA-S SP Mortar Battery","pts":0,"upgrades":[130,131]},
 	       {"id":551,"name":"2S3 Acacia Heavy SP Howitzer Battery","pts": 0, "upgrades":[105,106,107,108]},	     
 	       {"id":552,"name":"TOS-1 Thermobaric Rocket Launcher Battery","pts": 0,"upgrades":[109,110]},	     
 	       {"id":553,"name":"BM-21 Hail Rocket Launcher Battery","pts": 0,"upgrades":[95,96]},	            
 	       {"id":554,"name":"BM-27 Hurricane Rocket Launcher Battery","pts": 0,"upgrades":[97,98]},	     
 	       {"id":555,"name":"BMP-1 OP","pts":1,"units":"BMP-1 OP"},	 
+	       {"id":568,"name":"BMD-1 OP","pts":1,"units":"BMD-1 OP"},
 	       {"id":556,"name":"BMP-3 Recon Platoon","pts":0,"upgrades":[40,41,42]},	 
 	       {"id":557,"name":"BMP-2 Recon Platoon","pts":0,"upgrades":[43,44,45]},	 
-	       {"id":558,"name":"BMP-1 Recon Platoon","pts":0,"upgrades":[46,47,48]},	 
+	       {"id":558,"name":"BMP-1 Recon Platoon","pts":0,"upgrades":[46,47,48]},	
+ 	       {"id":569,"name":"BRDM-2 Recon Platoon","pts":0,"upgrades":[140,141]},
 	       {"id":559,"name":"Storm Anti-Tank Platoon","pts":0,"upgrades":[91,92,93,94]},	 
 	       {"id":560,"name":"Spandrel Anti-Tank Platoon","pts":0,"upgrades":[89,90]},	 
 	       {"id":561,"name":"SA-13 Gopher SAM Platoon","pts":0,"upgrades":[30,31]},	 
@@ -42,11 +45,8 @@
 	       {"id":563,"name":"SA-8 Gecko SAM Platoon","pts":0,"upgrades":[99,100]},	 
 	       {"id":564,"name":"MI-24 Assault Helicopter Company","pts":0,"upgrades":[111,112,113,114,115,116]},	 
 	       {"id":565,"name":"SU-25 Frogfoot Aviation Company","pts":0,"upgrades":[101,102,103]},	 
-	       {"id":566,"name":"MI-24 Assault Landing Company","pts":0,"upgrades":[120,121,122,123,124,125]},	 
-	       {"id":567,"name":"2S9 NONA-S SP Mortar Battery","pts":0,"upgrades":[130,131]},
-	       {"id":568,"name":"BMD-1 OP","pts":1,"units":"BMD-1 OP"},
-	       {"id":569,"name":"BRDM-2 Recon Platoon","pts":0,"upgrades":[140,141]},
-	       {"id":570,"name":"SU-17 Fitter Aviation Company","pts":0,"upgrades":[150,151,152,153,154,155]}
+	       {"id":570,"name":"SU-17 Fitter Aviation Company","pts":0,"upgrades":[150,151,152,153,154,155]},	       
+	       {"id":566,"name":"MI-24 Assault Landing Company","pts":0,"upgrades":[120,121,122,123,124,125]}
 
 	    ]}
 	],
