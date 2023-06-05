@@ -42,7 +42,12 @@
 	       {"id":563,"name":"SA-8 Gecko SAM Platoon","pts":0,"upgrades":[99,100]},	 
 	       {"id":564,"name":"MI-24 Assault Helicopter Company","pts":0,"upgrades":[111,112,113,114,115,116]},	 
 	       {"id":565,"name":"SU-25 Frogfoot Aviation Company","pts":0,"upgrades":[101,102,103]},	 
-	       {"id":566,"name":"MI-24 Assault Landing Company","pts":0,"upgrades":[120,121,122,123,124,125]}	 
+	       {"id":566,"name":"MI-24 Assault Landing Company","pts":0,"upgrades":[120,121,122,123,124,125]},	 
+	       {"id":567,"name":"2S9 NONA-S SP Mortar Battery","pts":0,"upgrades":[130,131]},
+	       {"id":568,"name":"BMD-1 OP","pts":1,"units":"BMD-1 OP"},
+	       {"id":569,"name":"BRDM-2 Recon Platoon","pts":0,"upgrades":[140,141]},
+	       {"id":570,"name":"SU-17 Fitter Aviation Company","pts":0,"upgrades":[150,151,152,153,154,155]}
+
 	    ]}
 	],
 
@@ -175,7 +180,21 @@
       	{"id": 122, "name": "4 x AK-74 Teams, 4 x RPG-7 Teams", "pts": 4},
       	{"id": 123, "name": "4 x AK-74 Teams, 4 x RPG-7VR Teams", "pts": 6},
       	{"id": 124, "name": "6 x AK-74 Teams, 6 x RPG-7 Teams", "pts": 6},
-      	{"id": 125, "name": "6 x AK-74 Teams, 6 x RPG-7VR Teams", "pts": 8}		
+      	{"id": 125, "name": "6 x AK-74 Teams, 6 x RPG-7VR Teams", "pts": 8},
+
+      	{"id": 130, "name": "3 x 2S9 NONA-S", "pts": 6},
+      	{"id": 131, "name": "6 x 2S9 NONA-S", "pts": 12},
+
+      	{"id": 140, "name": "2 x BRDM-2", "pts": 1},
+      	{"id": 141, "name": "4 x BRDM-2", "pts": 2},
+
+      	{"id": 150, "name": "2 x SU-17 Fitter", "pts": 2},
+      	{"id": 151, "name": "2 x SU-17 Fitter w/ Kh-25 AGM", "pts": 5},
+      	{"id": 152, "name": "4 x SU-17 Fitter", "pts": 5},
+      	{"id": 153, "name": "4 x SU-17 Fitter w/ Kh-25 AGM", "pts": 11},
+      	{"id": 154, "name": "6 x SU-17 Fitter", "pts": 8},
+      	{"id": 155, "name": "6 x SU-17 Fitter w/ Kh-25 AGM", "pts": 17}
+
 	],
 
 
@@ -189,17 +208,20 @@
     	{"max": 1, "min": 0, "from": [513]},
     	{"max": 1, "min": 0, "from": [514,515]},
     	{"max": 1, "min": 0, "from": [516,517]},
-    	{"max": 1, "min": 0, "from": [550]},
+
+    	{"max": 1, "min": 0, "from": [550,567]},
     	{"max": 1, "min": 0, "from": [551]},
     	{"max": 1, "min": 0, "from": [552]},
     	{"max": 1, "min": 0, "from": [553,554]},
-    	{"max": 1, "perArmy":true, "from": [555]},
-    	{"max": 1, "min": 0, "from": [556,557,558]},
+    	{"max": 1, "perArmy":true, "from": [555,568]},
+    	{"max": 1, "min": 0, "from": [556,557,558,569]},
     	{"max": 1, "min": 0, "from": [559,560]},
     	{"max": 1, "min": 0, "from": [561,562,563]},
     	{"max": 1, "min": 0, "from": [564]},
-    	{"max": 1, "min": 0, "from": [565]},
+    	{"max": 1, "min": 0, "from": [565,570]},
     	{"max": 1, "min": 0, "from": [566]}
+
+
     ],
 
 
@@ -246,7 +268,14 @@
    	    {"max": 1, "min": 1, "from": [105,106,107,108], "appliesTo": [551]},
    	    {"max": 1, "min": 1, "from": [109,110], "appliesTo": [552]},
    	    {"max": 1, "min": 1, "from": [111,112,113,114,115,116], "appliesTo": [564]},
-   	    {"max": 1, "min": 1, "from": [120,121,122,123,124,125], "appliesTo": [566]}
+   	    {"max": 1, "min": 1, "from": [120,121,122,123,124,125], "appliesTo": [566]},
+
+   	    {"max": 1, "min": 1, "from": [130,131], "appliesTo": [567]},
+   	    {"max": 1, "min": 1, "from": [140,141], "appliesTo": [569]},
+   	    {"max": 1, "min": 1, "from": [150,151,152,153,154,155], "appliesTo": [570]}
+
+
+
 
    ]
 }
