@@ -33,7 +33,7 @@
 
 	"upgrades": [
 		{"id": 1, "name": "1 x Challenger", "pts": 11},
-		{"id": 2, "name": "2 x Challenger", "pts": 11},
+		{"id": 2, "name": "2 x Challenger", "pts": 22},
 		{"id": 3, "name": "1 x Challenger (ROMOR)", "pts": 13},
 		{"id": 4, "name": "2 x Challenger (ROMOR)", "pts": 26},
 
