@@ -33,7 +33,7 @@
 	],
 
 	"upgrades": [
-		{"id": 1, "name": "Add up to 2 GPMG Teams for 1 pt each", "pts": 1},
+		{"id": 1, "name": "Add a GPMG Team (adds to a Platoon)", "pts": 1},
 		{"id": 2, "name": "Replace all Warriors with Uparmoured Warriors", "pts": 1},
 
 		{"id": 5, "name": "2 x Challenger", "pts": 22},
@@ -125,7 +125,7 @@
 
 
    "upgradeConstraints": [      
-   	    {"max": 1, "min": 0, "from": [1], "appliesTo": [501]},
+   	    {"max": 2, "min": 0, "from": [1], "appliesTo": [501]},
    	    {"max": 1, "min": 0, "from": [2], "appliesTo": [501]},
 
       	{"max": 1, "min": 1, "from": [5,6,7,8], "appliesTo": [505]},
