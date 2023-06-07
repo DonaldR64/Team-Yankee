@@ -17,21 +17,27 @@
 		]},
 
 	    {"name":"Support","formations":[
-	       {"id":550,"name":"2S1 Carnation SP Howitzer Battery","pts": 0, "upgrades":[49,50]},	     
+	       {"id":550,"name":"2S1 Carnation SP Howitzer Battery","pts": 0, "upgrades":[49,50]},	   
+	       {"id":567,"name":"2S9 NONA-S SP Mortar Battery","pts":0,"upgrades":[130,131]},
 	       {"id":551,"name":"2S3 Acacia Heavy SP Howitzer Battery","pts": 0, "upgrades":[105,106,107,108]},	     
 	       {"id":552,"name":"TOS-1 Thermobaric Rocket Launcher Battery","pts": 0,"upgrades":[109,110]},	     
 	       {"id":553,"name":"BM-21 Hail Rocket Launcher Battery","pts": 0,"upgrades":[95,96]},	            
 	       {"id":554,"name":"BM-27 Hurricane Rocket Launcher Battery","pts": 0,"upgrades":[97,98]},	     
 	       {"id":555,"name":"BMP-1 OP","pts":1,"units":"BMP-1 OP"},	 
+	       {"id":568,"name":"BMD-1 OP","pts":1,"units":"BMD-1 OP"},
 	       {"id":556,"name":"BMP-3 Recon Platoon","pts":0,"upgrades":[40,41,42]},	 
 	       {"id":557,"name":"BMP-2 Recon Platoon","pts":0,"upgrades":[43,44,45]},	 
-	       {"id":558,"name":"BMP-1 Recon Platoon","pts":0,"upgrades":[46,47,48]},	 
+	       {"id":558,"name":"BMP-1 Recon Platoon","pts":0,"upgrades":[46,47,48]},	
+ 	       {"id":569,"name":"BRDM-2 Recon Platoon","pts":0,"upgrades":[140,141]},
 	       {"id":559,"name":"Storm Anti-Tank Platoon","pts":0,"upgrades":[91,92,93,94]},	 
 	       {"id":560,"name":"Spandrel Anti-Tank Platoon","pts":0,"upgrades":[89,90]},	 
 	       {"id":561,"name":"SA-13 Gopher SAM Platoon","pts":0,"upgrades":[30,31]},	 
 	       {"id":562,"name":"SA-9 Gaskin SAM Platoon","pts":0,"upgrades":[32,33]},	 
 	       {"id":563,"name":"SA-8 Gecko SAM Platoon","pts":0,"upgrades":[99,100]},	 
-	       {"id":565,"name":"SU-25 Frogfoot Aviation Company","pts":0,"upgrades":[101,102,103]}	 
+	       {"id":565,"name":"SU-25 Frogfoot Aviation Company","pts":0,"upgrades":[101,102,103]},	 
+	       {"id":570,"name":"SU-17 Fitter Aviation Company","pts":0,"upgrades":[150,151,152,153,154,155]},	       
+	       {"id":566,"name":"MI-24 Assault Landing Company","pts":0,"upgrades":[120,121,122,123,124,125]}
+
 	    ]}
 	],
 
@@ -101,7 +107,22 @@
       	{"id": 113, "name": "6 x Mi-24 Hind", "pts": 15},
       	{"id": 114, "name": "2 x Mi-24 Hind (AT-9)", "pts": 6},
       	{"id": 115, "name": "4 x Mi-24 Hind (AT-9)", "pts": 12},
-      	{"id": 116, "name": "6 x Mi-24 Hind (AT-9)", "pts": 18}
+      	{"id": 116, "name": "6 x Mi-24 Hind (AT-9)", "pts": 18},
+
+      	{"id": 130, "name": "3 x 2S9 NONA-S", "pts": 6},
+      	{"id": 131, "name": "6 x 2S9 NONA-S", "pts": 12},
+
+      	{"id": 140, "name": "2 x BRDM-2", "pts": 1},
+      	{"id": 141, "name": "4 x BRDM-2", "pts": 2},
+
+      	{"id": 150, "name": "2 x SU-17 Fitter", "pts": 2},
+      	{"id": 151, "name": "2 x SU-17 Fitter w/ Kh-25 AGM", "pts": 5},
+      	{"id": 152, "name": "4 x SU-17 Fitter", "pts": 5},
+      	{"id": 153, "name": "4 x SU-17 Fitter w/ Kh-25 AGM", "pts": 11},
+      	{"id": 154, "name": "6 x SU-17 Fitter", "pts": 8},
+      	{"id": 155, "name": "6 x SU-17 Fitter w/ Kh-25 AGM", "pts": 17}
+
+
     ],
 
 
