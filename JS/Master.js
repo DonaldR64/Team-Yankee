@@ -4299,7 +4299,7 @@ log("Mistaken: " + mistaken)
 
                 for (let j=0;j<st.weaponArray.length;j++) {
                     let weapon = st.weaponArray[j];
-                    let overhead = "";
+                    let special = "";
                     if (weaponType === "MG" && weapon.type.includes("MG") === false) {
                         continue;
                     } else if (weaponType !== "MG" && weapon.type !== weaponType) {
@@ -4319,7 +4319,8 @@ log("Mistaken: " + mistaken)
                         } else (limited++);
                     }
 
-                    if (weapon.notes.includes("Overhead")) {overhead = "Overhead"}
+                    if (weapon.notes.includes("Overhead")) {special += ",Overhead"};
+                    if (weapon.notes.includes("NLOS")) {special += ",NLOS"};
                     if (target.type === "Aircraft" && (weapon.notes.includes("AA") === false || weapon.type.includes("AA") === false)) {
                         weaponExclusion = " has No AA Weapon";
                     } 
@@ -4327,7 +4328,7 @@ log("Mistaken: " + mistaken)
                     let initialLOS,tID;
                     for (let t=0;t<targetTeamArray.length;t++) {
                         tID = targetTeamArray[t].id;
-                        initialLOS = LOS(st.id,tID,overhead);
+                        initialLOS = LOS(st.id,tID,special);
                         if (initialLOS.los === true) {
                             break;
                         }
@@ -4408,9 +4409,10 @@ log("Mistaken: " + mistaken)
                 let ttLOS;
                 for (let k=0;k<weapons.length;k++) {
                     let weapon = weapons[k];
-                    let special = "";
-                    if (weapon.notes.includes("Overhead")) {special = "Overhead"};
-                    if (defensive === true) {special = "Defensive"};
+                    let special = " ";
+                    if (weapon.notes.includes("Overhead")) {special += ",Overhead"};
+                    if (weapon.notes.includes("NLOS")) {special += ",NLOS"};
+                    if (defensive === true) {special += ",Defensive"};
                     ttLOS = LOS(st.id,tt.id,special);
                     if (ttLOS.los === false) {continue};
                     if (ttLOS.distance > weapon.maxRange) {continue};
