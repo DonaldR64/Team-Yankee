@@ -72,7 +72,7 @@ const TY = (() => {
         "Hammerhead": "Team with a Hammerhead can remain Gone to Ground while shooting its missile",
         "HEAT": 'Target Armour is not increased for range over 16". Affected by BDD, Skirts, Chobham and ERA Armour',
         "Heavy Weapon": "A Heavy Weapon Team cannot Charge into Contact",
-        "HQ": "Always In Command and ignores Morale Checks. May Spot for Artillery",
+        "HQ": "Always In Command and ignores Morale Checks",
         "Hunter-Killer": "Hunter-Killer Helicopters can use terrain for Concealment and are Gone to Ground unless they Shoot",
         "Independent": "Independent Teams can use the Mistaken Target rule to reassign hits to nearby Units, but cannot Charge into Contact or take an Objective",        
         "Infra-Red": "Rolls 2 Dice for Night Visibility and takes the highest score",
@@ -3851,45 +3851,41 @@ log(outputCard)
                             }
                         }
                     }
-                }
-                if (state.TY.turn === 1) {
-                    GTG(unit);
-                }
-            } else {
-                GTG(unit);
-            }
-            for (let i=0;i<unit.teamIDs.length;i++) {
-                let team = TeamArray[unit.teamIDs[i]];
-                if (unit.player === state.TY.currentPlayer) {
                     team.spotAttempts = 0;
                     team.prevHexLabel = team.hexLabel;
                     team.prevHex = team.hex;
                     team.order = "";
                     team.specialorder = "";
-                } else {
-                    team.aaweapon = "";
+                    team.hitArray = [];
+                    team.eta = [];
+                    team.nightvisibility = 0;
+                    team.moved = false;
+                    team.maxTact = false;
+                    team.fired = false;
                 }
-
-                team.hitArray = [];
-                team.eta = [];
-                team.nightvisibility = 0;
-                team.moved = false;
-                team.fired = false;
+                if (state.TY.turn === 1) {
+                    GTG(unit);
+                }
+                let unitLeader = TeamArray[unit.teamIDs[0]];
+                if (unitLeader) {
+                    unitLeader.token.set("bar3_value",0);
+                    if (unitLeader.bailed === true) {
+                        SwapLeader(unit);
+                    }
+                }
+                unit.order = ""; 
+                unit.specialorder = "";
+            } else {
+                GTG(unit);
+                for (let i=0;i<unit.teamIDs.length;i++) {
+                    let team = TeamArray[unit.teamIDs[i]];
+                    team.hitArray = [];
+                    team.eta = [];
+                    team.nightvisibility = 0;
+                }
             }
-
-
-
-            unit.order = ""; 
-            unit.specialorder = "";
             unit.limited = 0;
             unit.size = unit.teamIDs.length;
-            let unitLeader = TeamArray[unit.teamIDs[0]];
-            if (unitLeader) {
-                unitLeader.token.set("bar3_value",0);
-                if (unitLeader.bailed === true) {
-                    SwapLeader(unit);
-                }
-            }
         }
     }
 
@@ -6447,6 +6443,10 @@ log("2nd Row to " + team3.name)
                     if (team.hexLabel !== team.prevHexLabel) {
                         if (team.moved === false) {
                             team.moved = true;
+                            let dist = team.hex.distance(team.prevHex);
+                            if (dist > 10) {
+                                team.maxTact = true;
+                            }
                             if (team.order === "Tactical") {
                                 team.addCondition("Tactical")
                             } else if (team.order === "Dash") {
@@ -6458,6 +6458,7 @@ log("2nd Row to " + team3.name)
                     } else if (team.hexLabel === team.prevHexLabel) {
                         if (team.moved === true) {
                             team.moved = false;
+                            team.maxTact = false;
                             if (team.order === "Hold" && team.fired === false) {
                                 team.addCondition("GTG")
                                 team.gonetoground = true;
