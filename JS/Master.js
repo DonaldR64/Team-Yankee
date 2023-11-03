@@ -1780,6 +1780,7 @@ log(hit)
             barrageID: "",
             BarrageInfo: [],
             smokeScreens: [[],[]],
+            minelets: [[],[]],
             conditions: {},
             teams: {}, //teamIDs -> unit and formation IDs
             formations: {}, //formationIDs -> name
@@ -5174,7 +5175,7 @@ log(artUnits)
         let barrageID = Tag[1];
         let observerID = Tag[2];
         let artUnitID = Tag[3];
-        let ammoType = Tag[4]; //Normal, Smoke Bombardment
+        let ammoType = Tag[4]; //Normal, Smoke Bombardment, Minelets, Bomblets
         let direction = Tag[5]; //in Smoke Bombardment
         let barrageTeam = TeamArray[barrageID];
         let observerTeam = TeamArray[observerID];
@@ -5336,6 +5337,8 @@ log(artUnits)
     
         weaponName = weapon.name;
         let extra = "";
+        if (ammoType === "Bomblets") {extra = "DPICM Rounds with "};
+        if (ammoType === "Minelets") {extra = "Scatterable Minelets with "};
         if (ammoType === "Smoke Bombardment") {extra = "Smoke Screen with "};
     
         outputCard.body.push("Firing " + extra + weaponName)
@@ -5391,7 +5394,16 @@ log(artUnits)
                 SmokeScreen(targetHex,num,direction,artilleryUnit.player);
                 state.TY.smokeScreens[artilleryUnit.player].push(artilleryUnit.id); //tracks that unit fired its one smoke bombardment
                 outputCard.body.push("Smoke Screen successfully placed");
-                RemoveBarrageToken()
+                RemoveBarrageToken();
+                PrintCard();
+                return;
+            } else if (ammoType === "Minelets") {
+                let num = Math.ceil(gunNum/3);
+                let s = "";
+                if (num > 1) {s = "s"};
+                outputCard.body.push("Place " + num + ' Minefield Marker' + s + ' within 2" of the Ranged In Target and Activate Them');
+                state.TY.minelets[currentPlayer].push(artilleryUnit.id);
+                unitFiredThisTurn = true;
                 PrintCard();
                 return;
             } else {
