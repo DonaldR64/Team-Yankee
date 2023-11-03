@@ -4496,7 +4496,7 @@ log(weapons)
                     toHit++;
                     toHitTips += "<br>Slow Firing & Moved +1";
                 }
-                if (weapon.notes.includes("Stabiliser") && weapon.notes.includes("Advanced Stabiliser") === false && team.movement > 10) {
+                if (weapon.notes.includes("Stabiliser") && weapon.notes.includes("Advanced Stabiliser") === false && team.maxTact === true) {
                     toHit += 1;
                     toHitTips.push("+1 for Stabiliser")
                 }
