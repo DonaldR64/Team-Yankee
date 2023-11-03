@@ -30,7 +30,7 @@
             {"id": 518, "name": "M48 Chaparral SAM Platoon","pts": 0,"upgrades": [140,141]},
             {"id": 519, "name": "Redeye SAM Platoon","pts": 0,"upgrades": [135,136]},
             {"id": 520, "name": "AH-1 Viper Attack Helicopter Platoon","pts": 0,"upgrades": [150,151]}, 
-            {"id": 521, "name": "Skyhawk Fighter Flight","pts": 0,"upgrades": [145,146]},
+            {"id": 521, "name": "Skyhawk Fighter Flight","pts": 0,"upgrades": [145,146]}
 
 	    ]}
 
