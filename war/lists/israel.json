@@ -101,7 +101,7 @@
         {"id": 102, "name": "4x M106 (120mm)", "pts": 4},
 
         {"id": 110, "name": "3x M109 (155mm)", "pts": 7},
-        {"id": 111, "name": "6x M109 (155mm)", "pts": 7},
+        {"id": 111, "name": "6x M109 (155mm)", "pts": 14},
 
         {"id": 115, "name": "2 x Jeep (TOW)", "pts": 3},
         {"id": 116, "name": "4 x Jeep (TOW)", "pts": 6},
