@@ -4318,6 +4318,26 @@ log("Mistaken: " + mistaken)
                             continue;
                         } else (limited++);
                     }
+                    if (weapon.notes.includes("Mounted") && state.TY.passengers[st.id]) {
+                        //check if passenger has weapon with name eg Dragon
+                        let check = false;
+                        let substrings = weapon.name.split(" ");
+                        let passengers = state.TY.passengers[st.id];
+                        ploop1:
+                        for (let p=0;p<passengers.length;p++) {
+                            let passengerTeam = TeamArray[passengers[p]];
+                            for (let w=0;w<passengerTeam.weaponArray.length;w++) {
+                                let wnam = passengerTeam.weaponArray[w].name;
+                                for (let s=0;s<substrings.length;s++) {
+                                    if (wnam.includes(substrings[s])) {
+                                        check = true;
+                                        break ploop1;
+                                    }
+                                }
+                            }
+                        }
+                        if (check === false) {continue};
+                    }
 
                     if (weapon.notes.includes("Overhead")) {special += ",Overhead"};
                     if (weapon.notes.includes("NLOS")) {special += ",NLOS"};
