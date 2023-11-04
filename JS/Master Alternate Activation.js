@@ -3553,15 +3553,14 @@ log(hit)
     }
 
 
-    const AdvanceStep = () => {
+    const NewTurn = () => {
         RemoveLines();
+        RemoveBarrageToken();
         if (state.TY.nations[0].length === 0 && state.TY.nations[1].length === 0) {
             sendChat("","No Units Created Yet");
             return;
         }
         let turn = state.TY.turn;
-        let currentStep = state.TY.step;
-        let steps = ["Start","Movement","Shooting","Assault"];
         if (turn === 0) {
             for (let p=0;p<2;p++) {
                 let num = 100 + parseInt(p);
@@ -3580,21 +3579,12 @@ log(hit)
             }
 
             turn = 1;
-            currentStep = "Start";
         } else {
-            let num = steps.indexOf(currentStep);
-            num += 1;
-            if (num >= steps.length) {
-                num = 0;
-                if (state.TY.currentPlayer !== parseInt(state.TY.startingPlayer)) {
-                    turn++;
-                }
-                state.TY.currentPlayer = (state.TY.currentPlayer === 0) ? 1:0;
-            };
-            currentStep = steps[num];
+            turn++;
+            state.TY.turn = turn;
         }
 
-        if ((state.TY.timeOfDay === "Dawn" || state.TY.timeOfDay === "Dusk") && currentPlayer === state.TY.firstPlayer && turn > 2) {
+        if ((state.TY.timeOfDay === "Dawn" || state.TY.timeOfDay === "Dusk") && turn > 2) {
             let numDice = turn - 2;
             let flip = false;
             for (let i=0;i<numDice;i++) {
@@ -3627,95 +3617,54 @@ log(hit)
         }
 
         state.TY.turn = turn;
-        state.TY.step = currentStep;
-        currentPlayer = state.TY.currentPlayer;
+        if (state.TY.darkness === true) {
+            pageInfo.page.set({
+                dynamic_lighting_enabled: true,
+                daylight_mode_enabled: true,
+                daylightModeOpacity: 0.1,
+            })
+        } else {
+            pageInfo.page.set("dynamic_lighting_enabled",false);
+        }
+        StartStep("ResLeaders");
 
-        let playerNation = state.TY.nations[state.TY.currentPlayer][0];
-        if (state.TY.nations[state.TY.currentPlayer].length > 1) {
-            playerNation = (WarsawPact.includes(state.TY.nations[state.TY.currentPlayer][0])) ? "Warsaw Pact":"NATO";
-        }
-
-        if (currentStep === "Start") {
-            if (state.TY.darkness === true) {
-                pageInfo.page.set({
-                    dynamic_lighting_enabled: true,
-                    daylight_mode_enabled: true,
-                    daylightModeOpacity: 0.1,
-                })
-            } else {
-                pageInfo.page.set("dynamic_lighting_enabled",false);
-            }
-            StartStep("ResLeaders");
-        }
-        if (currentStep === "Movement") {
-            SetupCard("Turn: " + state.TY.turn,"Movement Step",playerNation);
-            outputCard.body.push("Activate Units");
-            outputCard.body.push("Special Orders if Desired");
-            outputCard.body.push("Move any or all units");
-            PrintCard();
-        }
-        if (currentStep === "Shooting") {
-            inCommand(state.TY.currentPlayer);
-            ResetAuras(state.TY.currentPlayer);
-            SetupCard("Turn: " + state.TY.turn,"Shooting Step",playerNation);
-            outputCard.body.push("Anti-Aircraft Fire");
-            outputCard.body.push("Direct Fire");
-            outputCard.body.push("Bombardments");
-            PrintCard();
-        }
-        if (currentStep === "Assault") {
-            RemoveBarrageToken();
-            ResetAuras(state.TY.currentPlayer);
-            assaultingUnitID = "";
-            CCTeamIDs = [];
-            SetupCard("Turn: " + state.TY.turn,"Assault Step",playerNation);
-            outputCard.body.push("Units that have Assault Orders can Charge Into Contact");
-            outputCard.body.push("Resolve Close Combats One Unit at a Time")
-            outputCard.body.push("Defensive Fire")
-            outputCard.body.push("Then conduct Assaults");
-            PrintCard();
-        }
     }
 
     const StartStep = (pass) => {
-        let currentPlayer = parseInt(state.TY.currentPlayer);
-        let nat = state.TY.nations[currentPlayer][0];  
-        let side = ["Warsaw Pact","NATO"];
-        if (state.TY.nations[currentPlayer].length > 1) {
-            nat = side[currentPlayer];
-        }  
-
         if (pass === "ResLeaders") {
             CheckArray = [];
-            //check if a formation HQ for the player is dead
-            let formationIDs = deadHQs[currentPlayer];
-            for (let i=0;i<formationIDs.length;i++) {
-                let formation = FormationArray[formationIDs[i]];
-                if (formation) {
-                    let eligibleUnitIDs = formation.unitIDs;
-                    let team;
-                    let possibleTeams = [];
-                    for (let i=0;i<eligibleUnitIDs.length;i++) {
-                        let unit = UnitArray[eligibleUnitIDs[i]];
-                        let unitLeader = TeamArray[unit.teamIDs[0]];
-                        if (unitLeader.special.includes("Transport")) {continue};
-                        if ((unit.teamIDs.length > (lastStandCount[unit.type] + 1)) || unit.teamIDs.length === 1) {
-                            team = unitLeader;
-                            break;
-                        } else {
-                            possibleTeams.push(unitLeader);
+            for (let p=0;p<2;p++) {
+                //check if a formation HQ for the player is dead
+                let formationIDs = deadHQs[p];
+                for (let i=0;i<formationIDs.length;i++) {
+                    let formation = FormationArray[formationIDs[i]];
+                    if (formation) {
+                        let eligibleUnitIDs = formation.unitIDs;
+                        let team;
+                        let possibleTeams = [];
+                        for (let i=0;i<eligibleUnitIDs.length;i++) {
+                            let unit = UnitArray[eligibleUnitIDs[i]];
+                            let unitLeader = TeamArray[unit.teamIDs[0]];
+                            if (unitLeader.special.includes("Transport")) {continue};
+                            if ((unit.teamIDs.length > (lastStandCount[unit.type] + 1)) || unit.teamIDs.length === 1) {
+                                team = unitLeader;
+                                break;
+                            } else {
+                                possibleTeams.push(unitLeader);
+                            }
                         }
-                    }
-                    if (team === undefined && possibleTeams.length > 0) {
-                        team = possibleTeams[0];
-                    }
-                    if (team !== undefined) {
-                        CheckArray.push(team);
+                        if (team === undefined && possibleTeams.length > 0) {
+                            team = possibleTeams[0];
+                        }
+                        if (team !== undefined) {
+                            CheckArray.push(team);
+                        }
                     }
                 }
             }
+
             if (CheckArray.length > 0) {
-                SetupCard("Field Promotions","",nat);
+                SetupCard("Field Promotions","","Neutral");
                 ButtonInfo("Start","!FieldPromotions");
                 PrintCard();            
             } else {
@@ -3723,12 +3672,12 @@ log(hit)
             }
         }
         if (pass === "Remount") {
-            deadHQs[currentPlayer] = [];
+            deadHQs = [[],[]];
             CheckArray = [];
             let keys = Object.keys(UnitArray); 
             for (let i=0;i<keys.length;i++) {
                 let unit = UnitArray[keys[i]];
-                if (unit.type !== "Tank" || unit.player !== state.TY.currentPlayer) {continue};
+                if (unit.type !== "Tank") {continue};
                 let ids = unit.teamIDs;
                 for (let j=0;j<ids.length;j++) {
                     let team = TeamArray[ids[j]];
@@ -3738,7 +3687,7 @@ log(hit)
                 }
             }
             if (CheckArray.length > 0) {
-                SetupCard("Remount Checks","",nat);
+                SetupCard("Remount Checks","","Neutral");
                 ButtonInfo("Start Remount Checks","!RemountChecks");
                 PrintCard();            
             } else {
@@ -3750,7 +3699,7 @@ log(hit)
             let keys = Object.keys(UnitArray);
             for (let i=0;i<keys.length;i++) {
                 let unit = UnitArray[keys[i]];
-                if (unit.player !== state.TY.currentPlayer || (unit.type !== "Infantry" && unit.type !== "Unarmoured Tank" && unit.type !== "Gun")) {continue};
+                if ((unit.type !== "Infantry" && unit.type !== "Unarmoured Tank" && unit.type !== "Gun")) {continue};
                 let unitLeader = TeamArray[unit.teamIDs[0]];
                 if (!unitLeader) {
                     log("No Unit Leader for this unit: " + unit.name);
@@ -3782,7 +3731,7 @@ log(hit)
                     log(unit)
                     continue;
                 }
-                if (unit.player !== state.TY.currentPlayer || unitLeader.special.includes("HQ") || unitLeader.token.get(SM.HQ) === true || unitLeader.special.includes("Independent")) {continue};
+                if ( unitLeader.special.includes("HQ") || unitLeader.token.get(SM.HQ) === true || unitLeader.special.includes("Independent")) {continue};
                 let count = 0;
                 let ids = unit.teamIDs;
                 for (let j=0;j<ids.length;j++) {
@@ -3826,11 +3775,12 @@ log(hit)
         }
         if (pass === "Final") {
             SetupCard("Turn: " + state.TY.turn,"Starting Step",nat);
-            ClearSmoke();
+            ClearSmoke("Smokescreens");
             RemoveFoxholes();
-            ResetFlags();
-            if (state.TY.turn === 1 && state.TY.currentPlayer === state.TY.startingPlayer) {
-                outputCard.body.push("Aircraft cannot Arrive this turn");
+            //ResetFlags();
+            if (state.TY.turn === 1 && state.TY.gametype === "Meeting Engagement") {
+                outputCard.body.push("Aircraft cannot Arrive this turn");                
+                outputCard.body.push("Helicopters must Loiter this turn");
                 outputCard.body.push("All Teams are treated as having moved in the Shooting Step");
                 outputCard.body.push("No Artillery Bombardments this turn");
             } else {
@@ -3839,15 +3789,52 @@ log(hit)
                 outputCard.body.push("2 - Roll for Reserves");
                 outputCard.body.push("3 - Roll for Strike Aircraft");
             }
+            let firstNation;
+            if (state.TY.gametype === "Meeting Engagement") {
+                //roll to see who starts
+                let roll = randomInteger(2) - 1;
+                firstNation = state.TY.nations[roll][0];
+            } else {
+                firstNation = state.TY.nations[state.TY.startingPlayer][0]
+            }
+            outputCard.body.push("[hr]");
+            outputCard.body.push(6,firstNation,36);
+            outputCard.body.push(firstNation + " has the First Activation");
             PrintCard();
         }
     }
 
     const ResetFlags = () => {
+/*
+
         let keys = Object.keys(UnitArray);
         for (let j=0;j<keys.length;j++) {
             let unit = UnitArray[keys[j]];
             let conditions = ["Dash","Tactical","Hold","Assault","Fired","AAFire","Radio"];
+            for (let k=0;k<unit.teamIDs.length;k++) {
+                let team = TeamArray[unit.teamIDs[k]];
+                if (state.TY.conditions[team.id]) {
+                    for (let c=0;c<conditions.length;c++) {
+                        if (state.TY.conditions[team.id][conditions[c]]) {
+                            team.removeCondition(conditions[c]);
+                        }
+                    }
+                }
+                team.spotAttempts = 0;
+                team.prevHexLabel = team.hexLabel;
+                team.prevHex = team.hex;
+                team.order = "";
+                team.specialorder = "";
+                team.hitArray = [];
+                team.eta = [];
+                team.nightvisibility = 0;
+                team.moved = false;
+                team.maxTact = false;
+                team.fired = false;
+            }
+
+
+
             if (unit.player === state.TY.currentPlayer) {
                 for (let k=0;k<unit.teamIDs.length;k++) {
                     let team = TeamArray[unit.teamIDs[k]];
@@ -3894,6 +3881,7 @@ log(hit)
             unit.limited = 0;
             unit.size = unit.teamIDs.length;
         }
+*/
     }
 
     const GTG = (unit) => {
@@ -4171,19 +4159,6 @@ log(hit)
             }
         }
         return reroll;
-    }
-
-    const Komissar = (unit) => {
-        let komCheck = false;
-        //returns true if unit has a Komissar who is in command
-        let leader = TeamArray[unit.teamIDs[0]];
-        for (let i=0;i<unit.teamIDs.length;i++) {
-            let team = TeamArray[unit.teamIDs[i]];
-            if (team.special.includes("Komissar") && team.inCommand === true) {
-                komCheck = true;
-            }
-        }
-        return komCheck;
     }
 
     const Shooting = (msg) => {
@@ -5428,7 +5403,7 @@ log(artUnits)
     
             if (ammoType === "Smoke Bombardment") {
                 let num = gunNum * 4;
-                SmokeScreen(targetHex,num,direction,artilleryUnit.player);
+                SmokeScreen(targetHex,num,direction,artilleryUnit.id);
                 state.TY.smokeScreens[artilleryUnit.player].push(artilleryUnit.id); //tracks that unit fired its one smoke bombardment
                 outputCard.body.push("Smoke Screen successfully placed");
                 RemoveBarrageToken();
@@ -5607,7 +5582,7 @@ log(marker);
         });
     }
 
-    const SmokeScreen = (targetHex,number,direction,player) => {
+    const SmokeScreen = (targetHex,number,direction,unitID) => {
         let currentHex = targetHex;
         for (let i=0;i<number;i++) {
             let rotation = randomInteger(12) * 30;
@@ -5630,7 +5605,7 @@ log(marker);
             let sInfo = {
                 hexLabel: currentHex.label(),
                 id: newToken.id,
-                player: player,
+                type: "Smokescreen",
             }
             SmokeArray.push(sInfo); 
             hexMap[currentHex.label()].smokescreen = true;
@@ -5639,15 +5614,12 @@ log(marker);
         }   
     }
 
-    const ClearSmoke = () => {
+    const ClearSmoke = (type) => {
         let newSmoke = []
         for (let i=0;i<SmokeArray.length;i++) {
             let info = SmokeArray[i];
             let hexLabel = info.hexLabel;
-            let player = parseInt(info.player);
-            if (player !== state.TY.currentPlayer) {
-                newSmoke.push(info);
-            } else {
+            if (type === info.type) {
                 if (hexMap[hexLabel]) {
                     hexMap[hexLabel].smoke = false;
                     hexMap[hexLabel].smokescreen = false;
@@ -5658,12 +5630,14 @@ log(marker);
                 } else {
                     token.remove();
                 }
+            } else {
+                newSmoke.push(info);
             }
         }
         SmokeArray = newSmoke;
     }
 
-    const DirectSmoke = (team) => {
+    const DirectSmoke = (team,unitID) => {
         //place smoke on team
         let location = team.location;
         let rotation = randomInteger(12) * 30;
@@ -5688,7 +5662,7 @@ log(marker);
         let sInfo = {
             hexLabel: team.hexLabel,
             id: newToken.id, //id of the Smoke token, can be used to remove later
-            player: currentPlayer,
+            type: unitID,
         }
         SmokeArray.push(sInfo);
     }
@@ -6638,8 +6612,8 @@ log("2nd Row to " + team3.name)
             case '!Cross':
                 Cross(msg);
                 break;
-            case '!AdvanceStep':
-                AdvanceStep();
+            case '!NewTurn':
+                NewTurn();
                 break;
             case '!RemountChecks':
                 RemountChecks();
