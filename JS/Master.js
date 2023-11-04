@@ -6605,9 +6605,6 @@ log("2nd Row to " + team3.name)
             case '!TokenInfo':
                 TokenInfo(msg);
                 break;
-            case '!CheckLOS':
-                CheckLOS(msg);
-                break;
             case '!ClearState':
                 ClearState();
                 break;
