@@ -5,9 +5,9 @@
 	"notes": ["For any OP Must Field Artillery Unit"],
 	"sections": [
 		{"name": "Core Brigade Formations", "formations": [
-			{"id": 501, "name": "T-72M Tank Battalion","pts": 0,"upgrades": [10,11,12,13,14,15,16,17,18,20,21,22,23,24,25,26,27,28,30,31,32,33,34,35,36,37,38]},
-			{"id": 502, "name": "T-62 Tank Battalion","pts": 0,"upgrades": []},
-            {"id": 503, "name": "T-55 Tank Battalion","pts": 0,"upgrades": []},
+			{"id": 501, "name": "T-72M Tank Battalion","pts": 0,"upgrades": [1,10,11,12,13,14,15,16,17,18]},
+			{"id": 502, "name": "T-62 Tank Battalion","pts": 0,"upgrades": [41,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67]},
+            {"id": 503, "name": "T-55 Tank Battalion","pts": 0,"upgrades": [71,72,75,76,77,78,79,80,81,85,86,87,88,89,90,9195,96,97,98,99,100,101]},
             {"id": 504, "name": "BMP-1 Mech Battalion","pts": 0,"upgrades": []},
             {"id": 505, "name": "BTR Mech Battalion","pts": 0,"upgrades": []}
 		]},
@@ -32,35 +32,75 @@
 
       	{"id": 1, "name": "HQ - 1 T-72M", "pts": 3},
 
-      	{"id": 10, "name": "1st Company - 3x T-72M", "pts": 7},
-      	{"id": 11, "name": "1st Company - 4x T-72M", "pts": 10},
-      	{"id": 12, "name": "1st Company - 5x T-72M", "pts": 13},
-      	{"id": 13, "name": "1st Company - 6x T-72M", "pts": 16},
-      	{"id": 14, "name": "1st Company - 7x T-72M", "pts": 20},
-      	{"id": 15, "name": "1st Company - 8x T-72M", "pts": 24},
-      	{"id": 16, "name": "1st Company - 9x T-72M", "pts": 28},
-      	{"id": 17, "name": "1st Company - 10x T-72M", "pts": 32},
-      	{"id": 18, "name": "1st Co: Fit up to 3 tanks with Mine Clearing Devices for +1 point", "pts": 1},
+      	{"id": 10, "name": "Company: 3x T-72M", "pts": 7},
+      	{"id": 11, "name": "Company: 4x T-72M", "pts": 10},
+      	{"id": 12, "name": "Company: 5x T-72M", "pts": 13},
+      	{"id": 13, "name": "Company: 6x T-72M", "pts": 16},
+      	{"id": 14, "name": "Company: 7x T-72M", "pts": 20},
+      	{"id": 15, "name": "Company: 8x T-72M", "pts": 24},
+      	{"id": 16, "name": "Company: 9x T-72M", "pts": 28},
+      	{"id": 17, "name": "Company: 10x T-72M", "pts": 32},
+      	{"id": 18, "name": "Any Company: Fit up to 3 tanks with Mine Clearing Devices for +1 point", "pts": 1},
 
-        {"id": 20, "name": "2nd Company - 3x T-72M", "pts": 7},
-      	{"id": 21, "name": "2nd Company - 4x T-72M", "pts": 10},
-      	{"id": 22, "name": "2nd Company - 5x T-72M", "pts": 13},
-      	{"id": 23, "name": "2nd Company - 6x T-72M", "pts": 16},
-      	{"id": 24, "name": "2nd Company - 7x T-72M", "pts": 20},
-      	{"id": 25, "name": "2nd Company - 8x T-72M", "pts": 24},
-      	{"id": 26, "name": "2nd Company - 9x T-72M", "pts": 28},
-      	{"id": 27, "name": "2nd Company - 10x T-72M", "pts": 32},
-      	{"id": 28, "name": "2nd Co: Fit up to 3 tanks with Mine Clearing Devices for +1 point", "pts": 1},
+        {"id": 41, "name": "HQ - 1 T-62", "pts": 2},
 
-        {"id": 30, "name": "3rd Company - 3x T-72M", "pts": 7},
-      	{"id": 31, "name": "3rd Company - 4x T-72M", "pts": 10},
-      	{"id": 32, "name": "3rd Company - 5x T-72M", "pts": 13},
-      	{"id": 33, "name": "3rd Company - 6x T-72M", "pts": 16},
-      	{"id": 34, "name": "3rd Company - 7x T-72M", "pts": 20},
-      	{"id": 35, "name": "3rd Company - 8x T-72M", "pts": 24},
-      	{"id": 36, "name": "3rd Company - 9x T-72M", "pts": 28},
-      	{"id": 37, "name": "3rd Company - 10x T-72M", "pts": 32},
-      	{"id": 38, "name": "3rd Co: Fit up to 3 tanks with Mine Clearing Devices for +1 point", "pts": 1}
+      	{"id": 50, "name": "1st Company - 5x T-62", "pts": 7},
+      	{"id": 51, "name": "1st Company - 6x T-62", "pts": 8},
+      	{"id": 52, "name": "1st Company - 7x T-62", "pts": 9},
+      	{"id": 53, "name": "1st Company - 8x T-62", "pts": 11},
+      	{"id": 54, "name": "1st Company - 9x T-62", "pts": 13},
+      	{"id": 55, "name": "1st Company - 10x T-62", "pts": 15},
+
+        {"id": 56, "name": "2nd Company - 5x T-62", "pts": 7},
+      	{"id": 57, "name": "2nd Company - 6x T-62", "pts": 8},
+      	{"id": 58, "name": "2nd Company - 7x T-62", "pts": 9},
+      	{"id": 59, "name": "2nd Company - 8x T-62", "pts": 11},
+      	{"id": 60, "name": "2nd Company - 9x T-62", "pts": 13},
+      	{"id": 61, "name": "2nd Company - 10x T-62", "pts": 15},
+
+        {"id": 62, "name": "3rd Company - 5x T-62", "pts": 7},
+      	{"id": 63, "name": "3rd Company - 6x T-62", "pts": 8},
+      	{"id": 64, "name": "3rd Company - 7x T-62", "pts": 9},
+      	{"id": 65, "name": "3rd Company - 8x T-62", "pts": 11},
+      	{"id": 66, "name": "3rd Company - 9x T-62", "pts": 13},
+      	{"id": 67, "name": "3rd Company - 10x T-62", "pts": 15},
+
+        {"id": 71, "name": "HQ - 1 T-55", "pts": 1},
+        {"id": 72, "name": "Fit with Skirts", "pts": 1},
+
+        {"id": 75, "name": "1st Company - 5x T-55", "pts": 5},
+        {"id": 76, "name": "1st Company - 6x T-5", "pts": 6},
+        {"id": 77, "name": "1st Company - 7x T-55", "pts": 7},
+        {"id": 78, "name": "1st Company - 8x T-55", "pts": 9},
+        {"id": 79, "name": "1st Company - 9x T-55", "pts": 10},
+        {"id": 80, "name": "1st Company - 10x T-5", "pts": 11},
+        {"id": 81, "name": "1st Co: Fit all with Skirts", "pts": 1},
+
+        {"id": 85, "name": "2nd Company - 5x T-55", "pts": 5},
+        {"id": 86, "name": "2nd Company - 6x T-5", "pts": 6},
+        {"id": 87, "name": "2nd Company - 7x T-55", "pts": 7},
+        {"id": 88, "name": "2nd Company - 8x T-55", "pts": 9},
+        {"id": 89, "name": "2nd Company - 9x T-55", "pts": 10},
+        {"id": 90, "name": "2nd Company - 10x T-5", "pts": 11},
+        {"id": 91, "name": "2nd Co: Fit all with Skirts", "pts": 1},
+
+        {"id": 95, "name": "3rd Company - 5x T-55", "pts": 5},
+        {"id": 96, "name": "3rd Company - 6x T-5", "pts": 6},
+        {"id": 97, "name": "3rd Company - 7x T-55", "pts": 7},
+        {"id": 98, "name": "3rd Company - 8x T-55", "pts": 9},
+        {"id": 99, "name": "3rd Company - 9x T-55", "pts": 10},
+        {"id": 100, "name": "3rd Company - 10x T-5", "pts": 11},
+        {"id": 101, "name": "3rd Co: Fit all with Skirts", "pts": 1},
+
+        {"id": 115, "name": "AA Company: 2x ZSU-23-4 Shilka", "pts": 2},
+        {"id": 116, "name": "AA Company: 4x ZSU-23-4 Shilka", "pts": 4},
+        {"id": 117, "name": "AA Company: 2x ZSU-57-2", "pts": 1},
+        {"id": 118, "name": "AA Company: 4x ZSU-57-2", "pts": 2}
+
+
+
+
+
 
 
 
@@ -89,15 +129,22 @@
 
    "upgradeConstraints": [      
         {"max": 1, "min": 1, "from": [1], "appliesTo": [501]},
-        {"max": 1, "min": 1, "from": [10,11,12,13,14,15,16,17], "appliesTo": [501]},
-        {"max": 1, "min": 0, "from": [18], "appliesTo": [501]},
+        {"max": 3, "min": 2, "from": [10,11,12,13,14,15,16,17], "appliesTo": [501]},
+        {"max": 3, "min": 0, "from": [18], "appliesTo": [501]},
 
-        {"max": 1, "min": 1, "from": [20,21,22,23,24,25,26,27], "appliesTo": [501]},
-        {"max": 1, "min": 0, "from": [28], "appliesTo": [501]},
+        {"max": 1, "min": 1, "from": [41], "appliesTo": [502]},
+        {"max": 1, "min": 1, "from": [50,51,52,53,54,55], "appliesTo": [502]},
+        {"max": 1, "min": 1, "from": [56,57,58,59,60,61], "appliesTo": [502]},
+        {"max": 1, "min": 0, "from": [62,63,64,65,66,67], "appliesTo": [502]},
 
-        {"max": 1, "min": 1, "from": [1], "appliesTo": [501]},
-        {"max": 1, "min": 1, "from": [30,31,32,33,34,35,36,37], "appliesTo": [501]},
-        {"max": 1, "min": 0, "from": [38], "appliesTo": [501]}
+        {"max": 1, "min": 1, "from": [71], "appliesTo": [503]},
+        {"max": 1, "min": 1, "from": [75,76,77,78,79,80], "appliesTo": [503]},
+        {"max": 1, "min": 1, "from": [85,86,87,88,89,90], "appliesTo": [503]},
+        {"max": 1, "min": 0, "from": [95,96,97,98,99,100], "appliesTo": [503]},
+        {"max": 1, "min": 0, "from": [81], "appliesTo": [503]},
+        {"max": 1, "min": 0, "from": [91], "appliesTo": [503]},
+        {"max": 1, "min": 0, "from": [101], "appliesTo": [503]}
+
 
 
    ]
