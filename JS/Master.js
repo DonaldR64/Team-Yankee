@@ -6433,8 +6433,14 @@ log("2nd Row to " + team3.name)
                 }
                 let type = attributeArray.type;
                 if (type === "Infantry") {return};
-                
-
+                tactical = Math.round(parseInt(attributeArray.tactical)/2);
+                terraindash = Math.round(parseInt(attributeArray.terrain)/2);
+                countrydash = Math.round(parseInt(attributeArray.country)/2);
+                roaddash = Math.round(parseInt(attributeArray.road)/2);
+                AttributeSet(char.id,"tactical",tactical);
+                AttributeSet(char.id,"terrain",terraindash);
+                AttributeSet(char.id,"country",countrydash);
+                AttributeSet(char.id,"road",roaddash);
             }
         })
         
