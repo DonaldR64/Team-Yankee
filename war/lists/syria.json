@@ -21,8 +21,15 @@
 		]},
 
 	    {"name": "Corps Level Support","formations":[
-	    	
-
+            {"id": 530, "name": "2S1 Carnation Battery","pts": 0,"upgrades": [120,121]},
+            {"id": 531, "name": "BM-21 Hail Rocket Battery","pts": 0,"upgrades": [150,151]},
+            {"id": 532, "name": "2S3 Acacia Battery","pts": 0,"upgrades": [140,141]},
+            {"id": 533, "name": "BTR-60 OP","pts": 1},
+            {"id": 534, "name": "Spandrel AT Platoon","pts": 0,"upgrades": [125,126]},
+            {"id": 535, "name": "BRDM-2 Scout Platoon","pts": 0,"upgrades": [130,131]},
+            {"id": 536, "name": "AA Platoon","pts": 0,"upgrades": [160,161,165,166,170,171]},
+            {"id": 537, "name": "Helicopter Company","pts": 0,"upgrades": [180,181,190,191]},
+            {"id": 538, "name": "SU-25 Frogfoot Company","pts": 0,"upgrades": [200,201,202]}
 	    ]}
 
 	],
@@ -85,9 +92,35 @@
         {"id": 121, "name": "Howitzer Battery: 6x 2S1 Carnations", "pts": 8},
 
         {"id": 125, "name": "AT Platoon: 2x Spandrel", "pts": 1},
-        {"id": 126, "name": "AT Platoon: 3x Spandrel", "pts": 2}
+        {"id": 126, "name": "AT Platoon: 3x Spandrel", "pts": 2},
 
+        {"id": 130, "name": "2x BRDM Scouts", "pts": 1},
+        {"id": 131, "name": "4x BRDM Scouts", "pts": 2},
 
+        {"id": 140, "name": "Howitzer Battery: 3x 2S3 Acacia", "pts": 4},
+        {"id": 141, "name": "Howitzer Battery: 6x 2S3 Acacia", "pts": 9},
+
+        {"id": 150, "name": "3x BM-21 HAIL", "pts": 3},
+        {"id": 151, "name": "6x BM-21 HAIL", "pts": 6},
+
+        {"id": 160, "name": "2x SA-9 Gaskin", "pts": 1},
+        {"id": 161, "name": "4x SA-9 Gaskin", "pts": 2},
+
+        {"id": 165, "name": "2x SA-13 Gopher", "pts": 2},
+        {"id": 166, "name": "4x SA-13 Gopher", "pts": 3},
+
+        {"id": 170, "name": "2x SA-8 Gecko", "pts": 3},
+        {"id": 171, "name": "4x SA-8 Gecko", "pts": 7},
+
+        {"id": 180, "name": "2x Mi-24 Hind", "pts": 5},
+        {"id": 181, "name": "4x Mi-24 Hind", "pts": 10},
+
+        {"id": 190, "name": "2x Gazelle HOT", "pts": 6},
+        {"id": 191, "name": "4x Gazelle HOT", "pts": 12},
+
+        {"id": 200, "name": "2x SU-25 Frogfoot", "pts": 7},
+        {"id": 201, "name": "4x SU-25 Frogfoot", "pts": 14},
+        {"id": 202, "name": "6x SU-25 Frogfoot", "pts": 21}
 
 
 
@@ -106,10 +139,17 @@
     	{"max": 1, "min": 0, "from": [521]},
     	{"max": 1, "min": 0, "from": [522]},
     	{"max": 1, "min": 0, "from": [523]},
-    	{"max": 1, "min": 0, "from": [524]}
+    	{"max": 1, "min": 0, "from": [524]},
 
-
-
+    	{"max": 1, "min": 0, "from": [530]},
+    	{"max": 1, "min": 0, "from": [531]},
+    	{"max": 1, "min": 0, "from": [532]},
+    	{"max": 1, "min": 0, "from": [533]},
+    	{"max": 1, "min": 0, "from": [534]},
+    	{"max": 1, "min": 0, "from": [535]},
+    	{"max": 1, "min": 0, "from": [536]},
+    	{"max": 2, "min": 0, "from": [537]},
+    	{"max": 1, "min": 0, "from": [538]}
 
     ],
 
@@ -157,16 +197,30 @@
         {"max": 3, "min": 2, "from": [75,76,77], "appliesTo": [505]},
         {"max": 3, "min": 0, "from": [78], "appliesTo": [505]},
         {"max": 3, "min": 0, "from": [79], "appliesTo": [505]},
-        {"max": 1, "min": 0, "from": [115,116,117,118], "appliesTo": [505]}
+        {"max": 1, "min": 0, "from": [115,116,117,118], "appliesTo": [505]},
         {"max": 1, "min": 0, "from": [10,11,12,13,14,15,16,17,18,25,26,27,28,29,30,45,46,47,48,49,50], "appliesTo": [505]},
         {"max": 1, "min": 0, "from": [18], "appliesTo": [505]},
         {"max": 1, "min": 0, "from": [51], "appliesTo": [505]},
         {"max": 1, "min": 0, "from": [120,121], "appliesTo": [505]},
-        {"max": 1, "min": 0, "from": [125,126], "appliesTo": [505]}
+        {"max": 1, "min": 0, "from": [125,126], "appliesTo": [505]},
 
+        {"max": 1, "min": 0, "from": [10,11,12,13,14,15,16,17], "appliesTo": [520]},
+        {"max": 1, "min": 0, "from": [25,26,27,28,29,30], "appliesTo": [521]},
+        {"max": 1, "min": 0, "from": [45,46,47,48,49,50], "appliesTo": [522]},
+        {"max": 1, "min": 0, "from": [65,66,67], "appliesTo": [523]},
+        {"max": 1, "min": 0, "from": [68], "appliesTo": [523]},
+        {"max": 1, "min": 0, "from": [75,76,77], "appliesTo": [524]},
+        {"max": 1, "min": 0, "from": [78], "appliesTo": [524]},
+        {"max": 1, "min": 0, "from": [79], "appliesTo": [524]},
 
-
-
+        {"max": 1, "min": 0, "from": [120,121], "appliesTo": [530]},
+        {"max": 1, "min": 0, "from": [150,151], "appliesTo": [531]},
+        {"max": 1, "min": 0, "from": [140,141], "appliesTo": [532]},
+        {"max": 1, "min": 0, "from": [125,126], "appliesTo": [534]},
+        {"max": 1, "min": 0, "from": [130,131], "appliesTo": [535]},
+        {"max": 1, "min": 0, "from": [160,161,165,166,170,171], "appliesTo": [536]},
+        {"max": 2, "min": 0, "from": [180,181,190,191], "appliesTo": [537]},
+        {"max": 1, "min": 0, "from": [200,201,202], "appliesTo": [538]}
 
    ]
 }
