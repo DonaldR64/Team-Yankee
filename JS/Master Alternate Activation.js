@@ -20,6 +20,7 @@ const TY = (() => {
     let unitFiredThisTurn = false; //marker for smoke bombardments, inCommand
     let CCTeamIDs = []; //array of teams (IDs) in a CC, updated when charge/move
     let assaultingUnitID = "";
+    let currentUnitID;
     let deadHQs = [[],[]]; //formationIDs of any formations that lost leaders in prev. turn, by player
 
 
@@ -2976,11 +2977,28 @@ log(hit)
     }
 
     const ActivateUnitTwo = (teamID,order,specialorder) => {
+        if (!specialorder) {
+            specialorder = "";
+        };
         let team = TeamArray[teamID];
         let unit = UnitArray[team.unitID];
+        let errorMsg = "";
+    
+        if (currentUnitID) {
+            //last unit has checks GTG and in command
+            let curUnit = UnitArray[currentUnitID];
+            GTG(curUnit);
+            curUnit.IC();
+        }
+    
+        if (team.activated === true) {
+            errorMsg = "Team/Unit has already been activated";
+        }
+    
         let unitLeader = TeamArray[unit.teamIDs[0]];
         let targetTeam,targetName;
         let targetArray = [];
+        let unitActivation = false;
 
         if (team.inCommand === true && order !== "Spot") {
             targetTeam = unitLeader;
@@ -2991,26 +3009,17 @@ log(hit)
                     targetArray.push(tm);
                 }
             }
+            unitActivation = true;
         } else {
             targetTeam = team;
             targetName = team.name;
             targetArray = [targetTeam];
         }
-
-        if (!specialorder) {
-            specialorder = "";
-            SetupCard(targetName,order,unit.nation);
-            if (state.TY.step === "Shooting" && order === "Hold" && targetTeam.moved === true) {
-                outputCard.body.push("Team/Unit has already moved and so cannot be issued a Hold Order");
-                PrintCard();
-                return;
-            };
-        };
-
+    
         let noun = "Teams ";
         let verb = " are ";
         let noun2 = " their ";
-
+    
         let extraLine = ""
         if (team.inCommand === false) {
             noun = "The Team ";
@@ -3019,41 +3028,34 @@ log(hit)
             outputCard.body.push("Out of Command Team");
             outputCard.body.push("[hr]");
             if (order === "Assault") {
-                outputCard.body.push("Team defaults to a Tactical Order");
-                order = "Tactical";
+                errorMsg = "Out of Command Teams cannot Assault";
             };
             if (order === "Tactical") {
                 extraLine = "Firing suffers an additional +1 Penalty";
             } else if (order === "Dash") {
                 extraLine = "It should move towards the Unit Leader";
             } 
+           }
+    
+        if (order.includes("Assault") && unit.pinned() === true) {
+            errorMsg = "Unit is Pinned, cannot Assault";
         }
-
-        if (order.includes("Assault")) {
-            if (unit.pinned() === true) {
-                outputCard.body.push("Unit is Pinned, cannot Assault");
-                outputCard.body.push("Unit defaults to a Tactical Order");
-                order = "Tactical";
-            }
+    
+        SetupCard(targetName,"",targetTeam.nation);
+    
+        if (errorMsg !== "") {
+            outputCard.body.push(errorMsg);
+            PrintCard();
+            return;
         }
 
         if (order.includes("Tactical")) {
-            if (unit.type === "Aircraft") {
-                let needed = 4;
-                if (unitLeader.special.includes("Observer")) {needed = 3};
-                let roll = randomInteger(6);
-                outputCard.body.push("Arrival Roll: " + DisplayDice(roll,team.nation,24));
-                if (roll >= needed) {
-                    outputCard.body.push("Aircraft Arrives and can be placed anywhere on the Field");
-                    outputCard.body.push("Enemy AA Fire can happen anytime before the Aircraft attacks");
-                    outputCard.body.push("Teams can Spot for their own Fire");
-                } else {
-                    outputCard.body.push("[#ff0000]The Unit is Refuelling/Refitting this turn[/#]");
-                }
-            } else if (unit.type === "Helicopter") {
-                outputCard.body.push("The Helicopter may be placed anywhere on the Field");
+            if (unit.type === "Aircraft" || unit.type === "Helicopter") {
+                outputCard.body.push("The " + unit.type + " may be placed anywhere on the Field");
                 outputCard.body.push("Teams can Spot for their own Fire");
-                outputCard.body.push("Alternately the Helicopter can move off table and Loiter");
+                if (unit.type === "Helicopter") {
+                    outputCard.body.push("Alternately the Helicopter can move off table and Loiter");
+                }
             } else {
                 if (specialorder.includes("Dig In") === false) {
                     if (unit.pinned() === false) {
@@ -3078,6 +3080,7 @@ log(hit)
                 outputCard.body.push(noun + " stay in place, and may fire at" + noun2 + "Moving ROF");
             }
             outputCard.body.push(noun + verb + "Gone to Ground if not Firing");
+            outputCard.body.push(noun + " may also take Opportunity Fire during this turn");
         } else if (order === "Assault") {
             outputCard.body.push('Teams can move at Tactical Speed to a Max of 5 hexes, and may fire at their Moving ROF');
             outputCard.body.push('Teams must target an enemy within 4 hexes of the Team it will charge into');
@@ -3092,6 +3095,9 @@ log(hit)
         }
 
         targetTeam.token.set("aura1_color",Colours.black);
+        currentUnitID = unit.id;
+        ClearSmoke(unit.id);
+        ResetFlags(targetTeam,unitActivation);
 
         outputCard.body.push(extraLine);
         for (let i=0;i<targetArray.length;i++) {
@@ -3104,19 +3110,11 @@ log(hit)
             }
             if (targetArray[i].specialorder === "") {
                 targetArray[i].specialorder = specialorder;
-            } else if (targetArray[i].special.includes("Stormtroopers")) {
-                targetArray[i].specialorder += "," + specialorder;
-            } else {
-                outputCard.body.push('[' + targetArray[i].name + " already has " + targetArray[i].specialorder + "]");
-            }
+            } 
         }
         if (team.inCommand === true && order !== "Spot") {
             unit.order = order;
-            if (unit.specialorder !== "") {
-                unit.specialorder += "," + specialorder;
-            } else {
-                unit.specialorder = specialorder;
-            }
+            unit.specialorder = specialorder;
         }
         PrintCard();
     }
@@ -3311,8 +3309,6 @@ log(hit)
         let unitLeader = TeamArray[unit.teamIDs[0]];
         SetupCard(unit.name,specialorder,team.nation);
         let errorMsg = [];
-        let step = state.TY.step;
-
 
         let roll = randomInteger(6);
         let stat = 1;
@@ -3324,15 +3320,7 @@ log(hit)
         }
 
         if (targetTeam.specialorder !== "") {
-            if (targetTeam.special.includes("Stormtroopers") === false) {
-                errorMsg.push("Teams can only have one Special Order per turn");
-            } else if (targetTeam.specialorder.includes("Failed")) {
-                errorMsg.push("Cannot have a 2nd Special Order after a failed one");
-            } else if (targetTeam.specialorder.includes(",")) {
-                errorMsg.push("Cannot have a 3rd Special Order");
-            } else if (specialorder === "Clear Minefield" || specialorder === "Dig In") {
-                errorMsg.push(specialorder + " takes a Teams entire turn");
-            }
+            errorMsg.push("Teams can only have one Special Order per turn");
         }
         
         if (specialorder === "Blitz" || specialorder === "Dig In") {
@@ -3803,84 +3791,46 @@ log(hit)
         }
     }
 
-    const ResetFlags = () => {
-/*
+    const ResetFlags = (targetTeam,unitActivation) => {
+        let unit = UnitArray[targetTeam.unitID];
+        let conditions = ["Dash","Tactical","Hold","Assault","Fired","AAFire","Radio"];
 
-        let keys = Object.keys(UnitArray);
-        for (let j=0;j<keys.length;j++) {
-            let unit = UnitArray[keys[j]];
-            let conditions = ["Dash","Tactical","Hold","Assault","Fired","AAFire","Radio"];
-            for (let k=0;k<unit.teamIDs.length;k++) {
-                let team = TeamArray[unit.teamIDs[k]];
-                if (state.TY.conditions[team.id]) {
-                    for (let c=0;c<conditions.length;c++) {
-                        if (state.TY.conditions[team.id][conditions[c]]) {
-                            team.removeCondition(conditions[c]);
-                        }
+        for (let k=0;k<unit.teamIDs.length;k++) {
+            let team = TeamArray[unit.teamIDs[k]];
+            if (unitActivated === false && targetTeam.id !== team.id) {continue};
+            if (state.TY.conditions[team.id]) {
+                for (let c=0;c<conditions.length;c++) {
+                    if (state.TY.conditions[team.id][conditions[c]]) {
+                        team.removeCondition(conditions[c]);
                     }
-                }
-                team.spotAttempts = 0;
-                team.prevHexLabel = team.hexLabel;
-                team.prevHex = team.hex;
-                team.order = "";
-                team.specialorder = "";
-                team.hitArray = [];
-                team.eta = [];
-                team.nightvisibility = 0;
-                team.moved = false;
-                team.maxTact = false;
-                team.fired = false;
-            }
-
-
-
-            if (unit.player === state.TY.currentPlayer) {
-                for (let k=0;k<unit.teamIDs.length;k++) {
-                    let team = TeamArray[unit.teamIDs[k]];
-                    if (state.TY.conditions[team.id]) {
-                        for (let c=0;c<conditions.length;c++) {
-                            if (state.TY.conditions[team.id][conditions[c]]) {
-                                team.removeCondition(conditions[c]);
-                            }
-                        }
-                    }
-                    team.spotAttempts = 0;
-                    team.prevHexLabel = team.hexLabel;
-                    team.prevHex = team.hex;
-                    team.order = "";
-                    team.specialorder = "";
-                    team.hitArray = [];
-                    team.eta = [];
-                    team.nightvisibility = 0;
-                    team.moved = false;
-                    team.maxTact = false;
-                    team.fired = false;
-                }
-                if (state.TY.turn === 1) {
-                    GTG(unit);
-                }
-                let unitLeader = TeamArray[unit.teamIDs[0]];
-                if (unitLeader) {
-                    unitLeader.token.set("bar3_value",0);
-                    if (unitLeader.bailed === true) {
-                        SwapLeader(unit);
-                    }
-                }
-                unit.order = ""; 
-                unit.specialorder = "";
-            } else {
-                GTG(unit);
-                for (let i=0;i<unit.teamIDs.length;i++) {
-                    let team = TeamArray[unit.teamIDs[i]];
-                    team.hitArray = [];
-                    team.eta = [];
-                    team.nightvisibility = 0;
                 }
             }
+            team.spotAttempts = 0;
+            team.prevHexLabel = team.hexLabel;
+            team.prevHex = team.hex;
+            team.order = "";
+            team.specialorder = "";
+            team.hitArray = [];
+            team.eta = [];
+            team.nightvisibility = 0;
+            team.moved = false;
+            team.maxTact = false;
+            team.fired = false;
+        }
+
+        if (unitActivated === true) {
+            unit.order = ""; 
+            unit.specialorder = "";
             unit.limited = 0;
             unit.size = unit.teamIDs.length;
+            let unitLeader = TeamArray[unit.teamIDs[0]];
+            if (unitLeader) {
+                unitLeader.token.set("bar3_value",0);
+                if (unitLeader.bailed === true) {
+                    SwapLeader(unit);
+                }
+            }
         }
-*/
     }
 
     const GTG = (unit) => {
@@ -4170,11 +4120,6 @@ log(hit)
         let shooterUnit = UnitArray[shooter.unitID];
         let unitFire = false;
         let sname = shooter.name;
-
-        if (state.TY.step === "Movement" || state.TY.step === "Start") {
-            sendChat("","Advance Step before Shooting");
-            return;
-        }
 
         if (shooterID === shooterUnit.teamIDs[0]) {
             unitFire = true
@@ -5857,8 +5802,6 @@ log(unitIDs4Saves)
         return saveResult;
     }
     
-
-
 
 
 
