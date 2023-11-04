@@ -1,9 +1,6 @@
 const TY = (() => { 
     const version = '1.11.3';
     if (!state.TY) {state.TY = {}};
-
-    const gameScale = 1; //1 = Normal Movement, 0.5 = Half Movement
-
     //Constants and Persistent Variables
 
     const pageInfo = {name: "",page: "",gridType: "",scale: 0,width: 0,height: 0};
@@ -50,8 +47,8 @@ const TY = (() => {
 
     let specialInfo = {
         "Air Assault": "An Air Assault Unit may only be held in Reserve if all the Units deployed on table are Air Assault Units",
-        "Accurate": 'No penalty to Hit for range > 16" if Shooter did not Move',
-        "Advanced Stabiliser": 'Tactical Speed is 14". Machineguns cannot Shoot and the Team cannot Assault if it moves more than 10"',
+        "Accurate": 'No penalty to Hit for longer ranges if Shooter did not Move',
+        "Advanced Stabiliser": 'Tactical Speed is 7 hexes. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 5 hexes',
         "Amphibious": "Treat Impassable Water as Difficult Terrain",
         "Anti-Helicopter": "Can shoot at Helicopters with a ROF of 1",
         "Applique Armour": 'Front and Side Armour is 13 against HEAT weapons',
@@ -66,19 +63,19 @@ const TY = (() => {
         "ERA": "Front and Side Armour is minimum 16 against HEAT Weapons",
         "Flamethrower": "Infantry, Gun, and Unarmoured Tank Teams re-roll successful Saves when hit by a Flame-thrower and the Unit is automatically Pinned Down. Armoured Tank Teams use their Top armour for Armour Saves when hit by a Flame-thrower.",
         "Forward Firing": "Forward Firing Weapons can only target Teams fully in front of the Shooter",
-        "Guided": 'No penalty to Hit for range > 16". Cannot hit Infantry unless they are stationary in Bulletproof Cover',
-        "Guided AA": 'Guided Weapons that cannot target Tank or Infantry Teams. No penalty to Hit for range > 16"',
+        "Guided": 'No penalty to Hit for longer ranges. Cannot hit Infantry unless they are stationary in Bulletproof Cover',
+        "Guided AA": 'Guided Weapons that cannot target Tank or Infantry Teams. No penalty to Hit for longer ranges',
         "Gun Shield": "Gives Bulletproof Cover when shot at from the Front. No protection against Bombardments or if the Team moved at Dash speed",
         "Hammerhead": "Team with a Hammerhead can remain Gone to Ground while shooting its missile",
-        "HEAT": 'Target Armour is not increased for range over 16". Affected by BDD, Skirts, Chobham and ERA Armour',
+        "HEAT": 'Target Armour is not increased for longer ranges. Affected by BDD, Skirts, Chobham and ERA Armour',
         "Heavy Weapon": "A Heavy Weapon Team cannot Charge into Contact",
         "HQ": "Always In Command and ignores Morale Checks",
         "Hunter-Killer": "Hunter-Killer Helicopters can use terrain for Concealment and are Gone to Ground unless they Shoot",
         "Independent": "Independent Teams can use the Mistaken Target rule to reassign hits to nearby Units, but cannot Charge into Contact or take an Objective",        
         "Infra-Red": "Rolls 2 Dice for Night Visibility and takes the highest score",
         "Jump Jet": "Enters the table on a score of 3+",
-        "Large Gun": 'Cannot be placed in Buildings and cannot be placed from Ambush within ' + 16*gameScale + '" of enemy',
-        "Laser Rangefinder": 'No penalty to Hit for range > 16"',
+        "Large Gun": 'Cannot be placed in Buildings and cannot be placed from Ambush within 4 hexes of enemy',
+        "Laser Rangefinder": 'No penalty to Hit for longer ranges',
         "Laser Guided Projectiles": "Must be guided by an Observer, using it for LOS",
         "Limited 1": "Each time the Unit  shoots, one of its Teams may shoot this weapon rather than its usual weapons",
         "Mine Clearing Device": "Team can attempt to clear Minefields",
@@ -86,31 +83,31 @@ const TY = (() => {
         "MLRS": "Multiple Launching Rocket System - each Team counts as two Teams firing",
         "Mounted": "Can fire a Mounted Weapon if a Passenger has that weapon",
         "Napalm": "Infantry, Gun, and Unarmoured Tank Teams re-roll successful Saves when hit by Napalm bombs. Armoured Tank Teams use their Top armour for Armour Saves when hit by Napalm bombs",
-        "NLOS": 'A weapon with NLOS has no To Hit Penalty for ranges over 16" and does not require LOS. The Target Team always counds as Concealed even when in LOS. NLOS weapons cannot hit Infantry Teams unless the Infantry are stationary and in bulletproof cover',
+        "NLOS": 'A weapon with NLOS has no To Hit Penalty for longer ranges and does not require LOS. The Target Team always counds as Concealed even when in LOS. NLOS weapons cannot hit Infantry Teams unless the Infantry are stationary and in bulletproof cover',
         "No HE": "A weapon with no HE targetting an Infantry or Gun Team add +1 to the score needed To Hit",
-        "Observer": "An Observer Team can Spot for any friendly Artillery Unit and reduces the score required to Range In by -1",
+        "Observer": "An Observer Team can Spot for any friendly Artillery Unit and reduces the score required to Range In by 1",
         "One Shot": "Can only be used once per game",
         "Overhead Fire": "Grenade Launchers and Light Mortars capable of Overhead Fire can fire over friendly teams and Short Terrain",
         "Overworked": "Overworked weapons add +1 to the score needed To Hit when moving",
         "Passengers #": "A Transport Team can carry # Infantry Teams as Passengers",
         "Pinned ROF 1": "These weapons have a ROF of 1 when Pinned Down",
         "Pioneers": 'Can cross Minefields safely on a 2+. If remain in Minefield and not Pinned Down, clear the Minefield automatically',
-        "Radar": 'When shooting at Aircraft/Helicopters, range is increased by 12" and there are no penalties for range >16"',
+        "Radar": 'When shooting at Aircraft/Helicopters, range is increased by 6 hexes and there are no penalties for longer ranges',
         "Salvo": "Use a larger Artillery Template",
         "Scout": "Scouts are Gone to Ground unless they Shoot or Assault",
         "Self Defence AA": "Self-Defence AA weapons can Shoot at Aircraft with ROF 1",
         "Slow Firing": "Slow Firing Weapons add +1 to the score needed To Hit when moving",
         "Smoke": "Smoke weapons can Shoot Smoke ammunition",
         "Smoke Bombardment": "Once per game, the weapon can fire a Smoke Bombardment",
-        "Sneak and Peek": 'A Team with Sneak and Peek can move 10" if it is not firing its Main Gun',
+        "Sneak and Peek": 'A Team with Sneak and Peek can move 5 hexes if it is not firing its Main Gun',
         "Spearhead": "Special Rules for Deployment (page 93)",
-        "Stabiliser": 'Tank can move 14" at Tactical, gaining a +1 penalty To Hit. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 10"',
+        "Stabiliser": 'Tank can move 7 hexes at Tactical, gaining a +1 penalty To Hit. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 5 hexes',
         "Swingfire": "Team firing Swingfire Missiles can remain Gone to Ground",
         "Tandem Warhead": "Tandem Warhead HEAT weapons are unaffected by ERA Armour",
         "Thermal Imaging": "Rolls 2 Dice for Night Visibility and takes the highest score. No To Hit penalties for Night and Smoke",
         "Tractor": "A Tractor Team can tow a single Gun Team as a Passenger, placing the Gun Team behind it",
         "Unarmoured": "An Unarmoured Tank Team cannot Charge into Contact and must Break Off if Assaulted",
-        "Unit Transport": 'The Unit Leader of the Transport Attachment must end the Movement Step within 6”/15cm of the Unit Leader of its Passenger Unit while on table. If it cannot do this, then the Transport Attachment must be Sent to the Rear.',
+        "Unit Transport": 'The Unit Leader of the Transport Attachment must end the Movement Step within 3 hexes of the Unit Leader of its Passenger Unit while on table. If it cannot do this, then the Transport Attachment must be Sent to the Rear.',
     };
 
     const SaveResults = {
@@ -150,7 +147,7 @@ const TY = (() => {
     };
 
     //Types: Flat = 0, Short = 1, Tall = 2, Building = 3
-    //Dash: Road = 0,Country = 1,Terrain = 2, Building/Tank Obstacle = 3, Impassable = 4
+    //Dash: Road = 0,Country = 1,Terrain = 2, Tank Obstacle = 3, Impassable = 4
 
     const TerrainInfo = {
         "#00ff00": {name: "Woods",height: 2,bp: false,type: 2,group: "Woods",dash: 2},
@@ -167,17 +164,17 @@ const TY = (() => {
 
     const MapTokenInfo = {
         "wreck": {name: "Wreck",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
-        "building 1": {name: "Building 1",height: 1,bp: true,type: 3,group: "Building",dash: 3},
-        "building 2": {name: "Building 2",height: 2,bp: true,type: 3,group: "Building",dash: 3},
-        "building 3": {name: "Building 3",height: 3,bp: true,type: 3,group: "Building",dash: 3},
+        "building 1": {name: "Building 1",height: 1,bp: true,type: 3,group: "Building",dash: 2},
+        "building 2": {name: "Building 2",height: 2,bp: true,type: 3,group: "Building",dash: 2},
+        "building 3": {name: "Building 3",height: 3,bp: true,type: 3,group: "Building",dash: 2},
         "rubble": {name: "Rubble",height: 0,bp: true,type: 1,group: "Rough",dash: 2},
         "anti-tank ditch": {name: "Anti-Tank Ditch",height: 0,bp: true,type: 0,group: "Trench",dash: 3},
         "wall": {name: "Wall",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
         "hedge": {name: "Hedge",height: 0,bp: false,type: 1,group: "Obstacle",dash: 2},
         "bocage": {name: "Bocage",height: 0,bp: true,type: 2,group: "Obstacle",dash: 2},
-        "dragon's teeth": {name: "Dragon's Teeth",height: 0,bp: true,type: 1,group: "Obstacle",dash: 4},
-        "road block": {name: "Road Block",height: 0,bp: true,type: 1,group: "Obstacle",dash: 4},
-        "crater": {name: "Craters",height: 0,bp: true,type: 0,group: "Rough",dash: 3},        
+        "dragon's teeth": {name: "Dragon's Teeth",height: 0,bp: true,type: 1,group: "Obstacle",dash: 3},
+        "road block": {name: "Road Block",height: 0,bp: true,type: 1,group: "Obstacle",dash: 3},
+        "crater": {name: "Craters",height: 0,bp: true,type: 0,group: "Rough",dash: 2},        
         "crops": {name: "Crops",height: 0,bp: false,type: 1,group: "Crops",dash: 1},
         "foxholes": {name: "Foxholes",height: 0,bp: false,type: 0,group: "Foxholes",dash: 2}, //bp tracked in LOS, and in hexMap
         "smoke": {name: "Smoke",height: 0,bp: false,type: 0,group: "Smoke",dash: 1},
@@ -927,8 +924,6 @@ const TY = (() => {
 
             AttributeSet(char.id,"specialText",specialText);
 
-            AttributeSet(char.id,"gamescale",gameScale);
-
             let unique = (attributeArray.unique === "true") ? true:false;
 
             //armour
@@ -1257,9 +1252,12 @@ log(hit)
                     saveNeeded = Math.max(saveNeeded,16);
                 }
 
-                if (range > 16 && weapon.notes.includes("HEAT") === false && weapon.notes.includes("Krasnopol") === false) {
-                    saveNeeded += 1;
-                    save.tip += "<br>+1 Armour for Long Range<br>";
+                if (weapon.notes.includes("HEAT") === false && weapon.notes.includes("Krasnopol") === false && weapon.notes.includes("NLOS") === false) {
+                    let rangeIncrement = Math.max(0,Math.ceil(range/20) - 1);
+                    saveNeeded += rangeIncrement;
+                    if (rangeIncrement > 0) {
+                        save.tip += "<br>+" + rangeIncrement + " Armour for Range<br>";
+                    }
                 };
 
                 let armourSave = saveRoll + saveNeeded;
@@ -1828,7 +1826,6 @@ log(hit)
         if (!outputCard.nation || !Nations[outputCard.nation]) {
             outputCard.nation = "Neutral";
         }
-log(outputCard)
         if (!outputCard.title) {outputCard.title = "No Title, Check Log"}
 
         //start of card
@@ -2748,8 +2745,7 @@ log(outputCard)
                             let fm = TeamArray[fKeys[t]];
                             if (fm.id === team1.id || fm.id === team2.id || fm.player !== team1.player || fm.unitID === team1.unitID) {continue};
                             if (fm.type === "Infantry" && fm.moved === false) {continue}; //ignore these infantry
-                            let dis = fm.hex.distance(qrs);
-                            if (dis < 2) {
+                            if (fm.hex === qrs) {
             //log(fm.name)
                                 friendlyFlag = true;
                                 fmHeight = teamHeight(fm);
@@ -2788,7 +2784,7 @@ log(outputCard)
                             if (interHex.type === 2) {
                                 hexesWithTall++;
                             }
-                            if (hexesWithTall > 1 && distanceT1T2 > 6) {
+                            if (hexesWithTall > 1 && distanceT1T2 > 3) {
                                 los = false;
                                 losReason = "> 1 hexes through Tall terrain at " + qrsLabel; 
                                 break;
@@ -2851,9 +2847,19 @@ log(outputCard)
         outputCard.body.push(team1.name + " looking at " + team2.name);
     
         let losResult = LOS(id1,id2,"");
-    
+        let distance = parseInt(losResult.distance);
+        let metres = distance*20;
+        if (metres > 1000) {
+            metres /= 1000;
+            metres = metres.toString() + "km"
+            metres = metres.replace(".",",")
+        } else {
+            metres += "m";
+        }
+        metres = " (" + metres + ")";
+
         outputCard.body.push("[hr]");
-        outputCard.body.push("Distance: " + losResult.distance);
+        outputCard.body.push("Distance: " + distance + metres);
         outputCard.body.push("LOS: " + losResult.los);
 
         if (losResult.los !== false) {
@@ -3046,14 +3052,14 @@ log(outputCard)
                     outputCard.body.push("[#ff0000]The Unit is Refuelling/Refitting this turn[/#]");
                 }
             } else if (unit.type === "Helicopter") {
-                outputCard.body.push("The Helicopter may be placed anywhere on  the Field");
+                outputCard.body.push("The Helicopter may be placed anywhere on the Field");
                 outputCard.body.push("Teams can Spot for their own Fire");
                 outputCard.body.push("Alternately the Helicopter can move off table and Loiter");
             } else {
                 if (specialorder.includes("Dig In") === false) {
                     if (unit.pinned() === false) {
                         outputCard.body.push(noun + "can move at Tactical Speed, and may fire at" + noun2 + "Moving ROF");
-                        outputCard.body.push(noun + 'cannot move within ' + 2*gameScale + ' hexes of enemies');
+                        outputCard.body.push(noun + 'cannot move into contact with enemies');
                     } else {
                         outputCard.body.push(noun + "can move at Tactical Speed, and may fire at" + noun2 + "Moving ROF");
                         outputCard.body.push(noun + "cannot move closer to enemy teams");
@@ -3062,7 +3068,7 @@ log(outputCard)
             }
         } else if (order.includes("Dash")) {
             outputCard.body.push(noun + ' can move at Dash Speed, but may not fire');
-            outputCard.body.push(noun + ' cannot move within ' + 8*gameScale + ' hexes of visible enemies');
+            outputCard.body.push(noun + ' cannot move within 4 hexes of visible enemies');
             if (state.TY.darkness === true) {
                 outputCard.body.push("Darkness limits speed to Terrain Dash");
             }
@@ -3074,8 +3080,8 @@ log(outputCard)
             }
             outputCard.body.push(noun + verb + "Gone to Ground if not Firing");
         } else if (order === "Assault") {
-            outputCard.body.push('Teams can move at Tactical Speed to a Max of ' + 10*gameScale + ' hexes, and may fire at their Moving ROF');
-            outputCard.body.push('Teams must target an enemy within ' + 8*gameScale + ' hexes of the Team it will charge into');
+            outputCard.body.push('Teams can move at Tactical Speed to a Max of 5 hexes, and may fire at their Moving ROF');
+            outputCard.body.push('Teams must target an enemy within 4 hexes of the Team it will charge into');
             outputCard.body.push("Eligible Teams can complete the charge");
         } else if (order.includes("Spot")) {
             CreateBarrages(targetTeam.id);
@@ -3381,7 +3387,7 @@ log(outputCard)
         switch (specialorder) {
             case "Blitz & Move":
                 if (roll >= stat) {
-                    outputCard.body.push("The Unit Leader and any Teams that are In Command may immediately Move up to " + 4*gameScale + " hexes before making a normal Tactical Move");
+                    outputCard.body.push("The Unit Leader and any Teams that are In Command may immediately Move up to 2 hexes before making a normal Tactical Move");
                 } else {    
                     outputCard.body.push("Teams from the Unit can only Move at Tactical speed and automatically suffer a +1 to hit penalty as if they had Moved Out of Command");
                     specialorder = "Failed Blitz";
@@ -3390,7 +3396,7 @@ log(outputCard)
                 break;
             case "Blitz & Hold":
                 if (roll >= stat) {
-                    outputCard.body.push("The Unit Leader and any Teams that are In Command may immediately Move up to " + 4*gameScale + " hexes and then take up a Hold Order");
+                    outputCard.body.push("The Unit Leader and any Teams that are In Command may immediately Move up to 2 hexes and then take up a Hold Order");
                     ActivateUnitTwo(unitLeader.id,"Hold",specialorder);
                 } else {    
                     outputCard.body.push("Teams from the Unit count as Moving at Tactical speed and automatically suffer a +1 to hit penalty as if they had Moved Out of Command");
@@ -3399,7 +3405,7 @@ log(outputCard)
                 }
                 break;
             case "Cross Here":
-                outputCard.body.push("Any Teams (including the Unit Leader) from the Unit rolling to Cross Difficult Terrain within " + 6*gameScale + " hexes of where the Unit Leader crosses improve their chance of crossing safely, reducing the score they need to pass a Cross Test by 1.");
+                outputCard.body.push("Any Teams (including the Unit Leader) from the Unit rolling to Cross Difficult Terrain within 3 hexes of where the Unit Leader crosses improve their chance of crossing safely, reducing the score they need to pass a Cross Test by 1.");
                 ActivateUnitTwo(unitLeader.id,"Dash",specialorder);
                 break;
             case "Dig In":
@@ -3416,7 +3422,7 @@ log(outputCard)
                 break;
             case "Follow Me":
                 if (roll >= stat) {
-                    outputCard.body.push("In Command Teams may immediately Move directly forward up to an additional " + 4*gameScale + " hexes, remaining In Command.")
+                    outputCard.body.push("In Command Teams may immediately Move directly forward up to an additional 2 hexes, remaining In Command.")
                 } else {
                     outputCard.body.push("Teams remain where they are")
                     specialorder = "Failed Follow Me";
@@ -3426,14 +3432,14 @@ log(outputCard)
                 break;
             case "Shoot and Scoot":
                 if (roll >= stat) {
-                    outputCard.body.push("The Leader and any Teams that are In Command and did not Move in the Movement Step may immediately Move up to " + 4*gameScale + " hexes");
+                    outputCard.body.push("The Leader and any Teams that are In Command and did not Move in the Movement Step may immediately Move up to 2 hexes");
                 } else {
                     outputCard.body.push("Teams remain where they are")
                 }
                 PrintCard();
                 break;
             case "Clear Minefield":
-                outputCard.body.push('The Team is ordered to clear a Minefield within ' + 2*gameScale + ' Hexes');
+                outputCard.body.push('The Team is ordered to clear a Minefield within 2 Hexes');
                 outputCard.body.push("That Team counts as having Dashed, and cannot Shoot or Assault");
                 outputCard.body.push("The Minefield can be removed immediately");
                 outputCard.body.push("Other Teams may be given the same order");
@@ -4244,7 +4250,7 @@ log(outputCard)
         let targetTeamArray = BuildTargetTeamArray(target,shooter);
 
         let mistaken = true;
-        if (shooter.hex.distance(target.hex) < 8 && target.type === "Tank" && shooter.hex.distance(target.hex) < 4) {
+        if ((shooter.hex.distance(target.hex) < 8 && target.type.includes("Tank")) || shooter.hex.distance(target.hex) < 4) {
             mistaken = false;
         }
         if (defensive === true) {mistaken = false};
@@ -4479,9 +4485,12 @@ log(weapons)
                     excl = true;
                 }
 
-                if (los.distance > 16 && excl === false) {
-                    toHit++;
-                    toHitTips += "<br>Long Range +1";
+                let rangeIncrement = Math.max(Math.ceil(parseInt(los.distance)/20) - 1,0);
+
+
+                if (rangeIncrement > 0 && excl === false) {
+                    toHit += rangeIncrement;
+                    toHitTips += "<br>+" + rangeIncrement + " Long Range";
                 }
                 if (los.concealed === true) {
                     toHit++;
@@ -4783,7 +4792,7 @@ log(weapons)
                 for (let k=0;k<keys.length;k++) {
                     let team3 = TeamArray[keys[k]];
                     if (team3.player === shooterTeam.player) {
-                        if (team.hex.distance(team3.hex) < (8*gameScale)) {
+                        if (team.hex.distance(team3.hex) < 4) {
                             continue; //Safety Distance
                         }
                     }
@@ -4836,7 +4845,7 @@ log("In Mistaken")
                         let hit = team.hitArray[j];
                         if (hit.facing === "Side/Rear") {
                             team.priority += 1;
-                        } else if (hit.range <= 16) {
+                        } else if (hit.range <= 20) {
                             team.priority += 1;
                         }
                     }
@@ -5087,7 +5096,7 @@ log(artUnits)
         for (let i=0;i<artUnitIDs.length;i++) {
             let unitID = artUnitIDs[i];
             let unit = UnitArray[unitID];
-            if (unit.type === "Aircraft") {
+            if (unit.type === "Aircraft" || unit.type === "Helicopter") {
                 air = true;
             }
             artUnits.push(unit);
@@ -5263,7 +5272,7 @@ log(artUnits)
             templateRadius = 4;
             tooCloseDist = 10; //6" to template radius
         }
-        if (artilleryTeams[0].type === "Aircraft") {
+        if (artilleryTeams[0].type === "Aircraft" || artilleryTeams[0].type === "Helicopter") {
             tooCloseDist = templateRadius + 8;
         }
     
@@ -5303,6 +5312,7 @@ log(artUnits)
     
         let spotRolls = [];
         let needed = Math.max(observerTeam.skill,artilleryTeams[0].skill);
+
         let success = false;
         let crossTerrainCheck = false;
         let radiusHexes = [];
@@ -5334,10 +5344,15 @@ log(artUnits)
             needed += 1;
             tip2 += "<br>+1 Template over Terrain or Smoke"; 
         };
-            if (state.TY.darkness === true) {
+        if (state.TY.darkness === true) {
             needed += 1;
             tip2 += "<br>+1 Night Time";
         };
+        if (observerTeam.special.includes("Observer")) {
+            needed -=1;
+            tips2 += "<br>Specialist Observer -1";
+        }
+
 
     
         if (rangedIn) {needed = 0};
@@ -5396,7 +5411,7 @@ log(artUnits)
         } else {
             let text = ["","1st","2nd","3rd"];
             let text2 = ["","","+1 to Roll Needed to Hit","+2 to Roll Needed to Hit"];
-            if ((observerTeam.type !== "Aircraft") && rangedIn === false) {
+            if (observerTeam.type !== "Aircraft" && observerTeam.type !== "Helicopter" && rangedIn === false) {
                 PlaceRangedInMarker(artilleryUnit,targetHex);
             }
             let success = '[🎲](#" class="showtip" title="' + hittip + ') Ranged in on the ' + text[spotAttempts] + ' Attempt';
@@ -5480,7 +5495,7 @@ log(artUnits)
 
             if (roll >= neededToHit) {
                 team.hitArray = [hit];
-                if (team.type === "Infantry" || team.type === "Unarmoured Tank") {
+                if (team.type === "Infantry" || team.type === "Unarmoured Tank" || team.type === "Gun") {
                     let unitLeaderToken = TeamArray[unit.teamIDs[0]].token;
                     unitLeaderToken.set("aura1_color",Colours.yellow);                 
                 }
@@ -5975,8 +5990,8 @@ log(unitIDs4Saves)
             let dist = team1.hex.distance(team2.hex);
             let chargeDist = team1.hex.distance(team1.prevHex);
 log("Charge Dist: " + chargeDist)
-            if (action === "Add" && dist <= (8*gameScale) && team2.token.get(SM.surprised) === false) {
-                if (dist === 1 && team1.fired === false && hexMap[team1.prevHexLabel].type > 0 && chargeDist <= (4*gameScale)) {
+            if (action === "Add" && dist <= 4 && team2.token.get(SM.surprised) === false) {
+                if (dist === 1 && team1.fired === false && hexMap[team1.prevHexLabel].type > 0 && chargeDist <= 2) {
                     team2.token.set(SM.defensive,false);
                     team2.token.set(SM.surprised,true);
                     continue;
@@ -6220,7 +6235,7 @@ log("2nd Row to " + team3.name)
                     if (team2.type === "Unarmoured Tank") {continue}; //cant counterattack
                     let dist = team1.hex.distance(team2.hex);
                     if (team2.type === "Tank" && team1.hex.dash > 2) {continue}; //cant counterattack into that terrain
-                    if (dist <= (4*gameScale) && team2.bailed === false) {
+                    if (dist <= 2 && team2.bailed === false) {
                         combatOver = false;
                         break;
                     }
@@ -6231,9 +6246,9 @@ log("2nd Row to " + team3.name)
         if (combatOver === true) {
             SetupCard("Assault Over","",attackingNation);
             outputCard.body.push("The Assault is Over");
-            outputCard.body.push("Any surviving Losing Teams must move at Tactical speed the shortest distance to be further than " + 6*gameScale + '" away from all enemy Teams');
+            outputCard.body.push('Any surviving Losing Teams must move at Tactical speed the shortest distance to be further than 3 hexes away from all enemy Teams');
             outputCard.body.push("Any Teams not able to do so surrender and are destroyed");
-            outputCard.body.push("The Winning Teams may Consolidate " + 4*gameScale + '", this Move may not bring them within ' + 2*gameScale + '" of an enemy Team.')  
+            outputCard.body.push('The Winning Teams may Consolidate 2 hexes, this Move may not bring them into contact with an enemy Team.')  
             let teamKeys = Object.keys(TeamArray);
             for (let i=0;i<teamKeys.length;i++) {
                 let team = TeamArray[teamKeys[i]];
@@ -6248,9 +6263,9 @@ log("2nd Row to " + team3.name)
             outputCard.body.push("The Defenders may now choose to Counterattack");
             outputCard.body.push("One roll is made and compared to each Units Counterattack");
             outputCard.body.push("Any failing must Break Off")
-            outputCard.body.push("Breaking Off Teams must move at Tactical speed the shortest distance to be further than " + 6*gameScale + '" away from all Assaulting Teams');
+            outputCard.body.push('Breaking Off Teams must move at Tactical speed the shortest distance to be further than 3 hexes away from all Assaulting Teams');
             outputCard.body.push("Any Teams not able to do so surrender and are destroyed");
-            outputCard.body.push("The Winning Teams may Consolidate " + 4*gameScale + '", this Move may not bring them within ' + 2*gameScale + '" of an enemy Team.');
+            outputCard.body.push("The Winning Teams may Consolidate 2 hexes, this Move may not bring them into contact with an enemy team");
             outputCard.body.push("[hr]");
             for (let i=0;i<finalDUnitIDs.length;i++) {
                 let unit = UnitArray[finalDUnitIDs[i]];
@@ -6267,7 +6282,6 @@ log("2nd Row to " + team3.name)
                         if (passengerNumber > 0) {
                             needed = unitLeader.camounted;
                         }
-//others here later
                     }
                 }
                 outputCard.body.push(unit.name + ": " + needed + "+" + rerollText);
@@ -6402,51 +6416,6 @@ log("2nd Row to " + team3.name)
         let unit = UnitArray[team.unitID];
         DigIn(unit);
     }
-
-    const Test = (msg) => {
-        let chars = findObjs({
-            _pageid: Campaign().get("playerpageid"),
-            _type: "character",
-        })
-        
-        chars.forEach((char) => {
-            let revised = Attribute(char,"revised");
-            if (revised === "Done") {
-                return;
-            } else {
-                log(char.name)
-                AttributeSet(char.id,"revised","Done");
-                let attributeArray = AttributeArray(char.id);
-                for (let i=1;i<5;i++) {
-                    let name = attributeArray["weapon"+i+"name"];
-                    if (!name || name == " " || name == "") {continue};
-                    let range = attributeArray["weapon"+i+"range"];
-                    range = range.split("-");
-                    if (range.length > 1) {
-                        range[0] = Math.round(parseInt(range[0])/2);
-                        range[1] = Math.floor(parseInt(range[1] * 2.5));
-                        range = range[0] + "-" + range[1];
-                    } else {
-                        range = Math.floor(parseInt(range[1] * 2.5));
-                    }
-                    AttributeSet(char.id,"weapon"+i+"range",range)
-                }
-                let type = attributeArray.type;
-                if (type === "Infantry") {return};
-                tactical = Math.round(parseInt(attributeArray.tactical)/2);
-                terraindash = Math.round(parseInt(attributeArray.terrain)/2);
-                countrydash = Math.round(parseInt(attributeArray.country)/2);
-                roaddash = Math.round(parseInt(attributeArray.road)/2);
-                AttributeSet(char.id,"tactical",tactical);
-                AttributeSet(char.id,"terrain",terraindash);
-                AttributeSet(char.id,"country",countrydash);
-                AttributeSet(char.id,"road",roaddash);
-            }
-        })
-        
-    }
-
-
 
 
 
