@@ -353,7 +353,7 @@ const TY = (() => {
             "image": "https://s3.amazonaws.com/files.d20.io/images/366073450/MaE7Hz3ruNZ-2LrDfZQicA/thumb.png?1699036295",
             "dice": "Syria",
             "backgroundColour": "#2f8f43",
-            "titlefont": "Anton",
+            "titlefont": "Rye",
             "fontColour": "#FFFFFF",
             "borderColour": "#2f8f43",
             "borderStyle": "5px solid",
@@ -2852,14 +2852,13 @@ log(hit)
         if (metres > 1000) {
             metres /= 1000;
             metres = metres.toString() + "km"
-            metres = metres.replace(".",",")
         } else {
             metres += "m";
         }
         metres = " (" + metres + ")";
 
         outputCard.body.push("[hr]");
-        outputCard.body.push("Distance: " + distance + metres);
+        outputCard.body.push("Distance: " + distance + " hexes" + metres);
         outputCard.body.push("LOS: " + losResult.los);
 
         if (losResult.los !== false) {
@@ -2920,7 +2919,7 @@ log(hit)
         ButtonInfo("Place in Reserve","!PlaceInReserve");
 
         //ButtonInfo("Kill Selected Team","!!KillTeam;@{selected|token_id}");
-        ButtonInfo("Setup New Game","!SetupGame;?{Game Type|Meeting Engagement|Attack/Defend};?{First Player|Warsaw Pact,0|NATO,1};?{Time of Day|Daylight|Dawn|Dusk|Night|Random}");
+        ButtonInfo("Setup New Game","!SetupGame;?{Game Type|Meeting Engagement|Attack/Defend};?{Time of Day|Daylight|Dawn|Dusk|Night|Random}");
         //ButtonInfo("Test LOS","!TestLOS;@{selected|token_id};@{target|token_id}");
         //ButtonInfo("Unit Creation","!UnitCreation;?{Unit Name};?{Formation Name};?{Support|No|Yes};");
         //ButtonInfo("Team Unit Info","!TeamInfo");
@@ -3570,7 +3569,7 @@ log(hit)
             currentPlayer = state.TY.startingPlayer;
             if (state.TY.gametype === undefined || currentPlayer === undefined) {
                 SetupCard("Setup Game","","Neutral");
-                ButtonInfo("Setup New Game","!SetupGame;?{Game Type|Meeting Engagement|Attack/Defend};?{First Player|Warsaw Pact,0|NATO,1};?{Time of Day|Daylight|Dawn|Dusk|Night|Random}");
+                ButtonInfo("Setup New Game","!SetupGame;?{Game Type|Meeting Engagement|Attack/Defend};?{Time of Day|Daylight|Dawn|Dusk|Night|Random}");
                 PrintCard();
                 return;
             }
@@ -3713,7 +3712,7 @@ log(hit)
                 };
             };
             if (CheckArray.length > 0) {
-                SetupCard("Rally Checks","",nat);
+                SetupCard("Rally Checks","","Neutral");
                 ButtonInfo("Start Rally Checks","!RallyChecks");
                 PrintCard();            
             } else {
@@ -3750,7 +3749,7 @@ log(hit)
                 }
             }
             if (CheckArray.length > 0) {
-                SetupCard("Unit Morale Checks","",nat);
+                SetupCard("Unit Morale Checks","","Neutral");
                 ButtonInfo("Start Morale Checks","!MoraleChecks");
                 PrintCard();            
             } else {
@@ -3774,7 +3773,7 @@ log(hit)
             StartStep("Final");
         }
         if (pass === "Final") {
-            SetupCard("Turn: " + state.TY.turn,"Starting Step",nat);
+            SetupCard("Turn: " + state.TY.turn,"Starting Step","Neutral");
             ClearSmoke("Smokescreens");
             RemoveFoxholes();
             //ResetFlags();
@@ -3798,7 +3797,7 @@ log(hit)
                 firstNation = state.TY.nations[state.TY.startingPlayer][0]
             }
             outputCard.body.push("[hr]");
-            outputCard.body.push(6,firstNation,36);
+            outputCard.body.push(DisplayDice(6,firstNation,36));
             outputCard.body.push(firstNation + " has the First Activation");
             PrintCard();
         }
