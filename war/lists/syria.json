@@ -204,23 +204,23 @@
         {"max": 1, "min": 0, "from": [120,121], "appliesTo": [505]},
         {"max": 1, "min": 0, "from": [125,126], "appliesTo": [505]},
 
-        {"max": 1, "min": 0, "from": [10,11,12,13,14,15,16,17], "appliesTo": [520]},
-        {"max": 1, "min": 0, "from": [25,26,27,28,29,30], "appliesTo": [521]},
-        {"max": 1, "min": 0, "from": [45,46,47,48,49,50], "appliesTo": [522]},
-        {"max": 1, "min": 0, "from": [65,66,67], "appliesTo": [523]},
+        {"max": 1, "min": 1, "from": [10,11,12,13,14,15,16,17], "appliesTo": [520]},
+        {"max": 1, "min": 1, "from": [25,26,27,28,29,30], "appliesTo": [521]},
+        {"max": 1, "min": 1, "from": [45,46,47,48,49,50], "appliesTo": [522]},
+        {"max": 1, "min": 1, "from": [65,66,67], "appliesTo": [523]},
         {"max": 1, "min": 0, "from": [68], "appliesTo": [523]},
-        {"max": 1, "min": 0, "from": [75,76,77], "appliesTo": [524]},
+        {"max": 1, "min": 1, "from": [75,76,77], "appliesTo": [524]},
         {"max": 1, "min": 0, "from": [78], "appliesTo": [524]},
         {"max": 1, "min": 0, "from": [79], "appliesTo": [524]},
 
-        {"max": 1, "min": 0, "from": [120,121], "appliesTo": [530]},
-        {"max": 1, "min": 0, "from": [150,151], "appliesTo": [531]},
-        {"max": 1, "min": 0, "from": [140,141], "appliesTo": [532]},
-        {"max": 1, "min": 0, "from": [125,126], "appliesTo": [534]},
-        {"max": 1, "min": 0, "from": [130,131], "appliesTo": [535]},
-        {"max": 1, "min": 0, "from": [160,161,165,166,170,171], "appliesTo": [536]},
-        {"max": 2, "min": 0, "from": [180,181,190,191], "appliesTo": [537]},
-        {"max": 1, "min": 0, "from": [200,201,202], "appliesTo": [538]}
+        {"max": 1, "min": 1, "from": [120,121], "appliesTo": [530]},
+        {"max": 1, "min": 1, "from": [150,151], "appliesTo": [531]},
+        {"max": 1, "min": 1, "from": [140,141], "appliesTo": [532]},
+        {"max": 1, "min": 1, "from": [125,126], "appliesTo": [534]},
+        {"max": 1, "min": 1, "from": [130,131], "appliesTo": [535]},
+        {"max": 1, "min": 1, "from": [160,161,165,166,170,171], "appliesTo": [536]},
+        {"max": 2, "min": 1, "from": [180,181,190,191], "appliesTo": [537]},
+        {"max": 1, "min": 1, "from": [200,201,202], "appliesTo": [538]}
 
    ]
 }
