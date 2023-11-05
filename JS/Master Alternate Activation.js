@@ -990,7 +990,10 @@ const TY = (() => {
             this.artNum = artNum;
             this.spotAttempts = 0;
             this.rangedInHex = {};
-            this.nightvisibility = 0;
+            this.nightvisibility = randomInteger(6) * 4;
+            if (special.includes("Infra-Red") || special.includes("Thermal")) {
+                this.nightvisibility = Math.max(this.nightVisibility,randomInteger(6)*4);
+            }
 
             this.hex = hex; //axial
             this.hexLabel = hexLabel; //doubled
