@@ -20,7 +20,6 @@ const TY = (() => {
     let unitFiredThisTurn = false; //marker for smoke bombardments, inCommand
     let CCTeamIDs = []; //array of teams (IDs) in a CC, updated when charge/move
     let assaultingUnitID = "";
-    let currentUnitID;
     let deadHQs = [[],[]]; //formationIDs of any formations that lost leaders in prev. turn, by player
 
 
@@ -199,7 +198,6 @@ const TY = (() => {
             "bailed": "https://s3.amazonaws.com/files.d20.io/images/364582400/VKa2E3Avx1Jd4OKUcuWjxA/thumb.png?1698090348",
             "pinnedCharID": "-NhltPoS8_P4_rslcUsA",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/319032004/qf3aHgIiFnJ0aYoPOFR-TA/thumb.png?1671325647",
-            "barrageChar": "-NUlUj2snn9vRtAo2k2l", 
             "objectiveimage": "https://s3.amazonaws.com/files.d20.io/images/365313516/Bpy0UrmmYYph7t5xLL0o9A/thumb.png?1698546715",
             "platoonmarkers": ["letters_and_numbers0099::4815235","letters_and_numbers0100::4815236","letters_and_numbers0101::4815237","letters_and_numbers0102::4815238","letters_and_numbers0103::4815239","letters_and_numbers0104::4815240","letters_and_numbers0105::4815241","letters_and_numbers0106::4815242","letters_and_numbers0107::4815243","letters_and_numbers0108::4815244","letters_and_numbers0109::4815245","letters_and_numbers0110::4815246","letters_and_numbers0111::4815247","letters_and_numbers0112::4815248","letters_and_numbers0113::4815249","letters_and_numbers0114::4815250","letters_and_numbers0115::4815251","letters_and_numbers0116::4815252","letters_and_numbers0117::4815253","letters_and_numbers0118::4815254","letters_and_numbers0119::4815255","letters_and_numbers0120::4815256","letters_and_numbers0121::4815257","letters_and_numbers0122::4815258","letters_and_numbers0123::4815259","letters_and_numbers0124::4815260"],
         },
@@ -218,7 +216,6 @@ const TY = (() => {
             "bailed": "https://s3.amazonaws.com/files.d20.io/images/364580773/vg85YjKhl8LBdp-FSbTBtQ/thumb.png?1698089517",
             "pinnedCharID": "",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/319029852/xSAh0T5hTSCOSHrRZKBrtA/thumb.png?1671324745",
-            "barrageChar": "",  
             "objectiveimage": "",
             "platoonmarkers": ["letters_and_numbers0197::4815333","letters_and_numbers0198::4815334","letters_and_numbers0199::4815335","letters_and_numbers0200::4815336","letters_and_numbers0201::4815337","letters_and_numbers0202::4815338","letters_and_numbers0203::4815339","letters_and_numbers0204::4815340","letters_and_numbers0205::4815341","letters_and_numbers0206::4815342","letters_and_numbers0207::4815343","letters_and_numbers0208::4815344","letters_and_numbers0209::4815345","letters_and_numbers0210::4815346","letters_and_numbers0211::4815347","letters_and_numbers0212::4815348","letters_and_numbers0213::4815349","letters_and_numbers0214::4815350","letters_and_numbers0215::4815351","letters_and_numbers0216::4815352","letters_and_numbers0217::4815353","letters_and_numbers0218::4815354","letters_and_numbers0219::4815355","letters_and_numbers0220::4815356","letters_and_numbers0221::4815357","letters_and_numbers0222::4815358"],
         },
@@ -237,7 +234,6 @@ const TY = (() => {
             "bailed": "https://s3.amazonaws.com/files.d20.io/images/365311899/aJNi6yvCdnwEINZWsAL63g/thumb.png?1698545921",
             "pinnedCharID": "-NhtBzw_bXWrJORCxWZK",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/327891446/xsAVVJ0Ft-xZW92JUtZBdw/thumb.png?1676321000",
-            "barrageChar": "-NUlUkuOz7tjIrafOcNo",
             "objectiveimage": "https://s3.amazonaws.com/files.d20.io/images/365313551/2_miHmMrIheFFKq-5m3Iyw/thumb.png?1698546731",
             "platoonmarkers": ["letters_and_numbers0148::4815284","letters_and_numbers0149::4815285","letters_and_numbers0150::4815286","letters_and_numbers0151::4815287","letters_and_numbers0152::4815288","letters_and_numbers0153::4815289","letters_and_numbers0154::4815290","letters_and_numbers0155::4815291","letters_and_numbers0156::4815292","letters_and_numbers0157::4815293","letters_and_numbers0158::4815294","letters_and_numbers0159::4815295","letters_and_numbers0160::4815296","letters_and_numbers0161::4815297","letters_and_numbers0162::4815298","letters_and_numbers0163::4815299","letters_and_numbers0164::4815300","letters_and_numbers0165::4815301","letters_and_numbers0166::4815302","letters_and_numbers0167::4815303","letters_and_numbers0168::4815304","letters_and_numbers0169::4815305","letters_and_numbers0170::4815306","letters_and_numbers0171::4815307","letters_and_numbers0172::4815308","letters_and_numbers0173::4815309"],
         },
@@ -256,7 +252,6 @@ const TY = (() => {
             "bailed": "https://s3.amazonaws.com/files.d20.io/images/365311909/Gu6sVBnrKauP0gibski5CQ/thumb.png?1698545925",
             "pinnedCharID": "-NhtC--h2t90ayjtfXPx",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/327891469/QfaYQvRbVs7tA_3jGFwQ9Q/thumb.png?1676321007",
-            "barrageChar": "-NUlUl6uxp5omEWaZfze",  
             "objectiveimage": "https://s3.amazonaws.com/files.d20.io/images/365313723/o7CvHeJhHOVJ9h2tUECKfQ/thumb.png?1698546825",
             "platoonmarkers": ["letters_and_numbers0050::4815186","letters_and_numbers0051::4815187","letters_and_numbers0052::4815188","letters_and_numbers0053::4815189","letters_and_numbers0054::4815190","letters_and_numbers0055::4815191","letters_and_numbers0056::4815192","letters_and_numbers0057::4815193","letters_and_numbers0058::4815194","letters_and_numbers0059::4815195","letters_and_numbers0060::4815196","letters_and_numbers0061::4815197","letters_and_numbers0062::4815198","letters_and_numbers0063::4815199","letters_and_numbers0064::4815200","letters_and_numbers0065::4815201","letters_and_numbers0066::4815202","letters_and_numbers0067::4815203","letters_and_numbers0068::4815204","letters_and_numbers0069::4815205","letters_and_numbers0070::4815206","letters_and_numbers0071::4815207","letters_and_numbers0072::4815208","letters_and_numbers0073::4815209","letters_and_numbers0074::4815210","letters_and_numbers0075::4815211"],
         },
@@ -273,7 +268,6 @@ const TY = (() => {
             "rangedIn": "https://s3.amazonaws.com/files.d20.io/images/328835177/sjCggEYtL2PfE32fyQV4zw/thumb.png?1676837406",
             "platoonmarkers": ["","letters_and_numbers0148::4815284","letters_and_numbers0149::4815285","letters_and_numbers0150::4815286","letters_and_numbers0151::4815287","letters_and_numbers0152::4815288","letters_and_numbers0153::4815289","letters_and_numbers0154::4815290","letters_and_numbers0155::4815291","letters_and_numbers0156::4815292","letters_and_numbers0157::4815293","letters_and_numbers0158::4815294","letters_and_numbers0159::4815295","letters_and_numbers0160::4815296","letters_and_numbers0161::4815297","letters_and_numbers0162::4815298","letters_and_numbers0163::4815299","letters_and_numbers0164::4815300","letters_and_numbers0165::4815301","letters_and_numbers0166::4815302","letters_and_numbers0167::4815303","letters_and_numbers0168::4815304","letters_and_numbers0169::4815305","letters_and_numbers0170::4815306","letters_and_numbers0171::4815307","letters_and_numbers0172::4815308","letters_and_numbers0173::4815309"],
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/327891469/QfaYQvRbVs7tA_3jGFwQ9Q/thumb.png?1676321007",
-            "barrageChar": "-NUlUl6uxp5omEWaZfze",         
         },
 
         "Neutral": {
@@ -318,7 +312,6 @@ const TY = (() => {
             "ranks": "Western",
             "names": "British",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/340585556/aqSICgjEkrT9sLf730UJIA/thumb.png?1683384058",
-            "barrageChar": "-NUlVpaKAbNPTitcQRzi",
         },
         "Poland": {
             "image": "https://s3.amazonaws.com/files.d20.io/images/341315137/Y92DdqCPCBvk4hcmPk6fRw/thumb.png?1683817256",
@@ -330,7 +323,6 @@ const TY = (() => {
             "ranks": "Soviet",
             "names": "Soviet",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/319032004/qf3aHgIiFnJ0aYoPOFR-TA/thumb.png?1671325647",
-            "barrageChar": "-NUlUj2snn9vRtAo2k2l",
         },
         "Israel": {
             "image": "https://s3.amazonaws.com/files.d20.io/images/366072697/aGu0UIeI_9CN1Uk-ti_bbQ/thumb.png?1699035971",
@@ -347,7 +339,6 @@ const TY = (() => {
             "bailed": "https://s3.amazonaws.com/files.d20.io/images/365910072/lx9C4uLHSh7XnCrzdJWPHg/thumb.png?1698940336",
             "pinnedCharID": "",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/327891446/xsAVVJ0Ft-xZW92JUtZBdw/thumb.png?1676321000",
-            "barrageChar": "", 
             "platoonmarkers": ["letters_and_numbers0148::4815284","letters_and_numbers0149::4815285","letters_and_numbers0150::4815286","letters_and_numbers0151::4815287","letters_and_numbers0152::4815288","letters_and_numbers0153::4815289","letters_and_numbers0154::4815290","letters_and_numbers0155::4815291","letters_and_numbers0156::4815292","letters_and_numbers0157::4815293","letters_and_numbers0158::4815294","letters_and_numbers0159::4815295","letters_and_numbers0160::4815296","letters_and_numbers0161::4815297","letters_and_numbers0162::4815298","letters_and_numbers0163::4815299","letters_and_numbers0164::4815300","letters_and_numbers0165::4815301","letters_and_numbers0166::4815302","letters_and_numbers0167::4815303","letters_and_numbers0168::4815304","letters_and_numbers0169::4815305","letters_and_numbers0170::4815306","letters_and_numbers0171::4815307","letters_and_numbers0172::4815308","letters_and_numbers0173::4815309"],
         },
         "Syria": {
@@ -365,7 +356,6 @@ const TY = (() => {
             "bailed": "https://s3.amazonaws.com/files.d20.io/images/365910087/WnjytMMCK-NJROZviRF6YA/thumb.png?1698940344",
             "pinnedCharID": "",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/319032004/qf3aHgIiFnJ0aYoPOFR-TA/thumb.png?1671325647",
-            "barrageChar": "", 
             "platoonmarkers": ["letters_and_numbers0197::4815333","letters_and_numbers0198::4815334","letters_and_numbers0199::4815335","letters_and_numbers0200::4815336","letters_and_numbers0201::4815337","letters_and_numbers0202::4815338","letters_and_numbers0203::4815339","letters_and_numbers0204::4815340","letters_and_numbers0205::4815341","letters_and_numbers0206::4815342","letters_and_numbers0207::4815343","letters_and_numbers0208::4815344","letters_and_numbers0209::4815345","letters_and_numbers0210::4815346","letters_and_numbers0211::4815347","letters_and_numbers0212::4815348","letters_and_numbers0213::4815349","letters_and_numbers0214::4815350","letters_and_numbers0215::4815351","letters_and_numbers0216::4815352","letters_and_numbers0217::4815353","letters_and_numbers0218::4815354","letters_and_numbers0219::4815355","letters_and_numbers0220::4815356","letters_and_numbers0221::4815357","letters_and_numbers0222::4815358"],
         },
 
@@ -758,8 +748,7 @@ const TY = (() => {
 
             //create array of weapon info
             let weaponArray = [];
-            let artillery;
-            let artNum = 0;
+            let artilleryWpn;
             let bestAT = -1;
             let bestFP = 7;
             let bestATWpnNum;
@@ -845,8 +834,7 @@ const TY = (() => {
 
                 weaponArray.push(weapon);
                 if (weapon.halted === "Artillery" || weapon.halted === "Salvo" || weapon.moving === "Artillery" || weapon.moving === "Salvo") {
-                    artillery = weapon;
-                    artNum = i;
+                    artilleryWpn = weapon;
                 };
             }
 
@@ -986,8 +974,7 @@ const TY = (() => {
             this.hit = parseStat(attributeArray.hit);
 
 
-            this.artillery = artillery;
-            this.artNum = artNum;
+            this.artilleryWpn = artilleryWpn;
             this.spotAttempts = 0;
             this.rangedInHex = {};
 
@@ -1786,6 +1773,7 @@ log(hit)
             formations: {}, //formationIDs -> name
             units: {},//unitIDs -> name
             passengers: {},//keyed on IDs of transports, arrays of passengerIDs
+            currentUnitID: "",
         }
 //later - have night vision distance be somewhat random ie. full moon to dark of night/cloudy
 //could also have 2nd/3rd gen thermal vs IR
@@ -1826,7 +1814,7 @@ log(hit)
         } else {
             output += "/desc ";
         }
-
+log(outputCard)
         if (!outputCard.nation || !Nations[outputCard.nation]) {
             outputCard.nation = "Neutral";
         }
@@ -2875,34 +2863,22 @@ log(hit)
         state.TY.turn = 0;
         let Tag = msg.content.split(";");
         let gametype = Tag[1];
-        let startingPlayer = Number(Tag[2]);
-        let timeOfDay = Tag[3];
+        let timeOfDay = Tag[2];
         if (timeOfDay === "Random") {
             let roll = randomInteger(6);
             if (roll < 3) {timeOfDay = "Dawn"};
             if (roll === 3 || roll === 4) {timeOfDay = "Daylight"};
             if (roll > 4) {timeOfDay = "Dusk"};
         }
-    
         state.TY.gametype = gametype;
-        state.TY.currentPlayer = startingPlayer;
         state.TY.timeOfDay = timeOfDay;
         state.TY.darkness = false;
         if (timeOfDay === "Dawn" || timeOfDay === "Night") {
             state.TY.darkness = true;
         }
-        state.TY.startingPlayer = startingPlayer;
-        let side = ["Warsaw Pact","NATO"];
-        let nat = state.TY.nations[startingPlayer][0];
-        if (state.TY.nations[startingPlayer].length > 1) {
-            nat = side[startingPlayer];
-        }
-
         SetupCard("Setup New Game","","Neutral");
         outputCard.body.push("Game Type: " + gametype);
-        outputCard.body.push("First Player: " + nat);
         outputCard.body.push("Time of Day: " + timeOfDay);
-
         PrintCard();
     }
     
@@ -2922,7 +2898,7 @@ log(hit)
 
     const LaserGuided = (id) => {
         let team = TeamArray[id];
-        let artWeapon = team.artillery;
+        let artWeapon = team.artilleryWpn;
         let weapon;
         if (NATO.includes(team.nation)) {
             weapon = {
@@ -2977,15 +2953,11 @@ log(hit)
         let unit = UnitArray[team.unitID];
         let errorMsg = "";
     
-        if (currentUnitID) {
-            //last unit has checks GTG and in command
-            let curUnit = UnitArray[currentUnitID];
+        if (state.TY.currentUnitID !== "") {
+//last unit checks GTG and in command if didnt fire/assault - fix
+            let curUnit = UnitArray[state.TY.currentUnitID];
             GTG(curUnit);
             curUnit.IC();
-        }
-    
-        if (team.activated === true) {
-            errorMsg = "Team/Unit has already been activated";
         }
     
         let unitLeader = TeamArray[unit.teamIDs[0]];
@@ -3009,6 +2981,16 @@ log(hit)
             targetArray = [targetTeam];
         }
     
+        if (unit.id === state.TY.currentUnitID && order !== "Spot" && unitActivation === true) {
+                errorMsg = "Team/Unit has already been activated";
+        } else if (unit.id !== state.TY.currentUnitID) {
+            ClearSmoke(unit.id);
+            ResetFlags(targetTeam,unitActivation);
+        }
+    
+
+
+
         let noun = "Teams ";
         let verb = " are ";
         let noun2 = " their ";
@@ -3034,6 +3016,21 @@ log(hit)
             errorMsg = "Unit is Pinned, cannot Assault";
         }
     
+        if (order === "Spot") {
+            if (targetTeam.spotAttempts >= 3) {
+                errorMsg.push("No further Spotting Attempts by this Team/Unit");
+            }
+            if (targetTeam.moved === true && targetTeam.type !== "Aircraft") {
+                errorMsg.push("Spotter Team Moved or Dug In");
+            }
+            if (targetTeam.fired === true || targetTeam.aaFired === true) {
+                errorMsg.push("Spotter Team has Fired");
+            }
+            if (state.TY.turn === 1 && state.TY.gametype === "Meeting Engagement") {
+                errorMsg.push("No Barrages Turn 1");
+            }
+        }
+
         SetupCard(targetName,"",targetTeam.nation);
     
         if (errorMsg !== "") {
@@ -3041,6 +3038,8 @@ log(hit)
             PrintCard();
             return;
         }
+
+        targetTeam.token.set("aura1_color",Colours.black);
 
         if (order.includes("Tactical")) {
             if (unit.type === "Aircraft" || unit.type === "Helicopter") {
@@ -3087,10 +3086,7 @@ log(hit)
             outputCard.body.push('Passengers disembark the following turn');
         }
 
-        targetTeam.token.set("aura1_color",Colours.black);
-        currentUnitID = unit.id;
-        ClearSmoke(unit.id);
-        ResetFlags(targetTeam,unitActivation);
+        state.TY.currentUnitID = unit.id;
 
         outputCard.body.push(extraLine);
         for (let i=0;i<targetArray.length;i++) {
@@ -3432,7 +3428,7 @@ log(hit)
             if (team.type !== "Infantry" && team.type !== "Gun") {continue};
             if (team.inCommand === false || team.token.get("layer") === "walls") {continue};
             let hex = hexMap[team.hexLabel];
-            if (team.artillery !== undefined) {
+            if (team.artilleryWpn !== undefined) {
                 RemoveRangedInMarker(unit.id);
             }
             if (hex.terrain.includes("Building") || hex.terrain.includes("Foxholes")) {continue};
@@ -3538,17 +3534,19 @@ log(hit)
         let turn = state.TY.turn;
 
         //check no unactivated units on map
-        let keys = Object.keys(UnitArray);
-        for (let i=0;i<keys.length;i++) {
-            let unit = UnitArray[keys[i]];
-            let unitLeader = TeamArray[unit.teamIDs[0]];
-            if (hexMap[unitLeader.hexLabel].terrain.includes("Offboard") || unit.order !== "") {continue};
-            let pos = unitLeader.location;
-            sendPing(pos.x,pos.y, Campaign().get('playerpageid'), null, true); 
-            SetupCard(unit.nation,"",unit.nation);
-            outputCard.body.push("Unit has not been activated");
-            PrintCard();
-            return;
+        if (turn > 0) {
+            let keys = Object.keys(UnitArray);
+            for (let i=0;i<keys.length;i++) {
+                let unit = UnitArray[keys[i]];
+                let unitLeader = TeamArray[unit.teamIDs[0]];
+                if (hexMap[unitLeader.hexLabel].terrain.includes("Offboard") || unitLeader.token.get("aura1_color") === Colours.black) {continue};
+                let pos = unitLeader.location;
+                sendPing(pos.x,pos.y, Campaign().get('playerpageid'), null, true); 
+                SetupCard(unit.nation,"",unit.nation);
+                outputCard.body.push("Unit has not been activated");
+                PrintCard();
+                return;
+            }
         }
 
         if (turn === 0) {
@@ -3557,8 +3555,7 @@ log(hit)
                 let form = new Formation(p,state.TY.nations[p][0],num,"Barrages");
                 let unit = new Unit(p,state.TY.nations[p][0],num,"Barrages");
             }
-            currentPlayer = state.TY.startingPlayer;
-            if (state.TY.gametype === undefined || currentPlayer === undefined) {
+            if (state.TY.gametype === undefined) {
                 SetupCard("Setup Game","","Neutral");
                 ButtonInfo("Setup New Game","!SetupGame;?{Game Type|Meeting Engagement|Attack/Defend};?{Time of Day|Daylight|Dawn|Dusk|Night|Random}");
                 PrintCard();
@@ -3789,16 +3786,26 @@ log(hit)
                 let roll = randomInteger(2) - 1;
                 firstNation = state.TY.nations[roll][0];
             } else {
+//fix this
                 firstNation = state.TY.nations[state.TY.startingPlayer][0]
             }
             outputCard.body.push("[hr]");
             outputCard.body.push(DisplayDice(6,firstNation,36));
             outputCard.body.push(firstNation + " has the First Activation");
             PrintCard();
+            _.forEach(UnitArray,unit => {
+                let unitLeader = TeamArray[unit.teamIDs[0]];
+                unitLeader.token.set("aura1_color",Colours.green);
+//any other things to do at start of turn to unit                
+            });
+
+
+
+
         }
     }
 
-    const ResetFlags = (targetTeam,unitActivation) => {
+    const ResetFlags = (targetTeam,unitActivated) => {
         let unit = UnitArray[targetTeam.unitID];
         let conditions = ["Dash","Tactical","Hold","Assault","Fired","AAFire","Radio"];
 
@@ -4832,34 +4839,9 @@ log("In Create Barrages")
         RemoveBarrageToken();
         RemoveLines();
         let observerTeam = TeamArray[observerID];
-        let errorMsg = [];
-
-        if (observerTeam.spotAttempts >= 3) {
-            errorMsg.push("No further Spotting Attempts by this Team/Unit");
-        }
-        if (observerTeam.moved === true && observerTeam.type !== "Aircraft") {
-            errorMsg.push("Spotter Team Moved or Dug In");
-        }
-        if (observerTeam.fired === true || observerTeam.aaFired === true) {
-            errorMsg.push("Spotter Team has Fired");
-        }
-        if (observerTeam.player !== state.TY.currentPlayer) {
-            errorMsg.push("Cannot Fire Barrage in Defensive Fire");
-        }
-
-
-        if (state.TY.turn === 1 && state.TY.gametype === "Meeting Engagement" && state.TY.startingPlayer === state.TY.currentPlayer) {
-            errorMsg.push("No Barrages for First Player this Turn");
-        }
-        if (errorMsg.length > 0) {
-            for (let i=0;i<errorMsg.length;i++) {
-                outputCard.body.push(errorMsg[i]);
-            }
-            return;
-        }
         let img = Nations[observerTeam.nation].barrageimage;
         img = getCleanImgSrc(img);
-        let represents = Nations[observerTeam.nation].barrageChar;
+        let represents = "-NMza8uwbYRMNnvLa-VU";
         let colour = Nations[observerTeam.nation].borderColour;
         let location = hexMap[observerTeam.hexLabel].centre;
         //create macro for barrage based on current art availability
@@ -4907,7 +4889,7 @@ log(ai)
         if (unitIDs.length === 0) {
             outputCard.body.push("No Available Artillery");
             RemoveBarrageToken(newToken.id);
-            PrintCard();
+            //PrintCard();
             return;
         }
         let info = {
@@ -4919,10 +4901,12 @@ log(ai)
 
         outputCard.body.push("Place Barrage Marker");
         outputCard.body.push("Choose Artillery When in Place");
-        //feeds back to ActivateUnit2
+        return true; //feeds back to activate unit2
     }
 
     const ArtilleryInfo = (barrageID,spotter,barrageCharID) => {
+        log("Spotter")
+        log(spotter)
         let unitIDs = [];
         let normal = false;
         let salvo = false;
@@ -4935,7 +4919,9 @@ log(ai)
         if (spotter.type === "Aircraft" || spotter.type === "Helicopter") {
             artUnits.push(UnitArray[spotter.unitID]);
         } else {
+        log("Units")
             _.forEach(UnitArray,unit => {
+                log(unit)
                 if (unit.player === spotter.player && unit.artillery === true && unit.pinned() === false && unit.specialorder !== "Failed Blitz" && unit.specialorder.includes("Dig In") === false && unit.type !== "Aircraft" && unit.type !== "Helicopter" && unit.inReserve === false) {
                     artUnits.push(unit);
                 }
@@ -4954,7 +4940,9 @@ log(artUnits)
                         continue; //moved or in building
                     }
                 }
-                let weapon = team.artillery;
+                let weapon = team.artilleryWpn;
+log(weapon)
+                if (!weapon) {continue}
                 if (weapon.moving === "Artillery" || weapon.halted === "Artillery") {
                     normal = true;
                 }
@@ -5082,16 +5070,16 @@ log(artUnits)
             let artUnit = artUnits[i];
             let artIDs = artUnit.teamIDs;
             let artTeam = TeamArray[artIDs[0]];            
-            let name = artTeam.artillery.name;
+            let name = artTeam.artilleryWpn.name;
             outputCard.body.push(name);
 
             let salvo = false;
-            if (artTeam.artillery.moving === "Salvo" || artTeam.artillery.halted === "Salvo") {
+            if (artTeam.artilleryWpn.moving === "Salvo" || artTeam.artilleryWpn.halted === "Salvo") {
                 salvo = true;
             }
 
             let smoke = false;
-            if (artTeam.artillery.notes.includes("Smoke Bombardment") && state.TY.smokeScreens[artUnit.player].includes(artUnit.id) === false && unitFiredThisTurn === false) {
+            if (artTeam.artilleryWpn.notes.includes("Smoke Bombardment") && state.TY.smokeScreens[artUnit.player].includes(artUnit.id) === false && unitFiredThisTurn === false) {
                 smoke = true;
             }
             if (tooClose[0] === true) {
@@ -5116,11 +5104,11 @@ log(artUnits)
                 }
 
 
-                if (dist > artTeam.artillery.maxRange || dist < artTeam.artillery.minRange) {
+                if (dist > artTeam.artilleryWpn.maxRange || dist < artTeam.artilleryWpn.minRange) {
                     oor = true;
                     continue;
                 };
-                if (artTeam.artillery.notes.includes("Forward Firing") && hexMap[artTeam.hexLabel].terrain.includes("Offboard") === false) {
+                if (artTeam.artilleryWpn.notes.includes("Forward Firing") && hexMap[artTeam.hexLabel].terrain.includes("Offboard") === false) {
                     let facing = Facing(artTeam.id,barrageTeam.id);
                     if (facing !== "Front") {
                         oof = true;
@@ -5185,22 +5173,22 @@ log(artUnits)
         let weapon;
         for (let i=0;i<artilleryUnit.teamIDs.length;i++) {
             let team = TeamArray[artilleryUnit.teamIDs[i]];
-            if (team.artillery !== undefined) {
+            if (team.artilleryWpn !== undefined) {
                 let dist = team.hex.distance(barrageTeam.hex);
                 if (hexMap[team.hexLabel].terrain.includes("Offboard") ){
                     dist += 50; //1km off map
                 }  
-                if (dist > team.artillery.maxRange || dist < team.artillery.minRange) {
+                if (dist > team.artilleryWpn.maxRange || dist < team.artilleryWpn.minRange) {
                     continue;
                 };
-                if (team.artillery.notes.includes("Forward Firing") && hexMap[team.hexLabel].terrain.includes("Offboard") === false) {
+                if (team.artilleryWpn.notes.includes("Forward Firing") && hexMap[team.hexLabel].terrain.includes("Offboard") === false) {
                     let facing = Facing(team.id,barrageTeam.id);
                     if (facing !== "Front") {
                         continue;
                     };
                 }
                 artilleryTeams.push(team);
-                weapon = team.artillery;
+                weapon = team.artilleryWpn;
             }
         }
     
@@ -5239,7 +5227,7 @@ log(artUnits)
         let gunNum = artilleryTeams.length;
         for (let i=0;i<artilleryUnit.teamIDs.length;i++) {
             let artTeam = artilleryTeams[i]; //catch any art units that werent in facing, as they still rotate to fire
-            if (artTeam.artillery === undefined) {continue};
+            if (artTeam.artilleryWpn === undefined) {continue};
             let phi = Angle(artTeam.hex.angle(barrageTeam.hex));
             artTeam.token.set("rotation",phi);
             artTeam.fired = true;
@@ -6480,7 +6468,7 @@ log("2nd Row to " + team3.name)
                     if (team.moved === true) {
                         team.removeCondition("GTG")
                         team.gonetoground = false;
-                        if (team.artillery !== undefined) {
+                        if (team.artilleryWpn !== undefined) {
                             RemoveRangedInMarker(team.unitID);
                         }
                     }
