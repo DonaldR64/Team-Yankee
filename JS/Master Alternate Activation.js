@@ -2571,7 +2571,7 @@ log(hit)
         let distanceT1T2 = team1.hex.distance(team2.hex);
         let losReason = "";
     
-        if state.TY.darkness === true && special.includes("Spotter") === false && team2.queryCondition("Flare") === false && special.includes("NLOS") === false && team1.nightVisibility < distanceT1T2) {
+        if (state.TY.darkness === true && special.includes("Spotter") === false && team2.queryCondition("Flare") === false && special.includes("NLOS") === false && team1.nightVisibility < distanceT1T2) {
             let result = {
                 los: false,
                 concealed: false,
