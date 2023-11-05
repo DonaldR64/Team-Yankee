@@ -775,12 +775,12 @@ const TY = (() => {
                 if (halted !== "Artillery" && halted !== "Salvo") {
                     halted = parseInt(halted);
                 }
-                if (!halted || halted === "" || isNaN(halted)) {halted = 0};
+                if (!halted || halted === "") {halted = 0};
 
                 if (moving !== "Artillery" && moving !== "Salvo") {
                     moving = parseInt(moving);
                 }
-                if (!moving || moving === "" || isNaN(moving)) {moving = 0};
+                if (!moving || moving === "") {moving = 0};
 
                 let rangeText = attributeArray["weapon"+i+"range"];
                 rangeText = rangeText.split("-");
@@ -4864,7 +4864,7 @@ log("In Create Barrages")
             imgsrc: img,
             layer: "objects",
             aura1_color: colour,
-            aura1_radius: 3,
+            aura1_radius: 60,
         });
         toFront(newToken);
         state.TY.barrageID = newToken.id;
@@ -4879,12 +4879,12 @@ log(ai)
         let two = ai.two;
         if (two === true) {
             newToken.set({
-                aura2_radius: 5,
+                aura2_radius: 100,
                 aura2_color: "#d9d9d9",
             });
         }
         if (two === "Salvo Only") {
-            newToken.set("aura1_radius",5);
+            newToken.set("aura1_radius",100);
         }
         if (unitIDs.length === 0) {
             outputCard.body.push("No Available Artillery");
@@ -6393,7 +6393,12 @@ log("2nd Row to " + team3.name)
                 if (!team) {return};
 
                 let unit = UnitArray[team.unitID];
-                let unitLeader = TeamArray[unit.teamIDs[0]];
+                let unitLeader;
+                if (unit) {
+                    unitLeader = TeamArray[unit.teamIDs[0]];
+                } else {
+                    unitLeader = team;
+                }
 
                 let oldHexLabel = team.hexLabel;
                 let oldLocation = team.location;
