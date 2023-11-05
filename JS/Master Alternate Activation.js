@@ -6335,6 +6335,30 @@ log("2nd Row to " + team3.name)
 
 
 
+    const Test = () => {
+        let chars = findObjs({
+            _type: "character",
+        });
+        chars.forEach((char) => {
+            let tact = parseInt(Attribute(char,"tactical")) * 2;
+            let ter = parseInt(Attribute(char,"terrain")) * 2;
+            let country = parseInt(Attribute(char,"country")) * 2;
+            let road = parseInt(Attribute(char,"road")) * 2;
+            AttributeSet(char.id,"tactical",tact);
+            AttributeSet(char.id,"terrain",ter);
+            AttributeSet(char.id,"country",country);
+            AttributeSet(char.id,"road",road);
+        })
+
+
+
+
+    }
+
+
+
+
+
 
 
 
