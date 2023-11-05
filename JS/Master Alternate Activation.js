@@ -2566,19 +2566,21 @@ log(hit)
         }
     
         let distanceT1T2 = team1.hex.distance(team2.hex);
-        let nightVisibility = distanceT1T2;
         let losReason = "";
-
-        if (state.TY.darkness === true && special.includes("Spotter") === false && team2.queryCondition("Flare") === false && special.includes("NLOS") === false) {
-            if (team1.nightvisibility > 0) {
-                nightVisibility = team1.nightvisibility;
-            } else {
-                nightVisibility = randomInteger(6) * 4;
-                team1.nightvisibility = nightVisibility;
+    
+        if state.TY.darkness === true && special.includes("Spotter") === false && team2.queryCondition("Flare") === false && special.includes("NLOS") === false && team1.nightVisibility < distanceT1T2) {
+            let result = {
+                los: false,
+                concealed: false,
+                bulletproof: false,
+                smoke: false,
+                facing: facing,
+                shooterface: shooterFace,
+                distance: distanceT1T2,
+                special: special,
             }
-            if (team1.special.includes("Infra-Red") || team1.special.includes("Thermal")) {
-                nightVisibility = Math.max(nightVisibility,randomInteger(6)*4);
-            }
+            losReason = "Night Visibility < Distance"
+            return result;    
         }
     
         let facing = Facing(id1,id2);
@@ -2603,21 +2605,6 @@ log(hit)
         let bulletproof = false;
         let smoke = false;
         let los = true;
-    
-        if (nightVisibility < distanceT1T2) {
-            let result = {
-                los: false,
-                concealed: false,
-                bulletproof: false,
-                smoke: false,
-                facing: facing,
-                shooterface: shooterFace,
-                distance: distanceT1T2,
-                special: special,
-            }
-            losReason = "Night Visibility < Distance"
-            return result;    
-        }
     
         if (special.includes("NLOS")) {
             if (team2.type === "Infantry" && team2.moved === false && team2Hex.bp === true) {
@@ -3812,7 +3799,10 @@ log(hit)
             team.specialorder = "";
             team.hitArray = [];
             team.eta = [];
-            team.nightvisibility = 0;
+            team.nightvisibility = randomInteger(6) * 4;
+            if (team.special.includes("Infra-Red") || team.special.includes("Thermal")) {
+                nightVisibility = Math.max(nightVisibility,randomInteger(6)*4);
+            }
             team.moved = false;
             team.maxTact = false;
             team.fired = false;
