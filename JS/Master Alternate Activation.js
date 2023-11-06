@@ -157,6 +157,7 @@ const TY = (() => {
         "#434343": {name: "Hill 2",height:2,bp: false,type: 0,group: "Hill",dash: 1},
         "#666666": {name: "Hill 3",height:3,bp: false,type: 0,group: "Hill",dash: 1},
         "#c0c0c0": {name: "Hill 4",height:4,bp: false,type: 0,group: "Hill",dash: 1},
+        "#d9d9d9": {name: "Hill 5",height:5,bp: false,type: 0,group: "Hill",dash: 1},
         "#00ffff": {name: "Stream",height: 0,bp: false,type: 0,group: "Water",dash: 2},
         "#b6d7a8": {name: "Scrub",height: 0,bp: false,type: 1,group: "Crops",dash: 2},
         "#980000": {name: "Low Embankment",height: 0.25,bp: false,type: 0,group: "Hill",dash: 2},
@@ -165,9 +166,9 @@ const TY = (() => {
 
     const MapTokenInfo = {
         "wreck": {name: "Wreck",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
-        "building 1": {name: "Building 1",height: 1,bp: true,type: 3,group: "Building",dash: 2},
-        "building 2": {name: "Building 2",height: 2,bp: true,type: 3,group: "Building",dash: 2},
-        "building 3": {name: "Building 3",height: 3,bp: true,type: 3,group: "Building",dash: 2},
+        "buildings 1": {name: "Buildings Height 1",height: 1,bp: true,type: 3,group: "Building",dash: 2},
+        "buildings 2": {name: "Buildings Height 2",height: 2,bp: true,type: 3,group: "Building",dash: 2},
+        "buildings 3": {name: "Buildings Height 3",height: 3,bp: true,type: 3,group: "Building",dash: 2},
         "rubble": {name: "Rubble",height: 0,bp: true,type: 1,group: "Rough",dash: 2},
         "anti-tank ditch": {name: "Anti-Tank Ditch",height: 0,bp: true,type: 0,group: "Trench",dash: 3},
         "wall": {name: "Wall",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
@@ -5156,6 +5157,8 @@ log(weapon)
         let observerTeam = TeamArray[observerID];
         let artilleryUnit = UnitArray[artUnitID];
     
+
+
         unitIDs4Saves = {};
         let rangedIn = false;
         let targetHex = barrageTeam.hex;
