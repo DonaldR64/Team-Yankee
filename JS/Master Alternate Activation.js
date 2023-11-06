@@ -4966,8 +4966,8 @@ log(weapon)
                     bombletFlag = true;
                     salvo = true;
                 }
-                if (team.special.includes("Laser Guided") && spotter.spotAttempts === 0) {
-                    laserFlag = true; //takes all 3 spot attempts
+                if (team.special.includes("Laser Guided") && spotter.spotAttempts === 0 && spotter.special.includes("Observer")) {
+                    laserFlag = true; //takes all 3 spot attempts and only specialized observers
                 }
                 
                 //add ability for this artillery unit to the barrage character
