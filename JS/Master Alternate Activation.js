@@ -43,6 +43,7 @@ const TY = (() => {
         "defensive": "status_green",
         "surprised": "status_yellow",
         "HQ": "status_black-flag",
+        "oneshot": "status_oneshot::5503748",
     };
 
     let specialInfo = {
@@ -4950,6 +4951,8 @@ log(artUnits)
                 let weapon = team.artilleryWpn;
 log(weapon)
                 if (!weapon) {continue}
+                if ((weapon.notes.includes("One Shot") || weapon.notes.includes("One-Shot")) && team.token.get(sm.oneshot) === true) {continue};
+
                 if (weapon.moving === "Artillery" || weapon.halted === "Artillery") {
                     normal = true;
                 }
@@ -5181,6 +5184,8 @@ log(weapon)
         for (let i=0;i<artilleryUnit.teamIDs.length;i++) {
             let team = TeamArray[artilleryUnit.teamIDs[i]];
             if (team.artilleryWpn !== undefined) {
+                weapon = team.artilleryWpn;
+
                 let dist = team.hex.distance(barrageTeam.hex);
                 if (hexMap[team.hexLabel].terrain.includes("Offboard") ){
                     dist += 50; //1km off map
@@ -5194,8 +5199,9 @@ log(weapon)
                         continue;
                     };
                 }
+                if ((weapon.notes.includes("One Shot") || weapon.notes.includes("One-Shot")) && team.token.get(sm.oneshot) === true) {continue};
+
                 artilleryTeams.push(team);
-                weapon = team.artilleryWpn;
             }
         }
     
@@ -5259,6 +5265,9 @@ log(weapon)
             artTeam.token.set("rotation",phi);
             artTeam.fired = true;
             artTeam.addCondition("Fired");
+            if ((weapon.notes.includes("One Shot") || weapon.notes.includes("One-Shot")) && artTeam.token.get(sm.oneshot) === false) {
+                artTeam.token.set(sm.oneshot,true);
+            };
             if (state.TY.darkness === true) {
                 shooterTeam.addCondition("Flare");
             }   
