@@ -2961,7 +2961,6 @@ log(outputCard)
         let errorMsg = "";
     
         if (state.TY.currentUnitID !== "") {
-//last unit checks GTG and in command if didnt fire/assault - fix
             let curUnit = UnitArray[state.TY.currentUnitID];
             GTG(curUnit);
             curUnit.IC();
@@ -3816,8 +3815,15 @@ log(outputCard)
                 if (unitLeader) {
                     unitLeader.token.set("aura1_color",Colours.green);
                 }
+                if (unit.id === state.TY.currentUnitID) {
+                    GTG(unit);
+                    unit.IC();
+                }
+
 //any other things to do at start of turn to unit                
             });
+
+
             state.TY.currentUnitID = "";
 
 
