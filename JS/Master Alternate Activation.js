@@ -3137,7 +3137,11 @@ log(outputCard)
             AddAbility(abilityName,action,char.id);     
         }
 
-
+        if (type === "Aircraft") {
+            abilityName = "Arrive ?";
+            action = "!EnterAircraft";
+            AddAbility(abilityName,action,char.id);
+        }
 
         if (char.get("name").includes("Mine") && type === "System Unit") {
             abilityName = "Minefield Check";
@@ -6427,7 +6431,25 @@ log("2nd Row to " + team3.name)
         })
     }
 
-
+    const EnterAircraft = (msg) => {
+        let id = msg.selected[0]._id;
+        let team = TeamArray[id];
+        let unit = UnitArray[team.unitID];
+        let needed = 4;
+        if (team.special.includes("Jump Jet")) {
+            needed = 3;
+        }
+        SetupCard(unit.name,"Needing: " + needed + "+",unit.nation);
+        let roll = randomInteger(6);
+        outputCard.body.push("Roll: " + DisplayDice(roll,team.nation,36));
+        if (roll >= needed) {
+           outputCard.body.push("The Unit may enter the Battlefield this turn");
+        } else {
+           outputCard.body.push("[#ff0000]The Unit is Refuelling/Refitting this turn[/#]");
+        }
+        PrintCard();
+    }
+    
 
 
 
@@ -6681,6 +6703,9 @@ log("2nd Row to " + team3.name)
                 break;
             case '!SizeHex':
                 SizeHex(msg);
+                break;
+            case '!EnterAircraft':
+                EnterAircraft(msg);
                 break;
         }
     };
