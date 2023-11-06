@@ -6413,6 +6413,21 @@ log("2nd Row to " + team3.name)
     }
 
 
+    const SizeHex = (msg) => {
+        let tokenIDs = [];
+        for (let i=0;i<msg.selected.length;i++) {
+            tokenIDs.push(msg.selected[i]._id);
+        }
+        _.forEach(tokenIDs,tokenID => {
+            let token = findObjs({_type:"graphic", id: tokenID})[0];
+            token.set({
+                width: 75,
+                height: 89,
+            })
+        })
+    }
+
+
 
 
 
@@ -6663,6 +6678,9 @@ log("2nd Row to " + team3.name)
                 break;
             case '!EndFire':
                 EndFire(msg);
+                break;
+            case '!SizeHex':
+                SizeHex(msg);
                 break;
         }
     };
