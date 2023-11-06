@@ -4129,6 +4129,10 @@ log(outputCard)
         let targetID = Tag[2];
         let weaponType = Tag[3]; 
         let shellType = Tag[4]; //Regular,Smoke
+        ShootingTwo(shooterID,targetID,weaponType,shellType);
+    }
+
+    const ShootingTwo = (shooterID,targetID,weaponType,shellType,observerID) => {
         let shooter = TeamArray[shooterID];
         let shooterUnit = UnitArray[shooter.unitID];
         let unitFire = false;
@@ -4284,9 +4288,10 @@ log("Mistaken: " + mistaken)
                     } 
 
                     let initialLOS,tID;
+                    let sID = (!observerID) ? st.id:observerID;
                     for (let t=0;t<targetTeamArray.length;t++) {
                         tID = targetTeamArray[t].id;
-                        initialLOS = LOS(st.id,tID,special);
+                        initialLOS = LOS(sID,tID,special);
                         if (initialLOS.los === true) {
                             break;
                         }
@@ -4357,6 +4362,8 @@ log("Mistaken: " + mistaken)
         //expand ETA
         for (let i=0;i<shooterTeamArray.length;i++) {
             let st = shooterTeamArray[i];
+            let sID = (!observerID) ? st.id:observerID;
+
             for (let j=0;j<targetTeamArray.length;j++) {
                 let tt = TeamArray[targetTeamArray[j].id];
                 if (defensive === true && st.ccIDs.includes(tt.id) === false) {
@@ -4371,7 +4378,7 @@ log("Mistaken: " + mistaken)
                     if (weapon.notes.includes("Overhead")) {special += ",Overhead"};
                     if (weapon.notes.includes("NLOS")) {special += ",NLOS"};
                     if (defensive === true) {special += ",Defensive"};
-                    ttLOS = LOS(st.id,tt.id,special);
+                    ttLOS = LOS(sID,tt.id,special);
                     if (ttLOS.los === false) {continue};
                     if (ttLOS.distance > weapon.maxRange) {continue};
                     if (ttLOS.distance < weapon.minRange) {continue};
@@ -5223,6 +5230,26 @@ log(weapon)
             }
         }
     
+        let addBattery = false;
+        if (observerTeam.spotAttempts > 0) {
+            addBattery = true;
+        }
+        let spotAttempts = 3 - observerTeam.spotAttempts; //as spotter may spot more than once, zeroed in Reset Flags routine
+        if (spotAttempts < 3 && (ammoType === "Laser Guided" || ammoType === "Krasnopol")) {
+            outputCard.body.push("Observer needs 3 Spot Attempts for Laser Guided Munitions");
+            PrintCard();
+            return;
+        }
+        let spotRolls = [];
+
+        if (ammoType === "Laser Guided" || ammoType === "Krasnopol") {
+            let laserTargetID = hexMap[targetHex.label()].tokenIDs[0];
+            observerTeam.spotAttempts = 3;
+            ShootingTwo(artilleryUnit.leaderID,laserTargetID,"Laser Guided",ammoType,observerID);
+            RemoveBarrageToken()
+            return;
+        }
+
         //in range,arc of at least one team; rotate to face, mark as fired - weapon will be the weapon info, gun num will be # of teams firing
         let gunNum = artilleryTeams.length;
         for (let i=0;i<artilleryUnit.teamIDs.length;i++) {
@@ -5236,13 +5263,7 @@ log(weapon)
                 shooterTeam.addCondition("Flare");
             }   
         }
-        let addBattery = false;
-        if (observerTeam.spotAttempts > 0) {
-            addBattery = true;
-        }
-        let spotAttempts = 3 - observerTeam.spotAttempts; //as spotter may spot more than once, zeroed in Reset Flags routine
     
-        let spotRolls = [];
         let needed = Math.max(observerTeam.skill,artilleryTeams[0].skill);
 
         let success = false;
@@ -5331,9 +5352,6 @@ log(weapon)
         }
         PlaySound(sound);
 
-        let rerollException = false;
-        if (weapon.notes.includes("Bombs")) {rerollException = true};        
-
         if (success === false) {
             let fail = '[🎲](#" class="showtip" title="' + hittip + ')' + "Failed to Range In";
             outputCard.body.push(fail);
@@ -5370,16 +5388,20 @@ log(weapon)
                 let num = Math.ceil(gunNum/3);
                 let s = "";
                 if (num > 1) {s = "s"};
-                outputCard.body.push("Place " + num + ' Minefield Marker' + s + ' within 2" of the Ranged In Target and Activate Them');
+                outputCard.body.push("Place " + num + ' Minefield Marker' + s + ' within 2 hexes of the Ranged In Target');
                 state.TY.minelets[currentPlayer].push(artilleryUnit.id);
                 unitFiredThisTurn = true;
                 PrintCard();
                 return;
+            } else if (ammoType === "Laser Guided") {
+            
+            
+            
             } else {
                 if (observerLOS.los === false) {
                     outputCard.body.push("+1 to Roll Needed to Hit due to Spotter LOS");
                 }
-                if (gunNum < 3  && rerollException === false) {
+                if (gunNum < 3) {
                     outputCard.body.push("Hits Will be Rerolled Due to # of Guns");
                 } else if (gunNum > 4) {
                     outputCard.body.push("Misses Will be Rerolled Due to # of Guns");
@@ -5405,7 +5427,7 @@ log(weapon)
             let neededToHit = parseInt(team.hit) + (spotAttempts - 1);
             if (observerLOS.los === false) {neededToHit += 1};//repeat bombardment, spotter doesnt have LOS
             let roll = randomInteger(6);
-            if (gunNum < 3 && roll >= neededToHit && rerollException === false) {
+            if (gunNum < 3 && roll >= neededToHit) {
                 //reroll hits if only 1 or 2 guns
                 roll = randomInteger(6);
             }
@@ -5415,6 +5437,16 @@ log(weapon)
             }
             let tip =  "To Hit: " + roll + " vs. " + neededToHit + "+";
     
+            if (ammoType === "Bomblets") {
+                weapon = {
+                    name: "DPICM Rounds",
+                    at: 3,
+                    fp: 6,
+                    notes: " ",
+                    type: "Artillery",
+                }
+            }
+
             let hit = {
                 weapon: weapon,
                 bp: hexMap[team.hexLabel].bp,
