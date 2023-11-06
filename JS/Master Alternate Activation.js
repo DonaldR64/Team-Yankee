@@ -22,6 +22,8 @@ const TY = (() => {
     let assaultingUnitID = "";
     let deadHQs = [[],[]]; //formationIDs of any formations that lost leaders in prev. turn, by player
 
+    const TurnMarkers = ["","https://s3.amazonaws.com/files.d20.io/images/361055772/zDURNn_0bbTWmOVrwJc6YQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055766/UZPeb6ZiiUImrZoAS58gvQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055764/yXwGQcriDAP8FpzxvjqzTg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055768/7GFjIsnNuIBLrW_p65bjNQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055770/2WlTnUslDk0hpwr8zpZIOg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055771/P9DmGozXmdPuv4SWq6uDvw/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055765/V5oPsriRTHJQ7w3hHRBA3A/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055767/EOXU3ujXJz-NleWX33rcgA/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055769/925-C7XAEcQCOUVN1m1uvQ/thumb.png?1695998303"];
+
 
     let hexMap = {}; 
     let edgeArray = [];
@@ -166,9 +168,9 @@ const TY = (() => {
 
     const MapTokenInfo = {
         "wreck": {name: "Wreck",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
-        "buildings 1": {name: "Buildings Height 1",height: 1,bp: true,type: 3,group: "Building",dash: 2},
-        "buildings 2": {name: "Buildings Height 2",height: 2,bp: true,type: 3,group: "Building",dash: 2},
-        "buildings 3": {name: "Buildings Height 3",height: 3,bp: true,type: 3,group: "Building",dash: 2},
+        "building 1": {name: "Building - Height 1",height: 1,bp: true,type: 3,group: "Building",dash: 3},
+        "building 2": {name: "Building - Height 2",height: 2,bp: true,type: 3,group: "Building",dash: 3},
+        "building 3": {name: "Building - Height 3",height: 3,bp: true,type: 3,group: "Building",dash: 3},
         "rubble": {name: "Rubble",height: 0,bp: true,type: 1,group: "Rough",dash: 2},
         "anti-tank ditch": {name: "Anti-Tank Ditch",height: 0,bp: true,type: 0,group: "Trench",dash: 3},
         "wall": {name: "Wall",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
@@ -995,12 +997,12 @@ const TY = (() => {
             this.ccIDs = []; //ids of team in defensive fire range
             this.assaultTargetIDs = []; //ids of teams in CC with
             this.frontLine = false;
+            this.oppFireTarget = "";
 
             this.bailed = this.queryCondition("Bailed Out");
             this.fired = this.queryCondition("Fired");
             this.aaFired = this.queryCondition("AA Fire");
             this.moved = ((this.queryCondition("Tactical") || this.queryCondition("Dash")) === true) ? true:false;
-            this.aaweapon = ''; //used to track weapons fired in AA
             this.gonetoground = this.queryCondition("GTG");
 
             this.maxPass = maxPass;
@@ -1762,8 +1764,7 @@ log(hit)
             IRVision: 40,
             turn: 0,
             step: "start",
-            gametype: "undefined",
-            currentPlayer: undefined,
+            gametype: "",
             timeOfDay: "Day",
             startingPlayer: undefined,
             barrageID: "",
@@ -1776,6 +1777,7 @@ log(hit)
             units: {},//unitIDs -> name
             passengers: {},//keyed on IDs of transports, arrays of passengerIDs
             currentUnitID: "",
+            turnMarkerID: "",
         }
 //later - have night vision distance be somewhat random ie. full moon to dark of night/cloudy
 //could also have 2nd/3rd gen thermal vs IR
@@ -1790,7 +1792,7 @@ log(hit)
             _subtype: "token",
         });
 
-        let removals = ["SmokeScreen","rangedin","Foxholes","Smoke"];
+        let removals = ["SmokeScreen","rangedin","Foxholes","Smoke","Turn"];
         tokens.forEach((token) => {
             let layer = token.get("layer");
             if (token.get("status_dead") === true) {
@@ -2016,7 +2018,7 @@ log(outputCard)
                     foxholes: false,
                     type: 0,
                     bp: false,
-                    dash: "Country",
+                    dash: 0,
                 };
                 hexMap[label] = hexInfo;
                 columnLabel += 2;
@@ -2177,6 +2179,9 @@ log(outputCard)
         mta.forEach((token) => {
             let truncName = token.get("name").toLowerCase();
             truncName = truncName.trim();
+            if (truncName.includes("building")) {
+                truncName = truncName.slice(0,-1);
+            }
             let t = MapTokenInfo[truncName];
             if (!t) {
                 return;
@@ -2972,7 +2977,7 @@ log(outputCard)
             targetName = unit.name;
             for (let i=0;i<unit.teamIDs.length;i++) {
                 let tm = TeamArray[unit.teamIDs[i]];
-                if (tm.inCommand === true) {
+                if (tm.inCommand === true && tm.bailed === false) {
                     targetArray.push(tm);
                 }
             }
@@ -3545,6 +3550,7 @@ log(outputCard)
             for (let i=0;i<keys.length;i++) {
                 let unit = UnitArray[keys[i]];
                 let unitLeader = TeamArray[unit.teamIDs[0]];
+                if (!unitLeader) {continue};
                 if (hexMap[unitLeader.hexLabel].terrain.includes("Offboard") || unitLeader.token.get("aura1_color") === Colours.black) {continue};
                 let pos = unitLeader.location;
                 sendPing(pos.x,pos.y, Campaign().get('playerpageid'), null, true); 
@@ -3561,7 +3567,7 @@ log(outputCard)
                 let form = new Formation(p,state.TY.nations[p][0],num,"Barrages");
                 let unit = new Unit(p,state.TY.nations[p][0],num,"Barrages");
             }
-            if (state.TY.gametype === undefined) {
+            if (state.TY.gametype === "") {
                 SetupCard("Setup Game","","Neutral");
                 ButtonInfo("Setup New Game","!SetupGame;?{Game Type|Meeting Engagement|Attack/Defend};?{Time of Day|Daylight|Dawn|Dusk|Night|Random}");
                 PrintCard();
@@ -3570,16 +3576,22 @@ log(outputCard)
             if (state.TY.gametype === "Meeting Engagement") {
                 StartInFoxholes();
             }
-
             turn = 1;
+            state.TY.turn = 1;
+
         } else {
             turn++;
             state.TY.turn = turn;
         }
 
-
-
-
+        let tmID = state.TY.turnMarkerID;
+        let turnMarker = findObjs({_type:"graphic", id: tmID})[0];
+        if (!turnMarker) {
+            PlaceTurnMarker()
+        } else {
+            let newImg = getCleanImgSrc(TurnMarkers[state.TY.turn]);
+            turnMarker.set("imgsrc",newImg);
+        }
 
         if ((state.TY.timeOfDay === "Dawn" || state.TY.timeOfDay === "Dusk") && turn > 2) {
             let numDice = turn - 2;
@@ -3801,10 +3813,12 @@ log(outputCard)
             PrintCard();
             _.forEach(UnitArray,unit => {
                 let unitLeader = TeamArray[unit.teamIDs[0]];
-                unitLeader.token.set("aura1_color",Colours.green);
+                if (unitLeader) {
+                    unitLeader.token.set("aura1_color",Colours.green);
+                }
 //any other things to do at start of turn to unit                
             });
-
+            state.TY.currentUnitID = "";
 
 
 
@@ -3835,6 +3849,8 @@ log(outputCard)
             team.moved = false;
             team.maxTact = false;
             team.fired = false;
+            team.aaFired = false;
+            team.oppFireTarget = "";
         }
 
         if (unitActivated === true) {
@@ -4144,51 +4160,47 @@ log(outputCard)
         let unitFire = false;
         let sname = shooter.name;
 
+        let target = TeamArray[targetID];
+        let targetUnit = UnitArray[target.unitID];
+        
         if (shooterID === shooterUnit.teamIDs[0]) {
             unitFire = true
             sname = shooterUnit.name;
-            if (shooterUnit.order === "") {
-                sendChat("","Unit Order defaulted to Hold");
-                shooterUnit.order = "Hold"; //as if moved, would have been defaulted by changeGraphic already to Tactical
-                for (let i=0;i<shooterUnit.teamIDs.length;i++) {
-                    let sTeam = TeamArray[shooterUnit.teamIDs[i]];
-                    if (i===0) {sTeam.token.set("aura1_color",Colours.black)};
-                    if (sTeam.inCommand === true) {
-                        sTeam.order = "Hold";
-                        sTeam.addCondition("Hold");
-                    }
-                }
-            }
-        } else {
-            if (shooter.order === "") {
-                sendChat("","Team Order defaulted to Hold");
-                shooter.order = "Hold";
-            }
-        }
+        } 
 
         SetupCard(sname,"Shooting",shooter.nation);
 
+        let errorMsg = "";
         let defensive = false;
-        if (shooter.player !== state.TY.currentPlayer) {
-            defensive = true;
-            outputCard.subtitle = "Defensive Fire";
-            if (shooter.ccIDs.includes(targetID) === false || state.TY.step !== "Assault") {
-                outputCard.body.push('This Team cannot conduct Defensive Fire');
-                PrintCard();
-                return;
+        let oppfire = false;
+        if (shooterUnit.id !== state.TY.currentUnitID) {
+            if (assaultingUnitID === "") {
+                oppfire = true;
+                if (targetUnit.id !== state.TY.currentUnitID) {
+                    errorMsg = "Opportunity Fire has to be against currently activated unit";
+                }
+            } else {
+                defensive = true;
+                outputCard.subtitle = "Defensive Fire";
+                if (shooter.ccIDs.includes(targetID) === false || state.TY.step !== "Assault") {
+                    errorMsg = 'This Team cannot conduct Defensive Fire'
+                }
             }
         }
         let shootingType = (defensive === true) ? "Defensive":"Normal";
 
         if (shooter.order === "Dash" && defensive === false) {
-            outputCard.body.push('Team Dashed and cannot Fire');
+            errorMsg = 'Team Dashed and cannot Fire'
+        }
+
+        if (errorMsg !== "") {
+            outputCard.body.push(errorMsg);
             PrintCard();
             return;
         }
 
         let weapons = [];
         let shooterTeamArray = [];
-        let target = TeamArray[targetID];
         let targetTeamArray = BuildTargetTeamArray(target,shooter);
 
         let mistaken = true;
@@ -4229,11 +4241,9 @@ log("Mistaken: " + mistaken)
                 if (st.spotAttempts > 0) {
                     excluded = " Spotted for Artillery";
                 }
-            }
-
-            if (st.aaweapon.hasOwnProperty("name")) {
-                if (st.aaweapon.type === weaponType && defensive === true) {
-                    excluded = " fired AA, can't use same weapon in Defensive Fire";
+            } else if (defensive === true) {
+                if (st.oppFireTarget === targetUnit.id) {
+                    excluded = " Fired at this unit using Opportunity Fire";
                 }
             }
 
@@ -4289,6 +4299,7 @@ log("Mistaken: " + mistaken)
 
                     if (weapon.notes.includes("Overhead")) {special += ",Overhead"};
                     if (weapon.notes.includes("NLOS")) {special += ",NLOS"};
+//fix below
                     if (target.type === "Aircraft" && (weapon.notes.includes("AA") === false || weapon.type.includes("AA") === false)) {
                         weaponExclusion = " has No AA Weapon";
                     } 
@@ -4437,6 +4448,10 @@ log(weapons)
                     toHit += rangeIncrement;
                     toHitTips += "<br>+" + rangeIncrement + " Long Range";
                 }
+                if (oppfire === true && target.type !== "Aircraft" && target.type !== "Helicopter") {
+                    toHit++;
+                    toHitTips += "<br>Opportunity Fire +1";
+                }
                 if (los.concealed === true) {
                     toHit++;
                     toHitTips += "<br>Concealed +1";
@@ -4473,7 +4488,7 @@ log(weapons)
                     toHit++;
                     toHitTips += "<br>Slow Firing & Moved +1";
                 }
-                if (weapon.notes.includes("Stabiliser") && weapon.notes.includes("Advanced Stabiliser") === false && team.maxTact === true) {
+                if (weapon.notes.includes("Stabiliser") && weapon.notes.includes("Advanced Stabiliser") === false && sTeam.maxTact === true) {
                     toHit += 1;
                     toHitTips.push("+1 for Stabiliser")
                 }
@@ -4505,13 +4520,13 @@ log(weapons)
                         rof = weapon.moving;
                     }
                 }
+         ////       
                 if (target.type === "Aircraft") {
                     if (weapon.notes.includes("Self Defence AA")) {
                         rof = 1;
                     } else if (weapon.notes.includes("Dedicated AA")) {
                         rof = weapon.halted;
                     }
-                    sTeam.aaweapon = weapon;
                 }
 
                 if (rof === 0) {
@@ -4609,22 +4624,26 @@ log(weapons)
                         special: eta[targNum].los.special,
                     }
                     TeamArray[eta[targNum].targetID].hitArray.push(hit);
-                    if (weapon.type !== "AA MG") {
-                        let phi = Angle(sTeam.hex.angle(TeamArray[eta[targNum].targetID].hex));
-                        sTeam.token.set("rotation",phi);
-                    }
+  
 
 
                 }
             }
             //place markers on shooter
-            if (target.type === "Aircraft") {
+            if (target.type === "Aircraft" || target.type === "Helicopter") {
                 sTeam.addCondition("AAFire");
                 sTeam.aaFired = true;
             } else if (defensive === false) {
                 sTeam.addCondition("Fired");
                 sTeam.fired = true;
             }
+            if (oppfire === true) {
+                sTeam.oppFireTarget = targetUnit.id;
+            }
+            if (defensive === true) {
+                sTeam.oppFireTarget = "";
+            }
+
             if (state.TY.darkness === true) {
                 sTeam.addCondition("Flare");
             }
@@ -5943,7 +5962,7 @@ log(unitIDs4Saves)
             if (team1.special.includes("Heavy Weapon")) {
                 errorMsg = "This Team is a Heavy Weapons Team and cannot Charge into Contact";
             }
-            if (team1.aaweapon.hasOwnProperty("name")) {
+            if (team1.queryCondition("AAFire") === true) {
                 errorMsg = "This Team fired AA Fire and cannot Charge into Contact";
             }
 
@@ -6450,7 +6469,23 @@ log("2nd Row to " + team3.name)
         PrintCard();
     }
     
-
+    const PlaceTurnMarker = () => {
+        let turnMarker = getCleanImgSrc(TurnMarkers[state.TY.turn]);        
+        let x = Math.floor((pageInfo.width + edgeArray[1]) / 2);
+        let y = Math.floor((pageInfo.height/2));
+        let newToken = createObj("graphic", {   
+            left: x,
+            top: y,
+            width: 210, 
+            height: 210,  
+            name: "Turn",
+            pageid: Campaign().get("playerpageid"),
+            imgsrc: turnMarker,
+            layer: "map",
+        });
+        toFront(newToken);
+        state.TY.turnMarkerID = newToken.id;
+    }
 
 
 
@@ -6491,6 +6526,8 @@ log("2nd Row to " + team3.name)
                 if (hexMap[newHexLabel].dash === 4) {
                     moveBack = true;
                 }
+log("Hex Map Dash: " + hexMap[newHexLabel].dash)
+log("Move Back: " + moveBack)
                 let ccError = InCC(team);
                 if (moveBack === true || ccError === true) {
                     PlaySound("No");
