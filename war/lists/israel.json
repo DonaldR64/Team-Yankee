@@ -5,24 +5,23 @@
 	"notes": ["For any OP Must Field Artillery Unit"],
 	"sections": [
 		{"name": "Core Battalion Formations", "formations": [
-			{"id": 501, "name": "Merkava 1 Tank Company","pts": 0,"upgrades": [1,2,4,5,6,7,8,9,15,16,20,21,22]},
-			{"id": 502, "name": "Merkava 2 Tank Company","pts": 0,"upgrades": [31,32,34,35,36,37,38,39,15,16,20,21,22]},
-            {"id": 503, "name": "Magach 6 Tank Company","pts": 0,"upgrades": [41,42,44,45,46,47,48,49,15,16,20,21,22]},
-            {"id": 504, "name": "M113 Mech Infantry Company","pts": 0,"upgrades": [51,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68]}
+			{"id": 501, "name": "Merkava 1 Tank Company","pts": 0,"upgrades": [1,2,4,5,20,21,22,54,55]},
+			{"id": 502, "name": "Merkava 2 Tank Company","pts": 0,"upgrades": [31,32,34,35,20,21,22,54,55]},
+            {"id": 503, "name": "Magach 6 Tank Company","pts": 0,"upgrades": [41,42,44,45,20,21,22,54,55]},
+            {"id": 504, "name": "M113 Mech Infantry Company","pts": 0,"upgrades": [51,54,55,66,67,68]}
 		]},
 
-		{"name": "Brigade Support", "formations": [
-			{"id": 506, "name": "Merkava 1 Tank Platoon","pts": 0,"upgrades": [8,9]},
-			{"id": 507, "name": "Merkava 2 Tank Platoon","pts": 0,"upgrades": [38,39]},
-            {"id": 508, "name": "Magach 6 Tank Platoon","pts": 0,"upgrades": [48,49]},
-            {"id": 509, "name": "M113 Mech Infantry Platoon","pts": 0,"upgrades": [58,59]}
-		]},
+        {"name": "Brigade Support", "formations": [
+            {"id": 506, "name": "Merkava 1 Tank Platoon","pts": 0,"upgrades": [4,5]},
+            {"id": 507, "name": "Merkava 2 Tank Platoon","pts": 0,"upgrades": [34,35]},
+            {"id": 508, "name": "Magach 6 Tank Platoon","pts": 0,"upgrades": [44,45]},
+            {"id": 509, "name": "M113 Mech Infantry Platoon","pts": 0,"upgrades": [54,55]}
+        ]},
 
 	    {"name": "Divisional Support","formations":[
-	    	{"id": 510, "name": "M109 SP Artillery Battery","pts": 0,"upgrades": [110,111]},
+	    	{"id": 510, "name": "Artillery Battery","pts": 0,"upgrades": [110,111]},
 	    	{"id": 511, "name": "M113 OP","pts": 1, "units": "1x M113 OP"},
-	    	{"id": 512, "name": "M109 SP Artillery Battery","pts": 0,"upgrades": [110,111]},
-            {"id": 513, "name": "M106 120mm Mortar Battery","pts": 0,"upgrades": [100,101,102]},
+	    	{"id": 512, "name": "Artillery Battery","pts": 0,"upgrades": [110,111,100,101,102]},
             {"id": 514, "name": "Pereh Anti-tank Platoon","pts": 0,"upgrades": [120,121]},            
             {"id": 515, "name": "Jeep (TOW) Platoon","pts": 0,"upgrades": [115,116]},
             {"id": 516, "name": "M163 VADS AA Platoon","pts": 0,"upgrades": [125,126]},
@@ -41,16 +40,9 @@
       	{"id": 1, "name": "HQ - 1 Merkava 1", "pts": 6},
       	{"id": 2, "name": "HQ - 2 Merkava 1s", "pts": 12},
 
-      	{"id": 4, "name": "1st Platoon - 2 Merkava 1s", "pts": 12},
-      	{"id": 5, "name": "1st Platoon - 3 Merkava 1s", "pts": 18},
-      	{"id": 6, "name": "2nd Platoon - 2 Merkava 1s", "pts": 12},
-      	{"id": 7, "name": "2nd Platoon - 3 Merkava 1s", "pts": 18},
-      	{"id": 8, "name": "3rd Platoon - 2 Merkava 1s", "pts": 12},
-      	{"id": 9, "name": "3rd Platoon - 3 Merkava 1s", "pts": 18},
-      	
-      	{"id": 15, "name": "3x Galil Rifle Teams, 2x FN MG Teams, 2x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 3x M113 Transports", "pts": 8},
-      	{"id": 16, "name": "4x Galil Rifle Teams, 3x FN MG Teams, 3x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 4x M113 Transports", "pts": 11},
-
+      	{"id": 4, "name": "Platoon: 2 Merkava 1s", "pts": 12},
+      	{"id": 5, "name": "Platoon: 3 Merkava 1s", "pts": 18},
+    
       	{"id": 20, "name": "Jeep Recce Platoon","units": "3x Recce Jeeps", "pts": 2},
       	{"id": 21, "name": "M113 Recce Platoon (3)","units": "3x Recce M113", "pts": 2},
       	{"id": 22, "name": "M113 Recce Platoon (4)","units": "4x Recce M113", "pts": 3},
@@ -58,49 +50,24 @@
         {"id": 31, "name": "HQ - 1 Merkava 2", "pts": 7},
       	{"id": 32, "name": "HQ - 2 Merkava 2s", "pts": 14},
 
-      	{"id": 34, "name": "1st Platoon - 2 Merkava 2s", "pts": 14},
-      	{"id": 35, "name": "1st Platoon - 3 Merkava 2s", "pts": 21},
-      	{"id": 36, "name": "2nd Platoon - 2 Merkava 2s", "pts": 14},
-      	{"id": 37, "name": "2nd Platoon - 3 Merkava 2s", "pts": 21},
-      	{"id": 38, "name": "3rd Platoon - 2 Merkava 2s", "pts": 14},
-      	{"id": 39, "name": "3rd Platoon - 3 Merkava 2s", "pts": 21},
+      	{"id": 34, "name": "Platoon: 2 Merkava 2s", "pts": 14},
+      	{"id": 35, "name": "Platoon: 3 Merkava 2s", "pts": 21},
 
         {"id": 41, "name": "HQ - 1 Magach 6", "pts": 4},
       	{"id": 42, "name": "HQ - 2 Magach 6s", "pts": 7},
 
-      	{"id": 44, "name": "1st Platoon - 2 Magach 6s", "pts": 7},
-      	{"id": 45, "name": "1st Platoon - 3 Magach 6s", "pts": 11},
-      	{"id": 46, "name": "2nd Platoon - 2 Magach 6s", "pts": 7},
-      	{"id": 47, "name": "2nd Platoon - 3 Magach 6s", "pts": 11},
-      	{"id": 48, "name": "3rd Platoon - 2 Magach 6s", "pts": 7},
-      	{"id": 49, "name": "3rd Platoon - 3 Magach 6s", "pts": 11},
-
+      	{"id": 44, "name": "Platoon: 2 Magach 6s", "pts": 7},
+      	{"id": 45, "name": "Platoon: 3 Magach 6s", "pts": 11},
+ 
         {"id": 51, "name": "HQ - 1 Galil Team", "pts": 1},
         
-        {"id": 54, "name": "1st Platoon: 3x Galil Rifle Teams, 2x FN MG Teams, 2x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 3x M113 Transports", "pts": 8},
-        {"id": 55, "name": "1st Platoon: 4x Galil Rifle Teams, 3x FN MG Teams, 3x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 4x M113 Transports", "pts": 11},
-
-        {"id": 56, "name": "2nd Platoon: 3x Galil Rifle Teams, 2x FN MG Teams, 2x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 3x M113 Transports", "pts": 8},
-        {"id": 57, "name": "2nd Platoon: 4x Galil Rifle Teams, 3x FN MG Teams, 3x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 4x M113 Transports", "pts": 11},
-
-        {"id": 58, "name": "3rd Platoon: 3x Galil Rifle Teams, 2x FN MG Teams, 2x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 3x M113 Transports", "pts": 8},
-        {"id": 59, "name": "3rd Platoon: 4x Galil Rifle Teams, 3x FN MG Teams, 3x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 4x M113 Transports", "pts": 11},
-
-        {"id": 60, "name": "2x Merkava 1s", "pts": 12},
-        {"id": 61, "name": "3x Merkava 1s", "pts": 18},
-
-        {"id": 62, "name": "2x Merkava 2s", "pts": 14},
-        {"id": 63, "name": "3x Merkava 2s", "pts": 21},
-
-        {"id": 64, "name": "2x Magach 6s", "pts": 7},
-        {"id": 65, "name": "3x Magach 6s", "pts": 11},
+        {"id": 54, "name": "Platoon: 3x Galil Rifle Teams, 2x FN MG Teams, 2x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 3x M113 Transports", "pts": 8},
+        {"id": 55, "name": "Platoon: 4x Galil Rifle Teams, 3x FN MG Teams, 3x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 4x M113 Transports", "pts": 11},
 
         {"id": 66, "name": "2x M125 81mm Mortars", "pts": 1},
         {"id": 67, "name": "3x M125 81mm Mortars", "pts": 2},
 
         {"id": 68, "name": "2x M150 (TOW)", "pts": 3},
-
-
 
 
         {"id": 100, "name": "2x M106 (120mm)", "pts": 2},
@@ -153,7 +120,7 @@
 
     	{"max": 1, "min": 0, "from": [510]},
     	{"max": 1, "min": 0, "from": [511]},
-    	{"max": 1, "min": 0, "from": [512,513]},
+    	{"max": 1, "min": 0, "from": [512]},
     	{"max": 1, "min": 0, "from": [514]},
     	{"max": 1, "min": 0, "from": [515]},
     	{"max": 1, "min": 0, "from": [516,517]},
@@ -169,36 +136,29 @@
 
    "upgradeConstraints": [      
    	    {"max": 1, "min": 1, "from": [1,2], "appliesTo": [501]},
-   	    {"max": 1, "min": 1, "from": [4,5], "appliesTo": [501]},
-   	    {"max": 1, "min": 1, "from": [6,7], "appliesTo": [501]},
-   	    {"max": 1, "min": 0, "from": [8,9], "appliesTo": [501]},
-		{"max": 1, "min": 1, "from": [8,9], "appliesTo": [506]},
-   	    {"max": 1, "min": 0, "from": [15,16], "appliesTo": [501,502,503]},
-   	    {"max": 1, "min": 0, "from": [20,21,22], "appliesTo": [501.502,503]},
+   	    {"max": 3, "min": 2, "from": [4,5], "appliesTo": [501]},
 
-        {"max": 1, "min": 1, "from": [31,32], "appliesTo": [502]},
-   	    {"max": 1, "min": 1, "from": [34,35], "appliesTo": [502]},
-   	    {"max": 1, "min": 1, "from": [36,37], "appliesTo": [502]},
-   	    {"max": 1, "min": 0, "from": [38,39], "appliesTo": [502]},
-   	    {"max": 1, "min": 1, "from": [38,39], "appliesTo": [507]},
+		{"max": 1, "min": 1, "from": [31,32], "appliesTo": [502]},
+   	    {"max": 3, "min": 2, "from": [34,35], "appliesTo": [502]},
 
-        {"max": 1, "min": 1, "from": [41,42], "appliesTo": [503]},
-   	    {"max": 1, "min": 1, "from": [44,45], "appliesTo": [503]},
-   	    {"max": 1, "min": 1, "from": [46,47], "appliesTo": [503]},
-   	    {"max": 1, "min": 0, "from": [48,49], "appliesTo": [503]},
-   	    {"max": 1, "min": 1, "from": [48,49], "appliesTo": [508]},
+		{"max": 1, "min": 1, "from": [41,42], "appliesTo": [503]},
+   	    {"max": 3, "min": 2, "from": [44,45], "appliesTo": [503]},
 
-        {"max": 1, "min": 1, "from": [51], "appliesTo": [504]},
-   	    {"max": 1, "min": 1, "from": [54,55], "appliesTo": [504]},
-   	    {"max": 1, "min": 1, "from": [56,57], "appliesTo": [504]},
-   	    {"max": 1, "min": 0, "from": [58,59], "appliesTo": [504]},
-   	    {"max": 1, "min": 1, "from": [58,59], "appliesTo": [509]},
+		{"max": 1, "min": 0, "from": [20,21,22], "appliesTo": [501,502,503]},
+   	    {"max": 1, "min": 0, "from": [54,55], "appliesTo": [501,502,503]},
 
-        {"max": 1, "min": 0, "from": [60,61,62,63,64,65], "appliesTo": [504]},
-        {"max": 1, "min": 0, "from": [66,67], "appliesTo": [504]},
+		{"max": 1, "min": 1, "from": [51], "appliesTo": [504]},
+   	    {"max": 3, "min": 2, "from": [54,55], "appliesTo": [504]},
+		{"max": 1, "min": 0, "from": [4,5,34,35,44,45], "appliesTo": [504]},
+		{"max": 1, "min": 0, "from": [66,67], "appliesTo": [504]},
         {"max": 1, "min": 0, "from": [68], "appliesTo": [504]},
 
-        {"max": 1, "min": 1, "from": [100,101,102], "appliesTo": [513]},
+		{"max": 1, "min": 1, "from": [4,5], "appliesTo": [506]},
+		{"max": 1, "min": 1, "from": [34,35], "appliesTo": [507]},
+		{"max": 1, "min": 1, "from": [44,45], "appliesTo": [508]},
+		{"max": 1, "min": 1, "from": [54,55], "appliesTo": [509]},
+
+        {"max": 1, "min": 1, "from": [100,101,102], "appliesTo": [512]},
         {"max": 1, "min": 1, "from": [110,111], "appliesTo": [510,512]},
         {"max": 1, "min": 1, "from": [115,116], "appliesTo": [515]},
         {"max": 1, "min": 1, "from": [120,121], "appliesTo": [514]},
@@ -206,7 +166,7 @@
         {"max": 1, "min": 1, "from": [130,131], "appliesTo": [517]},
         {"max": 1, "min": 1, "from": [135,136], "appliesTo": [519]},
         {"max": 1, "min": 1, "from": [140,141], "appliesTo": [518]},
-        {"max": 1, "min": 1, "from": [145,146], "appliesTo": [521]},
+        {"max": 1, "min": 1, "from": [145,146,147,148], "appliesTo": [521]},
         {"max": 1, "min": 1, "from": [150,151], "appliesTo": [520]}
 
    ]
