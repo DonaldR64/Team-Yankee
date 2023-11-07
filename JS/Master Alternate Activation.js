@@ -4334,6 +4334,10 @@ log("Mistaken: " + mistaken)
                                 weaponExclusion = " cannot fire at Helicopters";
                             }
                         }
+                        if (st.type.includes("Tank") || st.type.includes("Gun")) {
+                            if (weapon.notes.includes("Guided") === false && weapon.notes.includes("Dedicated AA") === false && weapon.notes.includes("Anti-Helicopter") === false && weapon.type !== "AA MG") {}
+                            weaponExclusion = " cannot fire at Helicopters";
+                        }
                     }
 
                     if (initialLOS.los === false) {
