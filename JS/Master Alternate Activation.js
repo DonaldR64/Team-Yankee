@@ -48,6 +48,13 @@ const TY = (() => {
         "oneshot": "status_oneshot::5503748",
     };
 
+    const NightVision = {
+        IR: 50,
+        Gen1Thermal: 60,
+        Gen2Thermal: 80,
+    }
+
+
     let specialInfo = {
         "Air Assault": "An Air Assault Unit may only be held in Reserve if all the Units deployed on table are Air Assault Units",
         "Accurate": 'No penalty to Hit for longer ranges if Shooter did not Move',
@@ -1736,7 +1743,7 @@ log(hit)
         FoxholeArray = [];
         
         RemoveDead("All");
-
+        RebuildBuildings();
         //clear token info
         let tokens = findObjs({
             _pageid: Campaign().get("playerpageid"),
@@ -1765,8 +1772,7 @@ log(hit)
             lineArray: [],
             labmode: false,
             darkness: false,
-            nonIRVision: 4,
-            IRVision: 40,
+            vision: 5, //randomize if night to d6+2 and show when start
             turn: 0,
             step: "start",
             gametype: "",
@@ -1797,7 +1803,7 @@ log(hit)
             _subtype: "token",
         });
 
-        let removals = ["SmokeScreen","rangedin","Foxholes","Smoke","Turn"];
+        let removals = ["SmokeScreen","rangedin","Foxholes","Smoke","Turn","vehiclefire","WRECK"];
         tokens.forEach((token) => {
             let layer = token.get("layer");
             if (token.get("status_dead") === true) {
@@ -1813,6 +1819,28 @@ log(hit)
             }
         });
     }
+
+    const RebuildBuildings = () => {
+        let tokens = findObjs({
+            _pageid: Campaign().get("playerpageid"),
+            _type: "graphic",
+            _subtype: "token",
+            layer: "map",
+        });
+        tokens.forEach((token) => {
+            if (tokens.get("name").includes("Building")) {
+                let num = tokens.get("name").replace(/[^\d]/g,"");
+                if (!num) {num = 1};
+                token.set("bar1_value",num);
+            }
+            if (tokens.get("name").includes("Ruined Building")) {
+                let num = tokens.get("name").replace(/[^\d]/g,"");
+                if (!num) {num = 1};
+                //change token image here
+            }
+        });
+    }
+
 
     const PrintCard = (id) => {
         let output = "";
@@ -2572,7 +2600,14 @@ log(outputCard)
         let losReason = "";
     
         if (state.TY.darkness === true && team2.queryCondition("Flare") === false && special.includes("NLOS") === false) {
-            let vision = (team1.special.includes("Infra") || team1.special.includes("Thermal")) ? state.TY.IRVision:state.TY.nonIRVision;
+            let vision = state.TY.vision;
+            if (team1.special.includes("Infra-Red")) {
+                vision = NightVision("IR");
+            } else if (team1.special.includes("Thermal Imaging")) {
+                vision = NightVision("Gen1Thermal");
+            } else if (team1.special.includes("2nd Gen Thermal Imaging")) {
+                vision = NightVision("Gen2Thermal");
+            }
             if (distanceT1T2 > vision) {
                 let result = {
                     los: false,
@@ -2887,10 +2922,14 @@ log(outputCard)
         state.TY.darkness = false;
         if (timeOfDay === "Dawn" || timeOfDay === "Night") {
             state.TY.darkness = true;
+            state.TY.vision = randomInteger(6) + 2;
         }
         SetupCard("Setup New Game","","Neutral");
         outputCard.body.push("Game Type: " + gametype);
         outputCard.body.push("Time of Day: " + timeOfDay);
+        if (state.TY.darkness === true) {
+            outputCard.body.push("Visibility is " + state.TY.vision + "hexes");
+        }
         PrintCard();
     }
     
@@ -3619,6 +3658,8 @@ log(outputCard)
                     outputCard.body.push("[#ff0000]Night has fallen, the rest of the battle is fought in Darkness[/#]");
                     state.TY.timeOfDay = "Night";
                     state.TY.darkness = true;
+                    state.TY.vision = randomInteger(6) + 2;
+                    outputCard.body.push("Visibility is " + state.TY.vision + "hexes");
                     pageInfo.page.set({
                         dynamic_lighting_enabled: true,
                         daylight_mode_enabled: true,
