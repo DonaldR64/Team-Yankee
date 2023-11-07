@@ -985,7 +985,6 @@ const TY = (() => {
             this.counterattack = parseStat(attributeArray.counterattack);
             this.hit = parseStat(attributeArray.hit);
 
-
             this.artilleryWpn = artilleryWpn;
             this.spotAttempts = 0;
             this.rangedInHex = {};
@@ -1391,9 +1390,9 @@ log(hit)
                     layer: "map",
                     statusmarkers: "dead",
                 });
+                toFront(this.token);
             }
 
-            toFront(this.token);
             if (state.TY.conditions[this.id]) {
                 let keys = Object.keys(state.TY.conditions[this.id]);
                 for (let i=0;i<keys.length;i++) {
@@ -1440,8 +1439,6 @@ log(hit)
                 pageid: tok.get("pageid"),
                 imgsrc: img,
                 layer: "map",
-                emits_bright_light: true,
-                bright_light_distance: 30,
                 controlledby: "all",
             });
             toFront(newToken);
@@ -3612,9 +3609,16 @@ log(outputCard)
             let keys = Object.keys(UnitArray);
             for (let i=0;i<keys.length;i++) {
                 let unit = UnitArray[keys[i]];
+                if (unit.bailed === true) {
+                    let text = SwapLeader(unit);
+                    if (text !== "") {
+                        sendChat("",text);
+                    }
+                }
                 let unitLeader = TeamArray[unit.teamIDs[0]];
                 if (!unitLeader) {continue};
                 if (hexMap[unitLeader.hexLabel].terrain.includes("Offboard") || unitLeader.token.get("aura1_color") === Colours.black) {continue};
+                if (unitLeader.bailed === true) {continue};
                 let pos = unitLeader.location;
                 sendPing(pos.x,pos.y, Campaign().get('playerpageid'), null, true); 
                 SetupCard(unit.nation,"",unit.nation);
@@ -4519,7 +4523,7 @@ log(weapons)
             let eta = sTeam.eta;
             for (let j=0;j<weapons.length;j++) {
                 let weapon = weapons[j];
-                let toHit = target.hit;
+                let toHit = parseInt(target.hit);
                 let toHitTips = "<br>Base: " + toHit;
                 let los = eta[0].los;
                 let excl = false;
@@ -4578,12 +4582,12 @@ log(weapons)
                     toHitTips += "<br>Slow Firing & Moved +1";
                 }
                 if (weapon.notes.includes("Stabiliser") && weapon.notes.includes("Advanced Stabiliser") === false && sTeam.maxTact === true) {
-                    toHit += 1;
-                    toHitTips.push("+1 for Stabiliser")
+                    toHit++;
+                    toHitTips += "<br>+1 for Stabiliser";
                 }
 
                 if (toHitTips.length === 0) {
-                    toHitTips = ["No Modifiers"];
+                    toHitTips = "No Modifiers";
                 }
 
                 let rof = weapon.halted;
@@ -5794,11 +5798,12 @@ log(marker);
 
 
     const SwapLeader = (unit) => {
-        if (unit.teamIDs.length < 2) {return}; 
+        let text = "";
+        if (unit.teamIDs.length < 2) {return text}; 
         let team1 = TeamArray[unit.teamIDs[0]];
         for (let i=1;i<unit.teamIDs.length;i++) {
             let team2 = TeamArray[unit.teamIDs[i]];
-            if (team2.hex.distance(team1.hex) <= 6) {
+            if (team2.inCommand === true) {
                 if (team2.characterID === team1.characterID) {
                     let name1 = team1.name;
                     let name2 = team2.name;
@@ -5810,11 +5815,12 @@ log(marker);
                     let pos = unit.teamIDs.indexOf(t2ID);
                     unit.teamIDs.splice(pos,1);
                     unit.teamIDs.unshift(t2ID);
-                    outputCard.body.push(name1 + " takes command of " + name2);
+                    text = name1 + " takes command of " + name2;
                     break;
                 }
             }
         }
+        return text;
     }
 
     const EndFire = (msg) => {
