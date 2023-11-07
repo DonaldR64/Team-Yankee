@@ -4350,6 +4350,9 @@ log("Mistaken: " + mistaken)
                     if (weapon.notes.includes("Forward Firing") && initialLOS.shooterface !== "Front") {
                         weaponExclusion = " is Out of Arc";
                     };
+                    if (st.type === "Helicopter" && st.landed() === true && weapon.notes.includes("Door Guns") === false) {
+                        weaponExclusion = " is unable to fire while landed";
+                    }
 
                     if (weaponExclusion === undefined) {
                         weapons.push(weapon);
