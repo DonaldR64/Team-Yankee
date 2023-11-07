@@ -49,16 +49,15 @@ const TY = (() => {
     };
 
     const NightVision = {
-        IR: 50,
-        Gen1Thermal: 60,
+        IR: 40,
+        Gen1Thermal: 50,
         Gen2Thermal: 80,
     }
-
 
     let specialInfo = {
         "Air Assault": "An Air Assault Unit may only be held in Reserve if all the Units deployed on table are Air Assault Units",
         "Accurate": 'No penalty to Hit for longer ranges if Shooter did not Move',
-        "Advanced Stabiliser": 'Tactical Speed is 7 hexes. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 5 hexes',
+        "Advanced Stabiliser": 'Tactical Speed is 14 hexes. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 10 hexes',
         "Amphibious": "Treat Impassable Water as Difficult Terrain",
         "Anti-Helicopter": "Can shoot at Helicopters with a ROF of 1",
         "Applique Armour": 'Front and Side Armour is 13 against HEAT weapons',
@@ -82,9 +81,9 @@ const TY = (() => {
         "HQ": "Always In Command and ignores Morale Checks",
         "Hunter-Killer": "Hunter-Killer Helicopters can use terrain for Concealment and are Gone to Ground unless they Shoot",
         "Independent": "Independent Teams can use the Mistaken Target rule to reassign hits to nearby Units, but cannot Charge into Contact or take an Objective",        
-        "Infra-Red": "Rolls 2 Dice for Night Visibility and takes the highest score",
+        "Infra-Red": "Can see out to a distance of 800m (40 hexes) at night",
         "Jump Jet": "Enters the table on a score of 3+",
-        "Large Gun": 'Cannot be placed in Buildings and cannot be placed from Ambush within 4 hexes of enemy',
+        "Large Gun": 'Cannot be placed in Buildings and cannot be placed from Ambush within 8 hexes of enemy',
         "Laser Rangefinder": 'No penalty to Hit for longer ranges',
         "Laser Guided Projectiles": "Must be guided by an Observer, using it for LOS",
         "Limited 1": "Each time the Unit  shoots, one of its Teams may shoot this weapon rather than its usual weapons",
@@ -102,22 +101,23 @@ const TY = (() => {
         "Passengers #": "A Transport Team can carry # Infantry Teams as Passengers",
         "Pinned ROF 1": "These weapons have a ROF of 1 when Pinned Down",
         "Pioneers": 'Can cross Minefields safely on a 2+. If remain in Minefield and not Pinned Down, clear the Minefield automatically',
-        "Radar": 'When shooting at Aircraft/Helicopters, range is increased by 6 hexes and there are no penalties for longer ranges',
+        "Radar": 'When shooting at Aircraft/Helicopters, weapon range is increased by 12 hexes and there are no penalties for longer ranges',
         "Salvo": "Use a larger Artillery Template",
         "Scout": "Scouts are Gone to Ground unless they Shoot or Assault",
         "Self Defence AA": "Self-Defence AA weapons can Shoot at Aircraft with ROF 1",
         "Slow Firing": "Slow Firing Weapons add +1 to the score needed To Hit when moving",
         "Smoke": "Smoke weapons can Shoot Smoke ammunition",
         "Smoke Bombardment": "Once per game, the weapon can fire a Smoke Bombardment",
-        "Sneak and Peek": 'A Team with Sneak and Peek can move 5 hexes if it is not firing its Main Gun',
+        "Sneak and Peek": 'A Team with Sneak and Peek can move 10 hexes if it is not firing its Main Gun',
         "Spearhead": "Special Rules for Deployment (page 93)",
-        "Stabiliser": 'Tank can move 7 hexes at Tactical, gaining a +1 penalty To Hit. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 5 hexes',
+        "Stabiliser": 'Tank can move 14 hexes at Tactical, gaining a +1 penalty To Hit. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 10 hexes',
         "Swingfire": "Team firing Swingfire Missiles can remain Gone to Ground",
         "Tandem Warhead": "Tandem Warhead HEAT weapons are unaffected by ERA Armour",
-        "Thermal Imaging": "Rolls 2 Dice for Night Visibility and takes the highest score. No To Hit penalties for Night and Smoke",
+        "Thermal Imaging": "Visibility to 1000m (50 hexes) at night. No To Hit penalties for Night and Smoke",
+        "2nd Gen Thermal Imaging": "Visibility to 1600m (80 hexes) at night. No To Hit penalties for Night and Smoke",
         "Tractor": "A Tractor Team can tow a single Gun Team as a Passenger, placing the Gun Team behind it",
         "Unarmoured": "An Unarmoured Tank Team cannot Charge into Contact and must Break Off if Assaulted",
-        "Unit Transport": 'The Unit Leader of the Transport Attachment must end the Movement Step within 3 hexes of the Unit Leader of its Passenger Unit while on table. If it cannot do this, then the Transport Attachment must be Sent to the Rear.',
+        "Unit Transport": 'The Unit Leader of the Transport Attachment must end the Movement Step within 6 hexes of the Unit Leader of its Passenger Unit while on table. If it cannot do this, then the Transport Attachment must be Sent to the Rear.',
     };
 
     const SaveResults = {
@@ -2603,9 +2603,11 @@ log(outputCard)
             let vision = state.TY.vision;
             if (team1.special.includes("Infra-Red")) {
                 vision = NightVision("IR");
-            } else if (team1.special.includes("Thermal Imaging")) {
+            }
+            if (team1.special.includes("Thermal Imaging")) {
                 vision = NightVision("Gen1Thermal");
-            } else if (team1.special.includes("2nd Gen Thermal Imaging")) {
+            }
+            if (team1.special.includes("2nd Gen Thermal Imaging")) {
                 vision = NightVision("Gen2Thermal");
             }
             if (distanceT1T2 > vision) {
