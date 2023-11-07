@@ -1079,11 +1079,11 @@ const TY = (() => {
                     size = 40;
                     break;
                 case 'Land':
-                    imgSRC = "https://s3.amazonaws.com/files.d20.io/images/366077088/FP0gaU13t5SB11Cq4Fq4zQ/thumb.png?1699037802";
+                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/366077088/FP0gaU13t5SB11Cq4Fq4zQ/thumb.png?1699037802";
                     charID = "-NiLY-VogcGd_EbrZegV";
                     break;
                 case 'Flare':
-                    imgSRC = "https://s3.amazonaws.com/files.d20.io/images/366077896/UYxOO1P7P1wBDD75gtpsFA/thumb.png?1699038154";
+                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/366077896/UYxOO1P7P1wBDD75gtpsFA/thumb.png?1699038152";
                     charID = "-NiLYVaQvQOHD16lukjv";
                     break;
             }
@@ -1440,6 +1440,9 @@ log(hit)
                 pageid: tok.get("pageid"),
                 imgsrc: img,
                 layer: "map",
+                emits_bright_light: true,
+                bright_light_distance: 30,
+                controlledby: "all",
             });
             toFront(newToken);
 
@@ -1792,8 +1795,7 @@ log(hit)
             currentUnitID: "",
             turnMarkerID: "",
         }
-//later - have night vision distance be somewhat random ie. full moon to dark of night/cloudy
-//could also have 2nd/3rd gen thermal vs IR
+
         BuildMap();
         sendChat("","Cleared State/Arrays");
     }
@@ -1830,13 +1832,13 @@ log(hit)
             layer: "map",
         });
         tokens.forEach((token) => {
-            if (tokens.get("name").includes("Building")) {
-                let num = tokens.get("name").replace(/[^\d]/g,"");
+            if (token.get("name").includes("Building")) {
+                let num = token.get("name").replace(/[^\d]/g,"");
                 if (!num) {num = 1};
                 token.set("bar1_value",num);
             }
-            if (tokens.get("name").includes("Ruined Building")) {
-                let num = tokens.get("name").replace(/[^\d]/g,"");
+            if (token.get("name").includes("Ruined Building")) {
+                let num = token.get("name").replace(/[^\d]/g,"");
                 if (!num) {num = 1};
                 //change token image here
             }
@@ -2608,13 +2610,13 @@ log(outputCard)
         if (state.TY.darkness === true && team2.queryCondition("Flare") === false && special.includes("NLOS") === false) {
             let vision = state.TY.vision;
             if (team1.special.includes("Infra-Red")) {
-                vision = NightVision("IR");
+                vision = NightVision.IR
             }
             if (team1.special.includes("Thermal Imaging")) {
-                vision = NightVision("Gen1Thermal");
+                vision = NightVision.Gen1Thermal;
             }
             if (team1.special.includes("2nd Gen Thermal Imaging")) {
-                vision = NightVision("Gen2Thermal");
+                vision = NightVision.Gen2Thermal;
             }
             //check if in range of burning wreck
             let wreckKeys = Object.keys(WreckArray);
@@ -2946,7 +2948,7 @@ log(outputCard)
         outputCard.body.push("Game Type: " + gametype);
         outputCard.body.push("Time of Day: " + timeOfDay);
         if (state.TY.darkness === true) {
-            outputCard.body.push("Visibility is " + state.TY.vision + "hexes");
+            outputCard.body.push("Visibility is " + state.TY.vision + " hexes");
         }
         PrintCard();
     }
