@@ -40,8 +40,8 @@
       	{"id": 1, "name": "HQ - 1 Merkava 1", "pts": 6},
       	{"id": 2, "name": "HQ - 2 Merkava 1s", "pts": 12},
 
-      	{"id": 4, "name": "Platoon: 2 Merkava 1s", "pts": 12},
-      	{"id": 5, "name": "Platoon: 3 Merkava 1s", "pts": 18},
+      	{"id": 4, "name": "Platoon of 2 Merkava 1s", "pts": 12},
+      	{"id": 5, "name": "Platoon of 3 Merkava 1s", "pts": 18},
     
       	{"id": 20, "name": "Jeep Recce Platoon","units": "3x Recce Jeeps", "pts": 2},
       	{"id": 21, "name": "M113 Recce Platoon (3)","units": "3x Recce M113", "pts": 2},
@@ -50,19 +50,19 @@
         {"id": 31, "name": "HQ - 1 Merkava 2", "pts": 7},
       	{"id": 32, "name": "HQ - 2 Merkava 2s", "pts": 14},
 
-      	{"id": 34, "name": "Platoon: 2 Merkava 2s", "pts": 14},
-      	{"id": 35, "name": "Platoon: 3 Merkava 2s", "pts": 21},
+      	{"id": 34, "name": "Platoon of 2 Merkava 2s", "pts": 14},
+      	{"id": 35, "name": "Platoon of 3 Merkava 2s", "pts": 21},
 
         {"id": 41, "name": "HQ - 1 Magach 6", "pts": 4},
       	{"id": 42, "name": "HQ - 2 Magach 6s", "pts": 7},
 
-      	{"id": 44, "name": "Platoon: 2 Magach 6s", "pts": 7},
-      	{"id": 45, "name": "Platoon: 3 Magach 6s", "pts": 11},
+      	{"id": 44, "name": "Platoon of 2 Magach 6s", "pts": 7},
+      	{"id": 45, "name": "Platoon of 3 Magach 6s", "pts": 11},
  
         {"id": 51, "name": "HQ - 1 Galil Team", "pts": 1},
         
-        {"id": 54, "name": "Platoon: 3x Galil Rifle Teams, 2x FN MG Teams, 2x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 3x M113 Transports", "pts": 8},
-        {"id": 55, "name": "Platoon: 4x Galil Rifle Teams, 3x FN MG Teams, 3x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 4x M113 Transports", "pts": 11},
+        {"id": 54, "name": "Platoon of 3x Galil Rifle Teams, 2x FN MG Teams, 2x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 3x M113 Transports", "pts": 8},
+        {"id": 55, "name": "Platoon of 4x Galil Rifle Teams, 3x FN MG Teams, 3x RPG-7 Teams, 1x M47 Dragon Team, 1x 52mm Mortar Team, 4x M113 Transports", "pts": 11},
 
         {"id": 66, "name": "2x M125 81mm Mortars", "pts": 1},
         {"id": 67, "name": "3x M125 81mm Mortars", "pts": 2},
