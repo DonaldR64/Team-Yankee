@@ -1187,6 +1187,11 @@ const TY = (() => {
             this.token.set("tint_color",colour);
         }
     
+        landed() {
+            return this.queryCondition("Land");
+        }
+
+
         Save(hit,hitNum) {
 log(hit)
             let facing = hit.facing;
@@ -4305,11 +4310,7 @@ log("Mistaken: " + mistaken)
 
                     if (weapon.notes.includes("Overhead")) {special += ",Overhead"};
                     if (weapon.notes.includes("NLOS")) {special += ",NLOS"};
-//fix below
-                    if (target.type === "Aircraft" && (weapon.notes.includes("AA") === false || weapon.type.includes("AA") === false)) {
-                        weaponExclusion = " has No AA Weapon";
-                    } 
-
+        
                     let initialLOS,tID;
                     let sID = (!observerID) ? st.id:observerID;
                     for (let t=0;t<targetTeamArray.length;t++) {
@@ -4317,6 +4318,21 @@ log("Mistaken: " + mistaken)
                         initialLOS = LOS(sID,tID,special);
                         if (initialLOS.los === true) {
                             break;
+                        }
+                    }
+
+                    if (target.type === "Aircraft" && weapon.notes.includes("Guided AA") === false && weapon.notes.includes("Dedicated AA") === false && weapon.type !== "AA MG") {
+                        weaponExclusion = " cannot fire at Aircraft";
+                    }
+                    
+                    if (target.type === "Helicopter" && target.landed() === false) {
+                        if (st.type === "Aircraft" && weapon.notes.includes("Anti-Helicopter") === false) {
+                            weaponExclusion = " cannot fire at Helicopters";
+                        }
+                        if (st.type === "Infantry" && (st.special.includes("Heavy Weapon") || weapon.notes.includes("Heavy"))) {
+                            if (weapon.notes.includes("Guided") === false && weapon.notes.includes("Dedicated AA") === false && weapon.type !== "AA MG" && weapon.notes.includes("Anti-Helicopter") === false) {
+                                weaponExclusion = " cannot fire at Helicopters";
+                            }
                         }
                     }
 
@@ -4377,7 +4393,6 @@ log("Mistaken: " + mistaken)
             if (i>0) {wnames += ", "}
             wnames += weapons[i].name;
         }
-
 
         outputCard.body.push(wnames);
         outputCard.body.push("[hr]");
@@ -4498,16 +4513,7 @@ log(weapons)
                     toHit += 1;
                     toHitTips.push("+1 for Stabiliser")
                 }
-/*
-                if (aaPenalty[0] === true) {
-                    toHit += 1;
-                    toHitTips.push("+1 vs Aircraft");
-                }
-                if (aaPenalty[1] === true) {
-                    toHit += 1;
-                    toHitTips.push("+1 as ROF 1 Weapon vs. Air");
-                }
-*/
+
                 if (toHitTips.length === 0) {
                     toHitTips = ["No Modifiers"];
                 }
@@ -4526,11 +4532,32 @@ log(weapons)
                         rof = weapon.moving;
                     }
                 }
-         ////       
+
                 if (target.type === "Aircraft") {
-                    if (weapon.notes.includes("Self Defence AA")) {
-                        rof = 1;
-                    } else if (weapon.notes.includes("Dedicated AA")) {
+                    //allowable weapons should be screened out above
+                    if (weapon.type === "AA MG" && weapon.notes.includes("Dedicated AA") === false) {
+                        if (rof === 1) {
+                            toHit += 1;
+                            toHitTips.push("+1 as ROF 1 Weapon vs. Air");
+                        } else {
+                            rof = 1;                        
+                        }
+                    }   
+                    if (weapon.notes.includes("Dedicated AA") || weapon.notes.includes("Guided AA")) {
+                        rof = weapon.halted;
+                    }
+                }
+                if (target.type === "Helicopter" && target.landed() === false) {
+                    //allowable weapons should be screened out above
+                    if ((weapon.type === "AA MG" && weapon.notes.includes("Dedicated AA") === false) || sTeam.type === "Infantry" || (weapon.notes.includes("Guided") && weapon.notes.includes("Guided AA") === false) || (weapon.notes.includes("Anti-Helicopter") && sTeam.type !== "Aircraft")) {
+                        if (rof === 1) {
+                            toHit += 1;
+                            toHitTips.push("+1 as ROF 1 Weapon vs. Air");
+                        } else {
+                            rof = 1;                        
+                        }
+                    }   
+                    if (weapon.notes.includes("Dedicated AA") || weapon.notes.includes("Guided AA")) {
                         rof = weapon.halted;
                     }
                 }
