@@ -14,6 +14,7 @@ const TY = (() => {
     let FoxholeArray = [];
     let CheckArray = []; //used by Remount, Rally and Morale checks
     let RangedInArray = {};
+    let WreckArray = {};//used for night vision
 
     let unitCreationInfo = {}; //used during unit creation 
     let unitIDs4Saves = {}; //used during shooting routines
@@ -1443,6 +1444,7 @@ log(hit)
             toFront(newToken);
 
             hexMap[this.hexLabel].terrain.push("Wreck");
+            WreckArray[this.id] = this.hex;
             hexMap[this.hexLabel].bp = true;
             if (hexMap[this.hexLabel].type === 0) {
                 hexMap[this.hexLabel].type = 1;
@@ -2222,6 +2224,7 @@ log(outputCard)
 
             let vertices = TokenVertices(token);
             let centre = new Point(token.get('left'),token.get('top'));
+            let hex = pointToHex(centre);
             let id = stringGen();
             if (TerrainArray[id]) {
                 id += stringGen();
@@ -2242,6 +2245,9 @@ log(outputCard)
                 dash: t.dash,
             };
             TerrainArray[id] = info;
+            if (t.name === "WRECK") {
+                WreckArray[id] = hex;
+            }
         });
     };
 
@@ -2610,6 +2616,16 @@ log(outputCard)
             if (team1.special.includes("2nd Gen Thermal Imaging")) {
                 vision = NightVision("Gen2Thermal");
             }
+            //check if in range of burning wreck
+            let wreckKeys = Object.keys(WreckArray);
+            for (let w=0;w<wreckKeys.length;w++) {
+                let dist = WreckArray[wreckKeys[w]].distance(team2.hex);
+                if (dist <= 3) {
+                    vision = distanceT1T2 + 3;
+                    break;
+                }
+            }
+
             if (distanceT1T2 > vision) {
                 let result = {
                     los: false,
