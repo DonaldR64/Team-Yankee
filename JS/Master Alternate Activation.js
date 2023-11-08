@@ -597,6 +597,7 @@ const TY = (() => {
                 this.unitIDs.splice(index,1);
             }
             if (this.unitIDs.length === 0) {
+                delete state.TY.formations[this.id]
                 SetupCard("Formation Destroyed","",this.nation);
                 PrintCard();
             }
@@ -655,28 +656,33 @@ const TY = (() => {
         }
 
         remove(team) {
-            let index = this.teamIDs.indexOf(team.id);
+            let teamIDs = this.teamIDs;
+            let index = teamIDs.indexOf(team.id);
+            log("In Unit.remove")
+            log("Index of Team ID: " + index)
             if (index > -1) {
-                this.teamIDs.splice(index,1);
-                if (this.teamIDs.length === 1 && this.hqUnit === true) {
-                    let team = TeamArray[this.teamIDs[0]];
+                teamIDs.splice(index,1);
+                if (teamIDs.length === 1 && this.hqUnit === true) {
+                    let team = TeamArray[teamIDs[0]];
                     if (team.special.includes("Transport")) {
                         sendChat("","Remaining Team is Transport and Leaves the Field");
                         team.flees();
                     }
                 }
             }
-            if (this.teamIDs.length === 0) {
+            if (teamIDs.length === 0) {
                 let formation = FormationArray[this.formationID];
                 formation.remove(this);
                 if (this.hqUnit === true) {
                     deadHQs[this.player].push(formation.id);
                 }
+                delete state.TY.units[this.id];
                 delete UnitArray[this.id];
             } else if (index === 0) {
                 let auraC = team.token.get("aura1_color");
+                if (!auraC || auraC === "transparent") {auraC = Colours.black};
                 //change name to Sergeant if isnt a Lt or higher
-                let newLeader = TeamArray[this.teamIDs[0]];
+                let newLeader = TeamArray[teamIDs[0]];
                 newLeader.name = PromotedName(newLeader,team);
                 newLeader.token.set({
                     name: newLeader.name,
@@ -684,6 +690,8 @@ const TY = (() => {
                     tint_color: "transparent",
                 })
                 newLeader.inCommand = true;
+                log("new leader")
+                this.teamIDs = teamIDs;
             }
         }
 
@@ -1382,6 +1390,8 @@ log(hit)
 
 
         kill() {
+            log("In Kill")
+            log("Team ID: " + this.id)
             if (this.type === "Tank" || this.type === "Helicopter") {
                 this.wreck();
                 PlaySound("Explosion")
@@ -1389,9 +1399,11 @@ log(hit)
                 this.token.set({
                     layer: "map",
                     statusmarkers: "dead",
+
                 });
                 toFront(this.token);
             }
+            delete state.TY.teams[this.id];
 
             if (state.TY.conditions[this.id]) {
                 let keys = Object.keys(state.TY.conditions[this.id]);
@@ -1400,6 +1412,8 @@ log(hit)
                 }
             }
             UnitArray[this.unitID].remove(this);
+            log("New team IDs")
+            log(UnitArray[this.unitID].teamIDs)
             delete TeamArray[this.id];
         }
 
@@ -6598,6 +6612,14 @@ log("2nd Row to " + team3.name)
         state.TY.turnMarkerID = newToken.id;
     }
 
+    const TestKill = (msg) => {
+        let id = msg.selected[0]._id;
+        let team = TeamArray[id];
+        log("Kill: " + team.name);
+        team.kill();
+    }
+
+
 
 
 
@@ -6854,6 +6876,9 @@ log("Move Back: " + moveBack)
                 break;
             case '!EnterAircraft':
                 EnterAircraft(msg);
+                break;
+            case '!Kill':
+                TestKill(msg);
                 break;
         }
     };
