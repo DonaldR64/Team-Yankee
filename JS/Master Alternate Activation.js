@@ -1,5 +1,5 @@
 const TY = (() => { 
-    const version = '1.11.4';
+    const version = '1.11.8';
     if (!state.TY) {state.TY = {}};
     //Constants and Persistent Variables
 
