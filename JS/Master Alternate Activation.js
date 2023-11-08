@@ -4014,10 +4014,10 @@ log(outputCard)
             SetupCard(unit.name,"Unit Morale",unit.nation);
             let unitLeader = TeamArray[unit.teamIDs[0]];
             let location = unitLeader.location;
-            let lastStand = unitLeader.laststand;
+            let morale = unitLeader.morale;
             sendPing(location.x,location.y, Campaign().get('playerpageid'), null, true); 
-            outputCard.body.push("Roll Against: " + lastStand);
-            ButtonInfo("Roll","!RollD6;UnitMorale;" + unit.id + ";" + lastStand);
+            outputCard.body.push("Roll Against: " + morale);
+            ButtonInfo("Roll","!RollD6;UnitMorale;" + unit.id + ";" + morale);
             PrintCard();
         } else {
             StartStep("Formation Morale");
