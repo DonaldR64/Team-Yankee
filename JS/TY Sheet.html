@@ -674,6 +674,10 @@
 
 
             let tact = parseInt(values.tactical);
+            let ter = parseInt(values.terrain);
+            let count = parseInt(values.country);
+            let road = parseInt(values.road);
+            let cross = values.cross;
 
             let tactDisplay = tact.toString();
             if (combined.includes("Stabiliser")) {
@@ -687,6 +691,7 @@
             } 
             if (type === "Infantry") {
                 tact = '8';
+                tactDisplay = '8';
                 ter = '8';
                 count = '12';
                 road = '12';
@@ -704,7 +709,11 @@
                 "tacticaldisplay": tactDisplay,
                 "assaultname": assault,
                 "counterattackname": counterattack,
-
+                "tactical": tact,
+                "terrain": ter,
+                "country": count,
+                "road": road,
+                "cross": cross
             })
         });    
     });  
