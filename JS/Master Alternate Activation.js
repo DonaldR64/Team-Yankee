@@ -592,11 +592,16 @@ const TY = (() => {
         }
 
         remove(unit) {
-            let index = this.unitIDs.indexOf(unit.id);
+            log("In remove unit")
+            let unitIDs = this.unitIDs;
+            let index = unitIDs.indexOf(unit.id);
             if (index > -1) {
-                this.unitIDs.splice(index,1);
+                unitIDs.splice(index,1);
             }
-            if (this.unitIDs.length === 0) {
+            this.unitIDs = unitIDs;
+            log("New UnitIDs")
+            log(unitIDs)
+            if (unitIDs.length === 0 && this.name !== "Support") {
                 delete state.TY.formations[this.id]
                 SetupCard("Formation Destroyed","",this.nation);
                 PrintCard();
@@ -670,12 +675,16 @@ const TY = (() => {
                     }
                 }
             }
+            this.teamIDs = teamIDs;
+            log("New team IDs")
+            log(teamIDs)
             if (teamIDs.length === 0) {
                 let formation = FormationArray[this.formationID];
                 formation.remove(this);
                 if (this.hqUnit === true) {
                     deadHQs[this.player].push(formation.id);
                 }
+                log("Unit Destroyed")
                 delete state.TY.units[this.id];
                 delete UnitArray[this.id];
             } else if (index === 0) {
@@ -693,8 +702,7 @@ const TY = (() => {
                 })
                 newLeader.inCommand = true;
                 log("new leader")
-                this.teamIDs = teamIDs;
-            }
+            } 
         }
 
         unpin() {
@@ -1413,9 +1421,8 @@ log(hit)
                     this.removeCondition(keys[i]);
                 }
             }
-            UnitArray[this.unitID].remove(this);
-            log("New team IDs")
-            log(UnitArray[this.unitID].teamIDs)
+            let unit = UnitArray[this.unitID];
+            unit.remove(this);
             delete TeamArray[this.id];
         }
 
@@ -3964,10 +3971,15 @@ log(outputCard)
         let teamIDs = unit.teamIDs;
         for (let i=0;i<teamIDs.length;i++) {
             let team = TeamArray[teamIDs[i]];
-            if (team.type === "System Unit" || team.type === "Aircraft") {continue};
+            if (team.type === "System Unit" || team.type === "Aircraft" || team.type === "Helicopter") {continue};
             let gtg = (team.moved === true || team.fired === true) ? false:true;
-            team.addCondition("GTG")
-            team.gonetoground = true;
+            if (team.moved === true || team.fired === true) {
+                team.removeCondition("GTG")
+                team.gonetoground = false;
+            } else {
+                team.addCondition("GTG")
+                team.gonetoground = true;
+            }
         }
     }
 
