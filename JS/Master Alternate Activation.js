@@ -683,7 +683,7 @@ const TY = (() => {
                 //change name to Sergeant if isnt a Lt or higher
                 let newLeader = TeamArray[teamIDs[0]];
                 if (!auraC || auraC === "transparent") {
-                    auraC = (newLeader.order === "") ? Colours.black:Colours.green;
+                    auraC = (this.order === "") ? Colours.green:Colours.black;
                 };
                 newLeader.name = PromotedName(newLeader,team);
                 newLeader.token.set({
