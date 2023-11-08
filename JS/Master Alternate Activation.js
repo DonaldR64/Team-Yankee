@@ -57,7 +57,7 @@ const TY = (() => {
 
     let specialInfo = {
         "Air Assault": "An Air Assault Unit may only be held in Reserve if all the Units deployed on table are Air Assault Units",
-        "Accurate": 'No penalty to Hit for longer ranges if Shooter did not Move',
+        "Accurate": '+1 to Hit at Ranges > 20 if Shooter did not Move',
         "Advanced Stabiliser": 'Tactical Speed is 14 hexes. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 10 hexes',
         "Amphibious": "Treat Impassable Water as Difficult Terrain",
         "Anti-Helicopter": "Can shoot at Helicopters with a ROF of 1",
@@ -73,7 +73,7 @@ const TY = (() => {
         "ERA": "Front and Side Armour is minimum 16 against HEAT Weapons",
         "Flamethrower": "Infantry, Gun, and Unarmoured Tank Teams re-roll successful Saves when hit by a Flame-thrower and the Unit is automatically Pinned Down. Armoured Tank Teams use their Top armour for Armour Saves when hit by a Flame-thrower.",
         "Forward Firing": "Forward Firing Weapons can only target Teams fully in front of the Shooter",
-        "Guided": 'No penalty to Hit for longer ranges. Cannot hit Infantry unless they are stationary in Bulletproof Cover',
+        "Guided": '+1 to Hit at Ranges > 20. Cannot hit Infantry unless they are stationary in Bulletproof Cover',
         "Guided AA": 'Guided Weapons that cannot target Tank or Infantry Teams. No penalty to Hit for longer ranges',
         "Gun Shield": "Gives Bulletproof Cover when shot at from the Front. No protection against Bombardments or if the Team moved at Dash speed",
         "Hammerhead": "Team with a Hammerhead can remain Gone to Ground while shooting its missile",
@@ -85,7 +85,7 @@ const TY = (() => {
         "Infra-Red": "Can see out to a distance of 800m (40 hexes) at night",
         "Jump Jet": "Enters the table on a score of 3+",
         "Large Gun": 'Cannot be placed in Buildings and cannot be placed from Ambush within 8 hexes of enemy',
-        "Laser Rangefinder": 'No penalty to Hit for longer ranges',
+        "Laser Rangefinder": '+1 to Hit at Ranges > 20',
         "Laser Guided Projectiles": "Must be guided by an Observer, using it for LOS",
         "Limited 1": "Each time the Unit  shoots, one of its Teams may shoot this weapon rather than its usual weapons",
         "Mine Clearing Device": "Team can attempt to clear Minefields",
@@ -3664,7 +3664,13 @@ log(outputCard)
                 return;
             }
             if (state.TY.gametype === "Meeting Engagement") {
-                StartInFoxholes();
+                let keys = Object.keys(UnitArray);
+                for (let i=0;i<keys.length;i++) {
+                    let unit = UnitArray[keys[i]];
+                    DigIn(unit);
+                    GTG(unit);
+                }
+                
             }
             turn = 1;
             state.TY.turn = 1;
@@ -3879,6 +3885,7 @@ log(outputCard)
             ClearSmoke("Smokescreens");
             RemoveFoxholes();
             //ResetFlags();
+            outputCard.body.push("All Teams start Gone to Ground and Concealed until they activate");
             if (state.TY.turn === 1 && state.TY.gametype === "Meeting Engagement") {
                 outputCard.body.push("Aircraft cannot Arrive this turn");                
                 outputCard.body.push("Helicopters must Loiter this turn");
@@ -3996,15 +4003,6 @@ log(outputCard)
             StartStep("Remount");
         }
     }
-
-    const StartInFoxholes = () => {
-        let keys = Object.keys(UnitArray);
-        for (let i=0;i<keys.length;i++) {
-            let unit = UnitArray[keys[i]];
-            DigIn(unit);
-        }
-    }
-
 
     const RemountChecks = () => {
         let team = CheckArray.shift();
@@ -4554,25 +4552,35 @@ log(weapons)
                 let toHit = parseInt(target.hit);
                 let toHitTips = "<br>Base: " + toHit;
                 let los = eta[0].los;
+                let targetting = 0;
                 let excl = false;
-                if (weapon.notes.includes("Laser Rangefinder") || weapon.notes.includes("NLOS") || weapon.notes.includes("Guided") || (weapon.notes.includes("Accurate") && sTeam.moved === false)) {
-                    excl = true;
-                }
-                if (weapon.notes.includes("Radar") && (target.type === "Aircraft" || (target.type === "Helicopter" && target.queryCondition("Landed") === false))) {
-                    excl = true;
-                }
 
                 let rangeIncrement = Math.max(Math.ceil(parseInt(los.distance)/20) - 1,0);
 
+                if (weapon.notes.includes("NLOS")) {
+                    rangeIncrement = 0;
+                }
 
-                if (rangeIncrement > 0 && excl === false) {
+                if (weapon.notes.includes("Laser Rangefinder") || weapon.notes.includes("Guided") || (weapon.notes.includes("Accurate") && sTeam.moved === false)) {
+                    rangeIncrement = Math.max(rangeIncrement - 1,0);
+                }
+                if (weapon.notes.includes("Radar") && (target.type === "Aircraft" || (target.type === "Helicopter" && target.queryCondition("Landed") === false))) {
+                    rangeIncrement = Math.max(rangeIncrement - 1,0);
+                }
+
+                if (rangeIncrement > 0) {
                     toHit += rangeIncrement;
-                    toHitTips += "<br>+" + rangeIncrement + " Long Range";
+                    toHitTips += "<br>+" + rangeIncrement + " due to Range";
                 }
                 if (oppfire === true && target.type !== "Aircraft" && target.type !== "Helicopter") {
                     toHit++;
                     toHitTips += "<br>Opportunity Fire +1";
                 }
+
+                if (state.TY.turn === 1 && target.gonetoground === true) {
+                    los.concealed = true;
+                }
+
                 if (los.concealed === true) {
                     toHit++;
                     toHitTips += "<br>Concealed +1";
@@ -4581,6 +4589,7 @@ log(weapons)
                         toHitTips += "<br>Gone to Ground +1";
                     } 
                 }
+
                 if (los.smoke === true && sTeam.special.includes("Thermal Imaging") === false) {
                     toHit++;
                     toHitTips += "<br>Smoke +1";
