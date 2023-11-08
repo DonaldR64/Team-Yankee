@@ -4618,6 +4618,10 @@ log(weapons)
                     if (weapon.notes.includes("Dedicated AA") || weapon.notes.includes("Guided AA")) {
                         rof = weapon.halted;
                     }
+                    if (weapon.notes.includes("Manual Tracking")) {
+                        toHit += 1;
+                        toHitTips.push("Manual Tracking +1 vs Air");
+                    }
                 }
                 if (target.type === "Helicopter" && target.landed() === false) {
                     //allowable weapons should be screened out above
