@@ -979,6 +979,7 @@ const TY = (() => {
             this.location = location;
             this.prevHexLabel = hexLabel;
             this.prevHex = hex;
+            this.starthp = parseInt(attributeArray.startnumber);
 
             this.order = "";
             this.specialorder = "";
@@ -2477,11 +2478,13 @@ log(outputCard)
             };
             let name = NameAndRank(team,i);
             team.name = name;
+            let hp = team.starthp;
             let r = 0.1;
             if (team.type === "Infantry") {r = 0.25}
             team.token.set({
                 name: name,
                 tint_color: "transparent",
+                bar1_value: hp,
                 aura1_color: aura,
                 aura1_radius: r,
                 showname: true,
