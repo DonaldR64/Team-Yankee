@@ -99,7 +99,6 @@ const TY = (() => {
         "One Shot": "Can only be used once per game",
         "Overhead Fire": "Grenade Launchers and Light Mortars capable of Overhead Fire can fire over friendly teams and Short Terrain",
         "Overworked": "Overworked weapons add +1 to the score needed To Hit when moving",
-        "Passengers #": "A Transport Team can carry # Infantry Teams as Passengers",
         "Pinned ROF 1": "These weapons have a ROF of 1 when Pinned Down",
         "Pioneers": 'Can cross Minefields safely on a 2+. If remain in Minefield and not Pinned Down, clear the Minefield automatically',
         "Radar": 'When shooting at Aircraft/Helicopters, weapon range is increased by 6 hexes and there are no penalties for longer ranges',
@@ -115,6 +114,7 @@ const TY = (() => {
         "Swingfire": "Team firing Swingfire Missiles can remain Gone to Ground",
         "Tandem Warhead": "Tandem Warhead HEAT weapons are unaffected by ERA Armour",
         "Thermal Imaging": "Visibility to 1000m (20 hexes) at night. No To Hit penalties for Night and Smoke",
+        "Transport": "A Transport Team can carry Infantry Teams as Passengers",
         "2nd Gen Thermal Imaging": "Visibility to 1500m (30 hexes) at night. No To Hit penalties for Night and Smoke",
         "Tractor": "A Tractor Team can tow a single Gun Team as a Passenger, placing the Gun Team behind it",
         "Unarmoured": "An Unarmoured Tank Team cannot Charge into Contact and must Break Off if Assaulted",
@@ -1985,17 +1985,6 @@ log(outputCard)
         return p;
     }
 
-    const parse2ndStat = (x,y) => {
-        let p = parseInt(y);
-        if (x) {
-            p = x.replace(/[^\d]/g, "");
-        }
-        if (isNaN(p)) {
-            p = parseInt(y);
-        }
-        return p;
-    }
-
     const crossStat = (x) => {
         let c = 1;
         if (x) {
@@ -2485,6 +2474,7 @@ log(outputCard)
                 name: name,
                 tint_color: "transparent",
                 bar1_value: hp,
+                bar1_max: hp,
                 aura1_color: aura,
                 aura1_radius: r,
                 showname: true,
@@ -2571,7 +2561,7 @@ log(outputCard)
         if (h.bp === true || h.foxholes === true) {
             outputCard.body.push("(Bulletproof Cover)");
         }
-        outputCard.body.push("Elevation: " + (elevation * 25) + " Feet");
+        outputCard.body.push("Elevation: " + (elevation * 50) + " Metres");
         outputCard.body.push("[hr]");
         if (team.inCommand === true) {
             outputCard.body.push("Team is In Command");
@@ -2644,7 +2634,7 @@ log(outputCard)
             let wreckKeys = Object.keys(WreckArray);
             for (let w=0;w<wreckKeys.length;w++) {
                 let dist = WreckArray[wreckKeys[w]].distance(team2.hex);
-                if (dist <= 3) {
+                if (dist <= 1) {
                     vision = distanceT1T2 + 3;
                     break;
                 }
@@ -2768,112 +2758,105 @@ log(outputCard)
                 }
             }
         } else {
-            if (sameTerrain === true && team1Hex.type === "Building") {
-                // team 1 and 2 are in same building/room
-                concealed = true;
-                bulletproof = true;
-            } else {
-                //not in same building
-                for (let i=0;i<interHexes.length;i++) {
-                    let qrs = interHexes[i];
-                    let qrsLabel = qrs.label();
-                    let interHex = hexMap[qrsLabel];
-    //log(i + ": " + qrsLabel)
-    //log(interHex.terrain)
-    //log("Type: " + interHex.type)
-                    if (interHex.smoke === true || interHex.smokescreen === true) {smoke = true};
-                    if (interHex.smokescreen === true && distanceT1T2 > 3) { ///6mm change
-                        los = false;
-                        break;
-                    }
+            for (let i=0;i<interHexes.length;i++) {
+                let qrs = interHexes[i];
+                let qrsLabel = qrs.label();
+                let interHex = hexMap[qrsLabel];
+//log(i + ": " + qrsLabel)
+//log(interHex.terrain)
+//log("Type: " + interHex.type)
+                if (interHex.smoke === true || interHex.smokescreen === true) {smoke = true};
+                if (interHex.smokescreen === true && distanceT1T2 > 2) { ///6mm change
+                    los = false;
+                    break;
+                }
 
-                    let interHexElevation = parseInt(interHex.elevation) - teamLevel;
-                    let interHexHeight = parseInt(interHex.height);
-                    let B;
-                    if (team1Height > team2Height) {
-                        B = (distanceT1T2 - i) * team1Height / distanceT1T2;
-                    } else if (team1Height <= team2Height) {
-                        B = i * team2Height / distanceT1T2;
-                    }
-        //log("InterHex Height: " + interHexHeight);
-        //log("InterHex Elevation: " + interHexElevation);
-        //log("Last Elevation: " + lastElevation);
-        //log("B: " + B)
-                    if (interHexElevation < lastElevation && lastElevation > team1Height && lastElevation > team2Height) {
-                        los = false;
-                        losReason = "Terrain Drops off at " + qrsLabel;
-                        break;
-                    }            
+                let interHexElevation = parseInt(interHex.elevation) - teamLevel;
+                let interHexHeight = parseInt(interHex.height);
+                let B;
+                if (team1Height > team2Height) {
+                    B = (distanceT1T2 - i) * team1Height / distanceT1T2;
+                } else if (team1Height <= team2Height) {
+                    B = i * team2Height / distanceT1T2;
+                }
+    //log("InterHex Height: " + interHexHeight);
+    //log("InterHex Elevation: " + interHexElevation);
+    //log("Last Elevation: " + lastElevation);
+    //log("B: " + B)
+                if (interHexElevation < lastElevation && lastElevation > team1Height && lastElevation > team2Height) {
+                    los = false;
+                    losReason = "Terrain Drops off at " + qrsLabel;
+                    break;
+                }            
 
-                    let friendlyFlag = false;
-                    let friendlyHeight = 0;
-        
-                    if (special !== "Overhead" && special !== "Spotter" && special !== "Defensive" && i> 1) {
-            //check for intervening friendlies in 1 hexes of interHex - can ignore if same unit
-                        //if find one, flag and note height
-            //log("Friendlies")
-                        for (let t=0;t<fKeys.length;t++) {
-                            let fm = TeamArray[fKeys[t]];
-                            if (fm.id === team1.id || fm.id === team2.id || fm.player !== team1.player || fm.unitID === team1.unitID) {continue};
-                            if (fm.type === "Infantry" && fm.moved === false) {continue}; //ignore these infantry
-                            if (fm.hex === qrs) {
-            //log(fm.name)
-                                friendlyFlag = true;
-                                fmHeight = teamHeight(fm);
-                                friendlyHeight = Math.max(fmHeight,friendlyHeight);
-                                if (special === "Flamethrower") {friendlyHeight = 100}; //basically cant fire Flamethrower over heads of friendlies
-                            }
+                let friendlyFlag = false;
+                let friendlyHeight = 0;
+    
+                if (special !== "Overhead" && special !== "Spotter" && special !== "Defensive" && i> 1) {
+        //check for intervening friendlies in the way - can ignore if same unit
+                    //if find one, flag and note height (in case lower elevation)
+        //log("Friendlies")
+                    for (let t=0;t<fKeys.length;t++) {
+                        let fm = TeamArray[fKeys[t]];
+                        if (fm.id === team1.id || fm.id === team2.id || fm.player !== team1.player || fm.unitID === team1.unitID) {continue};
+                        if (fm.type === "Infantry" && fm.moved === false) {continue}; //ignore these infantry
+                        if (fm.hex === qrs) {
+        //log(fm.name)
+                            friendlyFlag = true;
+                            fmHeight = teamHeight(fm);
+                            friendlyHeight = Math.max(fmHeight,friendlyHeight);
+                            if (special === "Flamethrower") {friendlyHeight = 100}; //basically cant fire Flamethrower over heads of friendlies
                         }
                     }
+                }
 
-                    lastElevation = interHexElevation;
+                lastElevation = interHexElevation;
 
-                    if (interHexHeight + interHexElevation + friendlyHeight >= B) {
-                        if (friendlyFlag === true) {
-                            losReason = "Friendly at " + qrsLabel + " blocks LOS"
+                if (interHexHeight + interHexElevation + friendlyHeight >= B) {
+                    if (friendlyFlag === true) {
+                        losReason = "Friendly at " + qrsLabel + " blocks LOS"
+                        los = false;
+                        break;
+                    }
+    //log("Terrain higher than B")
+                    //distances set to 1 for 6mm scale
+                    if (i>1) {
+                        if (interHex.type === 3) {
+                            hexesWithBuild++;
+                        }
+                        if (hexesWithBuild > 1) {
                             los = false;
+                            losReason = "> 1 hexes into Building at " + qrsLabel;
                             break;
                         }
-        //log("Terrain higher than B")
-                        //distances set to 1 for 6mm scale
-                        if (i>1) {
-                            if (interHex.type === 3) {
-                                hexesWithBuild++;
-                            }
-                            if (hexesWithBuild > 1) {
-                                los = false;
-                                losReason = "> 1 hexes into Building at " + qrsLabel;
-                                break;
-                            }
-                            if (hexesWithBuild > 1 && interHex.type < 3) {
-                                los = false;
-                                losReason = "Other side of Building at " + qrsLabel;
-                                break;
-                            }
-
-
-                            if (interHex.type === 2) {
-                                hexesWithTall++;
-                            }
-                            if (hexesWithTall > 1 && distanceT1T2 > 3) {
-                                los = false;
-                                losReason = "> 1 hexes through Tall terrain at " + qrsLabel; 
-                                break;
-                            }
-                            if (interHex.type > 1) {
-                                concealed = true;
-                            }
-                            if (interHex.type == 1 && special !== "Overhead") {
-                                concealed = true;
-                            }
-                            if (interHex.bp === true && special !== "Overhead") {
-                                bulletproof = true;
-                            }
+                        if (hexesWithBuild > 1 && interHex.type < 3) {
+                            los = false;
+                            losReason = "Other side of Building at " + qrsLabel;
+                            break;
                         }
-                    } else {
-        //log("Terrain less than B")
 
+
+                        if (interHex.type === 2) {
+                            hexesWithTall++;
+                        }
+                        if (hexesWithTall > 1 && distanceT1T2 > 3) {
+                            los = false;
+                            losReason = "> 1 hexes through Tall terrain at " + qrsLabel; 
+                            break;
+                        }
+                        if (interHex.type > 1) {
+                            concealed = true;
+                        }
+                        if (interHex.type == 1 && special !== "Overhead") {
+                            concealed = true;
+                        }
+                        if (interHex.bp === true && special !== "Overhead") {
+                            bulletproof = true;
+                        }
                     }
+                } else {
+    //log("Terrain less than B")
+
                 }
             }
             if (team2.type === "Infantry" && team2.moved === false) {
@@ -2919,7 +2902,7 @@ log(outputCard)
     
         let losResult = LOS(id1,id2,"");
         let distance = parseInt(losResult.distance);
-        let metres = distance*20;
+        let metres = distance*50;
         if (metres > 1000) {
             metres /= 1000;
             metres = metres.toString() + "km"
@@ -3079,9 +3062,6 @@ log(outputCard)
             ClearSmoke(unit.id);
             ResetFlags(targetTeam,unitActivation);
         }
-    
-
-
 
         let noun = "Teams ";
         let verb = " are ";
@@ -3174,7 +3154,7 @@ log(outputCard)
         } else if (order.includes("Land")) {
             outputCard.body.push("The Helicopter(s) may be placed anywhere on  the Field");
             outputCard.body.push("At the end of its movement teams land");
-            outputCard.body.push('They may not land wthin 4" of an enemy team and may not Shoot while Landed');
+            outputCard.body.push('They may not land wthin 4 hexes of an enemy team and may not Shoot while Landed');
             outputCard.body.push('Passengers disembark the following turn');
         }
 
