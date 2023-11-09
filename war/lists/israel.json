@@ -37,30 +37,30 @@
 
 	"upgrades": [
 
-      	{"id": 10, "name": "HQ Platoon","units": "2x Merkava 1s", "pts": 12},
-      	{"id": 11, "name": "Merkava 1 Platoon", "units": "3x Merkava 1s","pts": 18},
+      	{"id": 10, "name": "HQ Platoon: 2x Merkava 1s", "pts": 12},
+      	{"id": 11, "name": "Merkava 1 Platoon: 3x Merkava 1s","pts": 18},
     
-      	{"id": 20, "name": "HQ Platoon","units": "2x Merkava 2s", "pts": 14},
-      	{"id": 21, "name": "Merkava 2 Platoon", "units": "3x Merkava 2s", "pts": 21},
+      	{"id": 20, "name": "HQ Platoon: 2x Merkava 2s", "pts": 14},
+      	{"id": 21, "name": "Merkava 2 Platoon: 3x Merkava 2s", "pts": 21},
 
-      	{"id": 30, "name": "HQ Platoon","units": "2x Magach 6s", "pts": 7},
-      	{"id": 31, "name": "Magach 6 Platoon", "units": "3x Magach 6s", "pts": 11},
+      	{"id": 30, "name": "HQ Platoon: 2x Magach 6s", "pts": 7},
+      	{"id": 31, "name": "Magach 6 Platoon: 3x Magach 6s", "pts": 11},
  
         {"id": 40, "name": "Company HQ - 1 Team", "pts": 1},
-        {"id": 41, "name": "Mech. Infantry Platoon", "units": "1 Platoon HQ Team, 3 Rifle Squads, 1 Dragon Team, 1 52mm Mortar Team, 1 M113 Transport Platoon (4 M113s)", "pts": 11},
+        {"id": 41, "name": "Mech. Infantry Platoon: 1 Platoon HQ Team, 3 Rifle Squads, 1 Dragon Team, 1 52mm Mortar Team, 1 M113 Transport Platoon (4 M113s)", "pts": 11},
 
-		{"id": 50, "name": "Jeep Recce Platoon","units": "3x Recce Jeeps", "pts": 2},
-		{"id": 51, "name": "M113 Recce Platoon","units": "4x Recce M113", "pts": 3},
+		{"id": 50, "name": "Jeep Recce Platoon: 3x Recce Jeeps", "pts": 2},
+		{"id": 51, "name": "M113 Recce Platoon: 4x Recce M113", "pts": 3},
 
-        {"id": 60, "name": "M125 Mortar Platoon","units": "3x M125 81mm Mortars", "pts": 2},
+        {"id": 60, "name": "M125 Mortar Platoon: 3x M125 81mm Mortars", "pts": 2},
 
-        {"id": 61, "name": "M150 TOW Platoon","units": "2x M150 TOW", "pts": 3},
+        {"id": 61, "name": "M150 TOW Platoon: 2x M150 TOW", "pts": 3},
 
 
-        {"id": 101, "name": "M106 Mortar Battery","units":"4x M106 (120mm)", "pts": 4},
+        {"id": 101, "name": "M106 Mortar Battery: 4x M106 (120mm)", "pts": 4},
 
-        {"id": 110, "name": "M109 Battery","units":"1 Team of 3x M109 155mm", "pts": 7},
-        {"id": 111, "name": "M109 Battery","units":"2 Teams of 3x M109 155mm", "pts": 14},
+        {"id": 110, "name": "M109 Battery: 1 Team of 3x M109 155mm", "pts": 7},
+        {"id": 111, "name": "M109 Battery: 2 Teams of 3x M109 155mm", "pts": 14},
 
         {"id": 145, "name": "1 Team of 2x Skyhawk", "pts": 3},
         {"id": 146, "name": "2 Teams of 2x Skyhawk", "pts": 6},
