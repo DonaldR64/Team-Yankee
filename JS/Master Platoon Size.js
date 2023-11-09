@@ -2480,6 +2480,9 @@ log(outputCard)
                 team.token.set({
                     bar1_value: hp,
                     bar1_max: hp,
+                    compact_bar: "standard",
+                    showplayers_bar1: true,
+                    playersedit_bar1: true,
                 });
             } 
         }
