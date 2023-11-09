@@ -11,7 +11,7 @@
             {"id": 504, "name": "M113 Mech Infantry Company","pts": 0,"upgrades": [40,41,50,51,11,21,31,60,61]}
 		]},
 
-        {"name": "Brigade Support", "formations": [
+        {"name": "Reserve Support", "formations": [
             {"id": 506, "name": "Merkava 1 Tank Reserve Platoon","pts": 0,"upgrades": [11]},
             {"id": 507, "name": "Merkava 2 Tank Reserve Platoon","pts": 0,"upgrades": [21]},
             {"id": 508, "name": "Magach 6 Tank Reserve Platoon","pts": 0,"upgrades": [31]},
