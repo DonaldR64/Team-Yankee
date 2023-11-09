@@ -973,6 +973,8 @@ const TY = (() => {
             this.characterID = char.id;
             this.unitID = unitID;
             this.formationID = formationID;
+            this.assocIDs = [];
+
             this.type = type;    
             this.location = location;
             this.prevHexLabel = hexLabel;
@@ -1036,6 +1038,7 @@ const TY = (() => {
                 state.TY.teams[this.id] = {
                     unitID: unitID,
                     formationID: formationID,
+                    assocIDs: [],
                 }
             }
 
@@ -2443,48 +2446,83 @@ log(outputCard)
         let teamIDs = unitCreationInfo.teamIDs;
         let formationID = Tag[1];
         let formation = FormationArray[formationID];
-
+    
         if (!formation) {
             formation = new Formation(nation,formationID,Tag[2]);
         }
         let unit = new Unit(nation,stringGen(),unitName,formationID);
-
+    
         unit.number = formation.unitIDs.length;
         let unitMarker = Nations[nation].platoonmarkers[unit.number];
         formation.add(unit);
-
+    
         log(formation)
         log(unit)
-
+    
+    
+        //sort into groups
+        let charGroups = {};
         for (let i=0;i<teamIDs.length;i++) {
-            let team = new Team(teamIDs[i],formationID,unit.id);
-            if (!team) {continue};
-            unit.add(team);
-            let aura = "transparent";
-            if (i === 0) {
-                aura = Colours.green
-            };
-            let name = NameAndRank(team,i);
-            team.name = name;
-            let hp = parseInt(team.starthp);
-            let r = (team.type === "Infantry") ? 0.25:0.1;
-            team.token.set({
-                name: name,
-                tint_color: "transparent",
-                aura1_color: aura,
-                aura1_radius: r,
-                showname: true,
-                statusmarkers: unitMarker,
-            })
-            if ((team.type === "Infantry" || team.type === "Unarmoured Tank") && hp > 1) {
+            let token = findObjs({_type:"graphic", id: teamIDs[i]})[0];
+            if (!token) {continue}
+            let char = getObj("character", token.get("represents"));
+            if (!char) {continue}
+            if (charGroups[char.id]) {
+                charGroups[char.id].push(teamIDs[i]);
+            } else {
+                charGroups[char.id] = [teamIDs[i]];
+            }
+        }
+    
+       let groupKeys = Object.keys(charGroups);
+       for (let i=0;i<groupKeys.length;i++) {
+            let ids = charGroups[groupKeys[i]];
+            for (let j=0;j<ids.length;j++) {
+                let team = new Team(ids[j],formationID,unit.id);
+                if (!team) {continue};       
+                unit.add(team);
+                let aura = "transparent";
+                let name;
+                
+                if (groupKeys.length === 1) {
+                    if (j===0) {aura = Colours.green};
+                    name = NameAndRank(team,j);
+                } else {
+                    if (team.special.includes("Platoon Leader")) {
+                        aura = Colours.green;
+                        name = NameAndRank(team,0);
+                    } else {
+                        if (j===0) {aura = Colours.lightblue};
+                        name = NameAndRank(team,j+1)
+                    }
+                    team.assocIDs = ids;
+                    state.TY.teams[team.id][assocIDs] = ids;
+                }
+
+                log(name)
+                log(state.TY.teams[team.id]);
+
+                team.name = name;
+                let hp = parseInt(team.starthp);
+                let r = (team.type === "Infantry") ? 0.25:0.1;
                 team.token.set({
-                    bar1_value: hp,
-                    bar1_max: hp,
-                    compact_bar: "standard",
-                    showplayers_bar1: true,
-                    playersedit_bar1: true,
+                    name: name,
+                    tint_color: "transparent",
+                    aura1_color: aura,
+                    aura1_radius: r,
+                    showname: true,
+                    statusmarkers: unitMarker,
                 });
-            } 
+                if ((team.type === "Infantry" || team.type === "Unarmoured Tank") && hp > 1) {
+                    team.token.set({
+                        bar1_value: hp,
+                        bar1_max: hp,
+                        compact_bar: "standard",
+                        showplayers_bar1: true,
+                        playersedit_bar1: true,
+                    });
+                } 
+            }
         }
         if (state.TY.nations[player].includes(nation) === false) {
             state.TY.nations[player].push(nation);
@@ -2495,12 +2533,14 @@ log(outputCard)
     const NameAndRank = (team,i) => {
         let name = team.characterName.replace(team.nation + " ","");
         let unit = UnitArray[team.unitID];
+        let unitNumber = unit.number;
+        let letter = rowLabels[unitNumber - 1];
         if (team.type.includes("Tank")) {
             name = name.replace(team.nation + " ","");
             let item = ((unit.number+1) * 100) + i
             name += " " + item.toString();
         } else if (team.type === "Infantry" || team.type === "Gun") {
-            name += " "+ i;
+            name += " "+ letter + "/" + i;
         } 
         let rank;
         if (team.special.includes("HQ") || team.token.get(SM.HQ) === true) {
