@@ -1780,6 +1780,8 @@ log(hit)
                 tint_color: "transparent",
                 aura1_color: "transparent",
                 aura1_radius: 0,
+                bar1_value: "",
+                bar1_max: "",
                 showname: true,
                 showplayers_aura1: true,
                 gmnotes: "",
@@ -2464,30 +2466,22 @@ log(outputCard)
             };
             let name = NameAndRank(team,i);
             team.name = name;
-            let hp = team.starthp;
+            let hp = parseInt(team.starthp);
             let r = (team.type === "Infantry") ? 0.25:0.1;
-            if (team.type === "Infantry" || team.type === "Unarmoured Tank") {
+            team.token.set({
+                name: name,
+                tint_color: "transparent",
+                aura1_color: aura,
+                aura1_radius: r,
+                showname: true,
+                statusmarkers: unitMarker,
+            })
+            if ((team.type === "Infantry" || team.type === "Unarmoured Tank") && hp > 1) {
                 team.token.set({
-                    name: name,
-                    tint_color: "transparent",
                     bar1_value: hp,
                     bar1_max: hp,
-                    compact_bar: true,
-                    aura1_color: aura,
-                    aura1_radius: r,
-                    showname: true,
-                    statusmarkers: unitMarker,
-                })
-            } else {
-                team.token.set({
-                    name: name,
-                    tint_color: "transparent",
-                    aura1_color: aura,
-                    aura1_radius: r,
-                    showname: true,
-                    statusmarkers: unitMarker,
-                })
-            }
+                });
+            } 
         }
         if (state.TY.nations[player].includes(nation) === false) {
             state.TY.nations[player].push(nation);
