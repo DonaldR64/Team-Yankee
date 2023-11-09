@@ -74,10 +74,10 @@ const TY = (() => {
         "Flamethrower": "Infantry, Gun, and Unarmoured Tank Teams re-roll successful Saves when hit by a Flame-thrower and the Unit is automatically Pinned Down. Armoured Tank Teams use their Top armour for Armour Saves when hit by a Flame-thrower.",
         "Forward Firing": "Forward Firing Weapons can only target Teams fully in front of the Shooter",
         "Guided": 'No Penalties for Long Range. Cannot hit Infantry unless they are stationary in Bulletproof Cover',
-        "Guided AA": 'Guided Weapons that cannot target Tank or Infantry Teams. No penalty to Hit for longer ranges. Always shoots at Halted ROF',
+        "Guided AA": 'Guided Weapons that cannot target Tank or Infantry Teams. No penalty to Hit for Long Range. Always shoots at Halted ROF',
         "Gun Shield": "Gives Bulletproof Cover when shot at from the Front. No protection against Bombardments or if the Team moved at Dash speed",
         "Hammerhead": "Team with a Hammerhead can remain Gone to Ground while shooting its missile",
-        "HEAT": 'Target Armour is not increased for longer ranges. Affected by BDD, Skirts, Chobham and ERA Armour',
+        "HEAT": 'Target Armour is not increased for Long Range. Affected by BDD, Skirts, Chobham and ERA Armour',
         "Heavy Weapon": "A Heavy Weapon Team cannot Charge into Contact",
         "HQ": "Always In Command and ignores Morale Checks",
         "Hunter-Killer": "Hunter-Killer Helicopters can use terrain for Concealment and are Gone to Ground unless they Shoot",
@@ -93,7 +93,7 @@ const TY = (() => {
         "MLRS": "Multiple Launching Rocket System - each Team counts as two Teams firing",
         "Mounted": "Can fire a Mounted Weapon if a Passenger has that weapon",
         "Napalm": "Infantry, Gun, and Unarmoured Tank Teams re-roll successful Saves when hit by Napalm bombs. Armoured Tank Teams use their Top armour for Armour Saves when hit by Napalm bombs",
-        "NLOS": 'A weapon with NLOS has no To Hit Penalty for longer ranges and does not require LOS. The Target Team always counds as Concealed even when in LOS. NLOS weapons cannot hit Infantry Teams unless the Infantry are stationary and in bulletproof cover',
+        "NLOS": 'A weapon with NLOS has no To Hit Penalty for Long Range and does not require LOS. The Target Team always counds as Concealed even when in LOS. NLOS weapons cannot hit Infantry Teams unless the Infantry are stationary and in bulletproof cover',
         "No HE": "A weapon with no HE targetting an Infantry or Gun Team add +1 to the score needed To Hit",
         "Observer": "An Observer Team can Spot for any friendly Artillery Unit and reduces the score required to Range In by 1",
         "One Shot": "Can only be used once per game",
@@ -101,7 +101,7 @@ const TY = (() => {
         "Overworked": "Overworked weapons add +1 to the score needed To Hit when moving",
         "Pinned ROF 1": "These weapons have a ROF of 1 when Pinned Down",
         "Pioneers": 'Can cross Minefields safely on a 2+. If remain in Minefield and not Pinned Down, clear the Minefield automatically',
-        "Radar": 'When shooting at Aircraft/Helicopters, weapon range is increased by 6 hexes and there are no penalties for longer ranges',
+        "Radar": 'When shooting at Aircraft/Helicopters, weapon range is increased by 6 hexes and there are no penalties for Long Range',
         "Salvo": "Use a larger Artillery Template",
         "Scout": "Scouts are Gone to Ground unless they Shoot or Assault",
         "Self Defence AA": "Self-Defence AA weapons can Shoot at Aircraft with ROF 1",
@@ -1272,10 +1272,9 @@ log(hit)
                 }
 
                 if (weapon.notes.includes("HEAT") === false && weapon.notes.includes("Krasnopol") === false && weapon.notes.includes("NLOS") === false) {
-                    let rangeIncrement = Math.max(0,Math.ceil(range/20) - 1);
-                    saveNeeded += rangeIncrement;
-                    if (rangeIncrement > 0) {
-                        save.tip += "<br>+" + rangeIncrement + " Armour for Range<br>";
+                    if (range > Math.round(hit.weapon.maxRange/2)) {
+                        saveNeeded++;
+                        save.tip += "<br>+1 Armour for Long Range<br>";
                     }
                 };
 
@@ -2628,7 +2627,7 @@ log(outputCard)
             if (team1.special.includes("2nd Gen Thermal Imaging")) {
                 vision = NightVision.Gen2Thermal;
             }
-            //check if in range of burning wreck
+            //check if adjacnt to burning wreck
             let wreckKeys = Object.keys(WreckArray);
             for (let w=0;w<wreckKeys.length;w++) {
                 let dist = WreckArray[wreckKeys[w]].distance(team2.hex);
@@ -4928,7 +4927,7 @@ log("In Mistaken")
                         let hit = team.hitArray[j];
                         if (hit.facing === "Side/Rear") {
                             team.priority += 1;
-                        } else if (hit.range <= 20) {
+                        } else if (hit.range <= Math.round(hit.weapon.maxRange/2)) {
                             team.priority += 1;
                         }
                     }
