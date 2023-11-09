@@ -6608,7 +6608,38 @@ log("2nd Row to " + team3.name)
         team.kill();
     }
 
+    const FlipGraphic = (angle,tok,team) => {
+        let rot;
+        let flip = false;
+        angle = Angle(angle);
+        if (team.type === "Infantry") {
+            rot = 0;
+        } else {
+            rot = angle;
+        }
+        if (angle > 180 && angle <= 360) {
+            flip = true;
+        }
+    
+        tok.set({
+            rotation: rot,
+            fliph: flip,
+        });
+    }
 
+    const MovementSound = (team) => {
+        let sounds = {
+            "Wheeled": "Wheeled",
+            "Tracked": "Tracked",
+            "Halftrack": "Tracked",
+            "Leg": "March",
+            "Aircraft": "Jet",
+            "Helicopter": "Helicopter",
+        }
+        let sound = sounds[team.movementType];
+        PlaySound(sound);
+    }
+ 
 
 
 
@@ -6617,7 +6648,7 @@ log("2nd Row to " + team3.name)
         if (tok.get('subtype') === "token") {
             RemoveLines();
             log(tok.get("name") + " moving");
-            if ((tok.get("left") !== prev.left) || (tok.get("top") !== prev.top)) {
+            if ((tok.get("left") !== prev.left) || (tok.get("top") !== prev.top) || tok.get("rotation") !== prev.rotation) {
                 let team = TeamArray[tok.id];
                 let newLocation = new Point(tok.get("left"),tok.get("top"));
                 let newHex = pointToHex(newLocation);
@@ -6639,7 +6670,6 @@ log("2nd Row to " + team3.name)
                 }
 
                 let oldHexLabel = team.hexLabel;
-                let oldLocation = team.location;
 
                 let moveBack = team.bailed;
                 if ((team.type === "Tank" || team.type === "Unarmoured Tank") && hexMap[newHexLabel].dash === 3) {
@@ -6670,6 +6700,12 @@ log("Move Back: " + moveBack)
                 }
                 hexMap[newHexLabel].teamIDs.push(tok.id);
                 inCommand(team);
+
+                //let theta = oldHex.angle(newHex);
+                //tok.set("rotation",theta);
+                FlipGraphic(tok.get("rotation"),tok,team);
+                MovementSound(team);
+
                 if (state.TY.passengers[tok.id]) {
                     //carrying passengers
                     let passengers = state.TY.passengers[tok.id];
