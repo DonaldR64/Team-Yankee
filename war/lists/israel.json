@@ -18,7 +18,7 @@
             {"id": 509, "name": "M113 Mech Infantry Reserve Platoon","pts": 0,"upgrades": [41]}
         ]},
 
-	    {"name": "Divisional Support","formations":[
+	    {"name": "Brigade Support","formations":[
 	    	{"id": 510, "name": "Artillery Battery","pts": 0,"upgrades": [110,111]},
 	    	{"id": 511, "name": "M113 OP","pts": 1, "units": "1x M113 OP"},
 	    	{"id": 512, "name": "Artillery Battery","pts": 0,"upgrades": [110,111,101]},
