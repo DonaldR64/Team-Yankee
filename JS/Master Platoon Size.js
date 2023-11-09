@@ -50,9 +50,9 @@ const TY = (() => {
     };
 
     const NightVision = {
-        IR: 15,
+        IR: 20,
         Gen1Thermal: 20,
-        Gen2Thermal: 30,
+        Gen2Thermal: 40,
     }
 
     let specialInfo = {
@@ -74,7 +74,7 @@ const TY = (() => {
         "Flamethrower": "Infantry, Gun, and Unarmoured Tank Teams re-roll successful Saves when hit by a Flame-thrower and the Unit is automatically Pinned Down. Armoured Tank Teams use their Top armour for Armour Saves when hit by a Flame-thrower.",
         "Forward Firing": "Forward Firing Weapons can only target Teams fully in front of the Shooter",
         "Guided": 'No Penalties for Long Range. Cannot hit Infantry unless they are stationary in Bulletproof Cover',
-        "Guided AA": 'Guided Weapons that cannot target Tank or Infantry Teams. No penalty to Hit for longer ranges',
+        "Guided AA": 'Guided Weapons that cannot target Tank or Infantry Teams. No penalty to Hit for longer ranges. Always shoots at Halted ROF',
         "Gun Shield": "Gives Bulletproof Cover when shot at from the Front. No protection against Bombardments or if the Team moved at Dash speed",
         "Hammerhead": "Team with a Hammerhead can remain Gone to Ground while shooting its missile",
         "HEAT": 'Target Armour is not increased for longer ranges. Affected by BDD, Skirts, Chobham and ERA Armour',
@@ -82,7 +82,7 @@ const TY = (() => {
         "HQ": "Always In Command and ignores Morale Checks",
         "Hunter-Killer": "Hunter-Killer Helicopters can use terrain for Concealment and are Gone to Ground unless they Shoot",
         "Independent": "Independent Teams can use the Mistaken Target rule to reassign hits to nearby Units, but cannot Charge into Contact or take an Objective",        
-        "Infra-Red": "Can see out to a distance of 750m (15 hexes) at night",
+        "Infra-Red": "Can see out to a distance of 1000m (20 hexes) at night",
         "Jump Jet": "Enters the table on a score of 3+",
         "Large Gun": 'Cannot be placed in Buildings and cannot be placed from Ambush within 4 hexes of enemy',
         "Laser Rangefinder": 'No Penalties for Long Range',
@@ -110,12 +110,12 @@ const TY = (() => {
         "Smoke Bombardment": "Once per game, the weapon can fire a Smoke Bombardment",
         "Sneak and Peek": 'A Team with Sneak and Peek can move 5 hexes if it is not firing its Main Gun',
         "Spearhead": "Special Rules for Deployment (page 93)",
-        "Stabiliser": 'Tank can move 7 hexes at Tactical, gaining a +1 penalty To Hit. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 10 hexes',
+        "Stabiliser": 'Tank can move 7 hexes at Tactical, gaining a +1 penalty To Hit. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 5 hexes',
         "Swingfire": "Team firing Swingfire Missiles can remain Gone to Ground",
         "Tandem Warhead": "Tandem Warhead HEAT weapons are unaffected by ERA Armour",
         "Thermal Imaging": "Visibility to 1000m (20 hexes) at night. No To Hit penalties for Night and Smoke",
         "Transport": "A Transport Team can carry Infantry Teams as Passengers",
-        "2nd Gen Thermal Imaging": "Visibility to 1500m (30 hexes) at night. No To Hit penalties for Night and Smoke",
+        "2nd Gen Thermal Imaging": "Visibility to 2000m (40 hexes) at night. No To Hit penalties for Night and Smoke",
         "Tractor": "A Tractor Team can tow a single Gun Team as a Passenger, placing the Gun Team behind it",
         "Unarmoured": "An Unarmoured Tank Team cannot Charge into Contact and must Break Off if Assaulted",
     };
@@ -141,8 +141,6 @@ const TY = (() => {
         "saved": "All Hits Saved",
         "cover": "All Hits Saved (Cover)",
     }
-
-    const PM = ["status_Green-01::2006603","status_Green-02::2006607","status_Green-03::2006611"];
 
     let outputCard = {title: "",subtitle: "",nation: "",body: [],buttons: []};
     const WarsawPact = ["Soviet","Poland","Syria"];
@@ -4534,25 +4532,18 @@ log(weapons)
                 let toHit = parseInt(target.hit);
                 let toHitTips = "<br>Base: " + toHit;
                 let los = eta[0].los;
-                let targetting = 0;
                 let excl = false;
 
-                let rangeIncrement = Math.max(Math.ceil(parseInt(los.distance)/20) - 1,0);
-
-                if (weapon.notes.includes("NLOS")) {
-                    rangeIncrement = 0;
-                }
-
-                if (weapon.notes.includes("Laser Rangefinder") || weapon.notes.includes("Guided") || (weapon.notes.includes("Accurate") && sTeam.moved === false)) {
-                    rangeIncrement = Math.max(rangeIncrement - 1,0);
+                if (weapon.notes.includes("Laser Rangefinder") || weapon.notes.includes("Guided") || (weapon.notes.includes("Accurate") && sTeam.moved === false) || weapon.notes.includes("NLOS")) {
+                    excl = true;
                 }
                 if (weapon.notes.includes("Radar") && (target.type === "Aircraft" || (target.type === "Helicopter" && target.queryCondition("Landed") === false))) {
-                    rangeIncrement = Math.max(rangeIncrement - 1,0);
+                    excl = true;
                 }
 
-                if (rangeIncrement > 0) {
-                    toHit += rangeIncrement;
-                    toHitTips += "<br>+" + rangeIncrement + " due to Range";
+                if (los.distance > (Math.round(weapon.maxRange/2))) {
+                    toHit++;
+                    toHitTips += "<br>Long Range +1";
                 }
                 if (oppfire === true && target.type !== "Aircraft" && target.type !== "Helicopter") {
                     toHit++;
