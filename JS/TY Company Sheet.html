@@ -683,8 +683,10 @@
             let teaminfo;
             if (type === "Infantry") {
                 teaminfo = "Infantry Teams: " + teamnumber;
-            } else if (type.includes("Tank")) {
+            } else if (type === "Tank") {
                 teaminfo = "Tank Team";
+            } else if (type === "Unarmoured Tank") {
+                teaminfo = "Unarmoured Tank Teams: " + teamnumber;
             } else if (type === "Aircraft") {
                 teaminfo = "Aircraft Team";
             } else if (type === "Helicopter") {
