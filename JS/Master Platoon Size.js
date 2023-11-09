@@ -2465,18 +2465,29 @@ log(outputCard)
             let name = NameAndRank(team,i);
             team.name = name;
             let hp = team.starthp;
-            let r = 0.1;
-            if (team.type === "Infantry") {r = 0.25}
-            team.token.set({
-                name: name,
-                tint_color: "transparent",
-                bar1_value: hp,
-                bar1_max: hp,
-                aura1_color: aura,
-                aura1_radius: r,
-                showname: true,
-                statusmarkers: unitMarker,
-            })
+            let r = (team.type === "Infantry") ? 0.25:0.1;
+            if (team.type === "Infantry" || team.type === "Unarmoured Tank") {
+                team.token.set({
+                    name: name,
+                    tint_color: "transparent",
+                    bar1_value: hp,
+                    bar1_max: hp,
+                    compact_bar: true,
+                    aura1_color: aura,
+                    aura1_radius: r,
+                    showname: true,
+                    statusmarkers: unitMarker,
+                })
+            } else {
+                team.token.set({
+                    name: name,
+                    tint_color: "transparent",
+                    aura1_color: aura,
+                    aura1_radius: r,
+                    showname: true,
+                    statusmarkers: unitMarker,
+                })
+            }
         }
         if (state.TY.nations[player].includes(nation) === false) {
             state.TY.nations[player].push(nation);
