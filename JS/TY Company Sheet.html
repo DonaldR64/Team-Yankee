@@ -405,8 +405,7 @@
         <input type="hidden" name="attr_nation"/>
           <section class="header f-center">
             <h1><span name="attr_character_name"></span></h1>
-            <h3><span>&#8226; </span><span name="attr_type"></span><span> Unit &#8226;</span></h3>
-            <h3><span>&#8226; </span><span>Teams: </span><span name="attr_startnumber"></span><span> &#8226; </span></h3>
+            <h3><span>&#8226; </span><span name="attr_teaminfo"></span><span> &#8226; </span></h3>
             <h3><span name="attr_specialText"></span></h3>
           </section>
 
@@ -611,7 +610,7 @@
     });
 
     on("change:attrs sheet:opened", function() { 
-        getAttrs(["type","nation","unique","tactical","terrain","country","road","cross","counterattack","assault","special","gamescale","weapon1notes","weapon2notes"], function(values) {
+        getAttrs(["type","nation","unique","tactical","terrain","country","road","cross","counterattack","assault","special","gamescale","weapon1notes","weapon2notes","startnumber"], function(values) {
             let nationImage;
             let nation = values.nation;
 
@@ -679,9 +678,17 @@
                 nationImage = "https://s3.amazonaws.com/files.d20.io/images/366073450/MaE7Hz3ruNZ-2LrDfZQicA/thumb.png?1699036295";       
             }
 
-
-
-
+            let teamnumber = values.startnumber;
+            let teaminfo;
+            if (type === "Infantry") {
+                teaminfo = "Infantry Teams: " + teamnumber;
+            } else if (type.includes("Tank")) {
+                teaminfo = "Vehicles: " + teamnumber;
+            } else if (type === "Aircraft") {
+                teaminfo = "Aircraft: " + teamnumber;
+            } else if (type === "Helicopter") {
+                teaminfo = "Helicopters: " + teamnumber;
+            }
 
             let tact = parseInt(values.tactical);
             let ter = parseInt(values.terrain);
@@ -723,7 +730,8 @@
                 "terrain": ter,
                 "country": count,
                 "road": road,
-                "cross": cross
+                "cross": cross,
+                "teaminfo": teaminfo,
             })
         });    
     });  
