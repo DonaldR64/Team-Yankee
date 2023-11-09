@@ -5024,7 +5024,7 @@ log("In Create Barrages")
             imgsrc: img,
             layer: "objects",
             aura1_color: colour,
-            aura1_radius: 60,
+            aura1_radius: 100,
         });
         toFront(newToken);
         state.TY.barrageID = newToken.id;
@@ -5039,12 +5039,12 @@ log(ai)
         let two = ai.two;
         if (two === true) {
             newToken.set({
-                aura2_radius: 100,
+                aura2_radius: 200,
                 aura2_color: "#d9d9d9",
             });
         }
         if (two === "Salvo Only") {
-            newToken.set("aura1_radius",100);
+            newToken.set("aura1_radius",200);
         }
         if (unitIDs.length === 0) {
             outputCard.body.push("No Available Artillery");
@@ -5217,12 +5217,12 @@ log(weapon)
             let distance2 = team2.hex.distance(barrageTeam.hex);
             if (air === true) {
                 //4" from edge of template 6mm
-                if (distance2 < (4+4)) {tooClose[0] = true};
-                if (distance2 < (6+4)) {tooClose[1] = true};
+                if (distance2 < (2+4)) {tooClose[0] = true};
+                if (distance2 < (4+4)) {tooClose[1] = true};
             } else {
                 //2" from edge of template or 3" for Salvo 6mm
-                if (distance2 < (4+2)) {tooClose[0] = true};
-                if (distance2 < (6+3)) {tooClose[1] = true};
+                if (distance2 < (2+2)) {tooClose[0] = true};
+                if (distance2 < (4+3)) {tooClose[1] = true};
             }
         }
         outputCard.body.push("[U]Units[/u]");
@@ -5262,7 +5262,7 @@ log(weapon)
                 artTeam = TeamArray[artIDs[j]];
                 let dist = artTeam.hex.distance(barrageTeam.hex);
                 if (hexMap[artTeam.hexLabel].terrain.includes("Offboard") ){
-                    dist += 50; //1 km extra
+                    dist += 20; //1 km extra
                 }
 
 
@@ -5342,7 +5342,7 @@ log(weapon)
 
                 let dist = team.hex.distance(barrageTeam.hex);
                 if (hexMap[team.hexLabel].terrain.includes("Offboard") ){
-                    dist += 50; //1km off map
+                    dist += 20; //1km off map
                 }  
                 if (dist > team.artilleryWpn.maxRange || dist < team.artilleryWpn.minRange) {
                     continue;
@@ -5365,14 +5365,14 @@ log(weapon)
             return;
         }
     
-        let templateRadius = 3;
-        let tooCloseDist = 7; //4" to template radius
+        let templateRadius = 2;
+        let tooCloseDist = 4; //2" to template radius
         if (weapon.moving === "Salvo" || weapon.halted === "Salvo") {
-            templateRadius = 5;
-            tooCloseDist = 11; //6" to template radius
+            templateRadius = 4;
+            tooCloseDist = 7; //3" to template radius
         }
         if (artilleryTeams[0].type === "Aircraft" || artilleryTeams[0].type === "Helicopter") {
-            tooCloseDist = templateRadius + 8;
+            tooCloseDist = templateRadius + 4;
         }
     
         if (ammoType !== "Smoke Bombardment") {
@@ -6546,22 +6546,6 @@ log("2nd Row to " + team3.name)
 
 
     const Test = () => {
-        let chars = findObjs({
-            _type: "character",
-        });
-        chars.forEach((char) => {
-            let tact = parseInt(Attribute(char,"tactical")) * 2;
-            let ter = parseInt(Attribute(char,"terrain")) * 2;
-            let country = parseInt(Attribute(char,"country")) * 2;
-            let road = parseInt(Attribute(char,"road")) * 2;
-            AttributeSet(char.id,"tactical",tact);
-            AttributeSet(char.id,"terrain",ter);
-            AttributeSet(char.id,"country",country);
-            AttributeSet(char.id,"road",road);
-        })
-
-
-
 
     }
 
