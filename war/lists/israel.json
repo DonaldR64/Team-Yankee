@@ -12,10 +12,10 @@
 		]},
 
         {"name": "Brigade Support", "formations": [
-            {"id": 506, "name": "Merkava 1 Tank Support Platoon","pts": 0,"upgrades": [11]},
-            {"id": 507, "name": "Merkava 2 Tank Support Platoon","pts": 0,"upgrades": [21]},
-            {"id": 508, "name": "Magach 6 Tank Support Platoon","pts": 0,"upgrades": [31]},
-            {"id": 509, "name": "M113 Mech Infantry Support Platoon","pts": 0,"upgrades": [41]}
+            {"id": 506, "name": "Merkava 1 Tank Reserve Platoon","pts": 0,"upgrades": [11]},
+            {"id": 507, "name": "Merkava 2 Tank Reserve Platoon","pts": 0,"upgrades": [21]},
+            {"id": 508, "name": "Magach 6 Tank Reserve Platoon","pts": 0,"upgrades": [31]},
+            {"id": 509, "name": "M113 Mech Infantry Reserve Platoon","pts": 0,"upgrades": [41]}
         ]},
 
 	    {"name": "Divisional Support","formations":[
