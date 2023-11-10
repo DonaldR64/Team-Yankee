@@ -2496,7 +2496,9 @@ log(outputCard)
                         name = NameAndRank(team,j+1)
                     }
                     team.assocIDs = ids;
-                    state.TY.teams[team.id][assocIDs] = ids;
+                    let info = state.TY.teams[team.id];
+                    info.assocIDs = ids;
+                    state.TY.teams[team.id] = info;
                 }
 
                 log(name)
