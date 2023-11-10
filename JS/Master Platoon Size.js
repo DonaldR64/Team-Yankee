@@ -618,11 +618,12 @@ const TY = (() => {
             this.nation = nation;
             this.player = (WarsawPact.includes(nation)) ? 0:1;
             this.formationID = formationID;
+            this.number = 0;
             this.teamIDs = [];
             this.hqUnit = false;
             this.artillery = false;
             this.type = "";
-            this.number = 0;
+            this.num = 0;
             this.linkedUnitID = ""; //used in Mistaken for HQ units
             this.limited = 0; //used to track limited use weapons
             this.inReserve = false;
@@ -2452,8 +2453,8 @@ log(outputCard)
         }
         let unit = new Unit(nation,stringGen(),unitName,formationID);
     
-        unit.number = formation.unitIDs.length;
-        let unitMarker = Nations[nation].platoonmarkers[unit.number];
+        unit.num = formation.unitIDs.length;
+        let unitMarker = Nations[nation].platoonmarkers[unit.num];
         formation.add(unit);
     
         log(formation)
@@ -2492,7 +2493,7 @@ log(outputCard)
                         aura = Colours.green;
                         name = NameAndRank(team,0);
                     } else {
-                        if (j===0) {aura = Colours.lightblue};
+                        if (j===0) {aura = Colours.darkblue};
                         name = NameAndRank(team,j+1)
                     }
                     team.assocIDs = ids;
@@ -2503,15 +2504,19 @@ log(outputCard)
 
                 log(name)
                 log(state.TY.teams[team.id]);
+                log("I: " + i)
+                log("J: " + j)
+                log(aura)
 
                 team.name = name;
                 let hp = parseInt(team.starthp);
-                let r = (team.type === "Infantry") ? 0.25:0.1;
+                let r = (team.type === "Infantry") ? 7:0.1;
                 team.token.set({
                     name: name,
                     tint_color: "transparent",
                     aura1_color: aura,
                     aura1_radius: r,
+                    showplayers_aura1: true,
                     showname: true,
                     statusmarkers: unitMarker,
                 });
@@ -2535,8 +2540,8 @@ log(outputCard)
     const NameAndRank = (team,i) => {
         let name = team.characterName.replace(team.nation + " ","");
         let unit = UnitArray[team.unitID];
-        let unitNumber = unit.number;
-        let letter = rowLabels[unitNumber - 1];
+        let unitNumber = unit.num;
+        let letter = rowLabels[unitNumber];
         if (team.type.includes("Tank")) {
             name = name.replace(team.nation + " ","");
             let item = ((unit.number+1) * 100) + i
