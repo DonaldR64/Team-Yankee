@@ -974,7 +974,6 @@ const TY = (() => {
             this.characterID = char.id;
             this.unitID = unitID;
             this.formationID = formationID;
-            this.assocIDs = [];
 
             this.type = type;    
             this.location = location;
@@ -1039,7 +1038,6 @@ const TY = (() => {
                 state.TY.teams[this.id] = {
                     unitID: unitID,
                     formationID: formationID,
-                    assocIDs: [],
                 }
             }
 
