@@ -4327,7 +4327,7 @@ log(outputCard)
         let targetTeamArray = BuildTargetTeamArray(target,shooter);
 
         let mistaken = true;
-        if ((shooter.hex.distance(target.hex) < 8 && target.type.includes("Tank")) || shooter.hex.distance(target.hex) < 4) {
+        if ((shooter.hex.distance(target.hex) <= 4 && target.type.includes("Tank")) || shooter.hex.distance(target.hex) <= 2) {
             mistaken = false;
         }
         if (defensive === true) {mistaken = false};
@@ -4693,6 +4693,19 @@ log(weapons)
                     continue;
                 }
 
+                let hp = parseInt(sTeam.token.get("bar1_value")) || 1;
+                let hpMax = parseInt(sTeam.token.get("bar1_max")) || 1;
+                if (hp/hpMax !== 1) {
+                    let newROF = (hp * rof)/hpMax;
+                    if (newROF < 1) {
+                        rof = 1;
+                        toHit++;
+                        toHitTips.push("+1 due to Casualties");
+                    } else {
+                        rof = Math.round(newROF);
+                    }
+                }
+
                 let rolls = [];
                 let hits = 0;
                 for (let k=0;k<rof;k++) {
@@ -4990,7 +5003,8 @@ log("Array Length: " + array.length)
         array = array.sort(function(a,b){
             return b.priority - a.priority;
         })
-        let roll = randomInteger(6);
+        let roll = 6; //trial of 1st mistaken being passed
+        //let roll = randomInteger(6);
 log("Roll: " + roll)
 
         for (let i=0;i<array.length;i++) {
