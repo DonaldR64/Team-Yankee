@@ -3335,6 +3335,9 @@ log(outputCard)
             let weaponType = weaponTypes[i];
             let names = types[weaponType]
             if (names.length > 0) {
+                if (weaponType === "MG" && names.length > 1) {
+                    names = "MGs";
+                }
                 names = names.toString();
                 if (names.charAt(0) === ",") {names = names.replace(",","")};
                 names = names.replaceAll(",","+");
@@ -3758,6 +3761,17 @@ log(outputCard)
 
     }
 
+
+
+
+
+
+
+
+
+
+
+
     const StartStep = (pass) => {
         if (pass === "ResLeaders") {
             CheckArray = [];
@@ -4004,9 +4018,15 @@ log(outputCard)
             if (team.moved === true || team.fired === true) {
                 team.removeCondition("GTG")
                 team.gonetoground = false;
+                if (team.token.get("aura1_color") === Colours.lightpurple) {
+                    team.token.set("aura1_color",Colours.black);
+                }
             } else {
                 team.addCondition("GTG")
                 team.gonetoground = true;
+                if (i===0 && state.TY.turn > 0) {
+                    team.token.set("aura1_color",Colours.lightpurple)
+                }
             }
         }
     }
@@ -6782,8 +6802,11 @@ log("Move Back: " + moveBack)
                             team.moved = false;
                             team.maxTact = false;
                             if (team.order === "Hold" && team.fired === false) {
-                                team.addCondition("GTG")
+                                team.addCondition("GTG");
                                 team.gonetoground = true;
+                                if (team.id === unitLeader.id && state.TY.turn > 0) {
+                                    team.token.set("aura1_color",Colours.lightpurple)
+                                }
                             }
                         }
                     }
@@ -6791,6 +6814,9 @@ log("Move Back: " + moveBack)
                     if (team.moved === true) {
                         team.removeCondition("GTG")
                         team.gonetoground = false;
+                        if (team.token.get("aura1_color") === Colours.lightpurple) {
+                            team.token.set("aura1_color",Colours.black);
+                        }
                         if (team.artilleryWpn !== undefined) {
                             RemoveRangedInMarker(team.unitID);
                         }
