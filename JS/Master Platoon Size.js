@@ -2455,6 +2455,19 @@ log(outputCard)
         let unitMarker = Nations[nation].platoonmarkers[unit.number];
         formation.add(unit);
 
+        teamIDs.sort((a,b) => {
+            let tokenA = findObjs({_type:"graphic", id: a})[0];
+            let tokenB = findObjs({_type:"graphic", id: b})[0];
+            let charA = getObj("character", tokenA.get("represents")); 
+            let charB = getObj("character", tokenA.get("represents")); 
+            if (!charA || !charB) {return 0};
+            let rankA = Attribute(charA,"rank");
+            let rankB = Attribute(charB,"rank");
+            if (rankA > rankB) {return 1};
+            if (rankA < rankB) {return -1};
+            return 0;
+        });
+
         log(formation)
         log(unit)
 
