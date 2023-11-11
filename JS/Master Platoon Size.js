@@ -941,14 +941,12 @@ const TY = (() => {
 
             AttributeSet(char.id,"specialText",specialText);
 
-            let unique = (attributeArray.unique === "true") ? true:false;
+            let rank = parseInt(attributeArray.rank) || 0;
 
             //armour
             let front = parseInt(attributeArray.armourF);
-            let side = attributeArray.armourS;
-            if (side) {side = parseInt(side)} else {side = 0};
-            let top = attributeArray.armourT;
-            if (top) {top = parseInt(top)} else {top = 0};
+            let side = parseInt(attributeArray.armourS) || 0;
+            let top = parseInt(attributeArray.armourT) || 0;
 
             //passengers
             let maxPass = 0;
@@ -1011,7 +1009,7 @@ const TY = (() => {
             this.hexLabel = hexLabel; //doubled
             this.rotation = token.get("rotation");
             this.special = special;
-            this.unique = unique;
+            this.rank = rank;
 
             this.weaponArray = weaponArray;
             this.assaultWpn = bestATWpnNum;
@@ -2459,10 +2457,10 @@ log(outputCard)
             let tokenA = findObjs({_type:"graphic", id: a})[0];
             let tokenB = findObjs({_type:"graphic", id: b})[0];
             let charA = getObj("character", tokenA.get("represents")); 
-            let charB = getObj("character", tokenA.get("represents")); 
+            let charB = getObj("character", tokenB.get("represents")); 
             if (!charA || !charB) {return 0};
-            let rankA = Attribute(charA,"rank");
-            let rankB = Attribute(charB,"rank");
+            let rankA = parseInt(Attribute(charA,"rank"));
+            let rankB = parseInt(Attribute(charB,"rank"));
             if (rankA > rankB) {return 1};
             if (rankA < rankB) {return -1};
             return 0;
@@ -4942,10 +4940,8 @@ log("In Mistaken")
         for (let i=0;i<unit.teamIDs.length;i++) {
             let team = TeamArray[unit.teamIDs[i]];
             if (team.hitArray.length === 0) {continue};
-            team.priority = 0;
-            if (i===0) {team.priority = 1};
-            if (team.special.includes("HQ") || team.special.includes("Independent") || team.token.get(SM.HQ) === true) {team.priority = 3};
-            if (team.unique === true) {team.priority = 2};
+            team.priority = team.rank;
+            if (team.token.get(SM.HQ) === true) {team.priority = 3};
             if (team.type === "Tank") {
                 if (team.bailed === true) {
                     team.priority = -3;
@@ -4967,11 +4963,9 @@ log("In Mistaken")
             for (let i=0;i<linkedUnit.teamIDs.length;i++) {
                 let team = TeamArray[linkedUnit.teamIDs[i]];
                 if (team.hitArray.length === 0) {continue};
-                team.priority = 0;
-                if (i===0) {team.priority = 1};
-                if (team.special.includes("HQ") || team.token.get(SM.HQ) === true || team.special.includes("Independent")) {team.priority = 3};
-                if (team.unique === true) {team.priority = 2};
-                if (team.bailed === true && team.type === "Tank") {team.priority = -2};
+                team.priority = team.rank;
+                if (team.token.get(SM.HQ) === true) {team.priority = 3};
+                if (team.bailed === true && team.type === "Tank") {team.priority = -3};
                 array.push(team);
             }
         }
