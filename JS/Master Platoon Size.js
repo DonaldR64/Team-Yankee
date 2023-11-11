@@ -2461,8 +2461,8 @@ log(outputCard)
             if (!charA || !charB) {return 0};
             let rankA = parseInt(Attribute(charA,"rank"));
             let rankB = parseInt(Attribute(charB,"rank"));
-            if (rankA > rankB) {return 1};
-            if (rankA < rankB) {return -1};
+            if (rankA > rankB) {return -1};
+            if (rankA < rankB) {return 1};
             return 0;
         });
 
@@ -2533,6 +2533,7 @@ log(outputCard)
             }  else if (i === 0) {
                 rank = 2;
                 if (WarsawPact.includes(team.nation) && unit.artillery === true) {rank=3};
+                if (team.special.includes("Passengers") || team.special.includes("Transport")) {rank++}
                 name = Ranks[Nations[team.nation].ranks][rank] + Name(Nations[team.nation].names);
             } 
         }
@@ -3053,8 +3054,10 @@ log(outputCard)
     
         if (state.TY.currentUnitID !== "") {
             let curUnit = UnitArray[state.TY.currentUnitID];
-            GTG(curUnit);
-            curUnit.IC();
+            if (curUnit) {
+                GTG(curUnit);
+                curUnit.IC();
+            }
         }
     
         let unitLeader = TeamArray[unit.teamIDs[0]];
@@ -3297,49 +3300,63 @@ log(outputCard)
             AddAbility(abilityName,"!Cross",char.id);
         }
 
-        let mg = false;
-        let num = 1;
+        let types = {
+            "Small Arms": [],
+            "MG": [],
+            "Flamethrower": [],
+            "Gun": [],
+            "Autocannon": [],
+            "Handheld AT": [],
+            "Vehicle Missile": [],
+            "Artillery": [],
+        }
+
+        let smoke = false; //true if gun fires smoke
         for (let i=0;i<team.weaponArray.length;i++) {
             let weapon = team.weaponArray[i];
-            if (weapon.type === "Artillery" || weapon.type === "Rockets") {
-                if (team.type === "Aircraft") {
-                    AddAbility("Target " + weapon.name,"!Activate;Spot",char.id);
-                } else {
-                    AddAbility("Preplan","!PlaceRangedIn",char.id);
-                }
-                continue; //no direct fire on this line
-            }
-            //if weapon has direct fire should classify type as gun
-            let abName = weapon.name;
-            let wtype = weapon.type;
+            if (weapon.type === " " || weapon.name === " ") {continue};
+            if (weapon.notes.includes("Close Combat")) {continue};
             if (weapon.type.includes("MG")) {
-                wtype = "MG"
-                if (mg === true) {
-                    continue;
-                } else {
-                    abName = "MGs"
-                    mg = true;
-                }
+                types["MG"].push(weapon.name);
+            } else if (weapon.type === "Artillery" || weapon.type === "Rockets"){
+                types["Artillery"].push(weapon.name);
+            } else {
+                types[weapon.type].push(weapon.name); 
             }
-            let shellType = "Regular";
             if (weapon.notes.includes("Smoke")) {
-                shellType = "?{Fire Smoke|No,Regular|Yes,Smoke}";
+                smoke = true;
             }
-            if (weapon.notes.includes("Limited")) {
-                let wn = weapon.notes.split(",");
-                for (let i=0;i<wn.length;i++) {
-                    if (wn[i].includes("Limited")) {
-                        num = wn[i].replace(/[^0-9]+/g, "");
-                        abName += " (Ltd " + num + ")";
-                        break;
+        }
+        
+
+        let weaponNum = 1;
+        let weaponTypes = Object.keys(types);
+        for (let i=0;i<weaponTypes.length;i++) {
+            let weaponType = weaponTypes[i];
+            let names = types[weaponType]
+            if (names.length > 0) {
+                names = names.toString();
+                if (names.charAt(0) === ",") {names = names.replace(",","")};
+                names = names.replaceAll(",","+");
+                if (type === "Artillery") {
+                    if (team.type === "Aircraft") {
+                        AddAbility("Target " + names,"!Activate;Spot",char.id);
+                    } else {
+                        AddAbility("Preplan","!PlaceRangedIn",char.id);
                     }
+                } else {
+                    let shellType = "Regular";
+                    if (type === "Gun" && smoke === true) {
+                        shellType = "?{Fire Smoke|No,Regular|Yes,Smoke}";
+                    }
+                    abilityName = weaponNum + ": " + names;
+                    action = "!Shooting;@{selected|token_id};@{target|token_id};" + weaponType + ";" + shellType;
+                    AddAbility(abilityName,action,char.id);
+                    weaponNum++;
                 }
             }
-            abilityName = num + ": " + abName;
-            action = "!Shooting;@{selected|token_id};@{target|token_id};" + wtype + ";" + shellType;
-            AddAbility(abilityName,action,char.id);
-            num++;
         }
+
 
         if (type === "Infantry" || type === "Tank") {
             AddAbility("Close Combat","!CloseCombat;@{selected|token_id}",char.id);
