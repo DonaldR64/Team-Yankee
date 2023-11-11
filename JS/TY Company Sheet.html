@@ -45,6 +45,17 @@
                 <option value="Syria">Syria</option>
 
             </select>
+            <label>Rank:</label><input type="text" name="attr_character_name">
+            <br>
+            <label for="attr_startnumber">Rank:</label>
+            <select name="attr_startnumber">
+                <option value="" selected disabled hidden>Choose here</option>
+                <option value="0">Base</option>
+                <option value="1">Specialist Team</option>
+                <option value="2">Platoon Leader</option>
+                <option value="3">Independent</option>
+                <option value="4">HQ</option>
+            </select>      
         </div>
         <div class="col">
             <h3>Attributes</h3>
@@ -381,18 +392,6 @@
      </div>    
 
     </div>    
-
-
-    <div class="row">
-            <h3>Special</h3>
-            <input type="text" name="attr_special">
-            <br>
-            <h3>Mistaken Target</h3>
-            <input type="checkbox" id="unique" name="attr_unique" value="true">
-            <label for="unique">Higher Priority Team/Squad</label>
-            <input type="checkbox" id="platoon" name="attr_platoon" value="true">
-            <label for="platoon">Platoon Leader</label>
-    </div>
 </div>
 
 
