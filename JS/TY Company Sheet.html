@@ -97,6 +97,17 @@
                 <option value="-">-</option>                          
             </select>
             <br>
+            <label for="attr_assault">Assault vs Armour if different:</label>
+            <select name="attr_assault">
+                <option value="" selected disabled hidden>Choose here</option>
+                <option value="4">4+</option>
+                <option value="3">3+</option>
+                <option value="5">5+</option>
+                <option value="2">2+</option>   
+                <option value="6">6</option>    
+                <option value="-">-</option>                          
+            </select>
+            <br>
             <label for="attr_counterattack">Counterattack:</label>
             <select name="attr_counterattack">
                 <option value="" selected disabled hidden>Choose here</option>
@@ -479,6 +490,7 @@
             <div class="info">
               <h2>Skill: <span name="attr_skill"></span>+</h2>
               <h3><span name="attr_assaultname"></span><span name="attr_assault"></span><span name="attr_aplus"></span></h3>
+              <h3><span name="attr_assault2name"></span><span name="attr_assault2"></span><span name="attr_aplus2"></span></h3>
               <h3><span name="attr_counterattackname"></span><span name="attr_counterattack"></span><span name="attr_cplus"></span></h3>
             </div>  
           </section>
@@ -610,7 +622,7 @@
     });
 
     on("change:attrs sheet:opened", function() { 
-        getAttrs(["type","nation","unique","tactical","terrain","country","road","cross","counterattack","assault","special","gamescale","weapon1notes","weapon2notes","startnumber"], function(values) {
+        getAttrs(["type","nation","unique","tactical","terrain","country","road","cross","counterattack","assault","assault2","special","gamescale","weapon1notes","weapon2notes"], function(values) {
             let nationImage;
             let nation = values.nation;
 
@@ -628,10 +640,12 @@
             let type = values.type;
             let ralName = "Remount: ";
             let aplus = "+";
+            let aplus2 = "+";
             let rplus = "+";
             let cplus = "+";
 
             let assault = "Assault: ";
+            let assault2 = "";
             let counterattack = "Counterattack: "
             if (type === "Infantry") {
                 ralName = "Rally: ";
@@ -639,19 +653,33 @@
             if (type === "Aircraft" || type === "Helicopter") {
                 ralName = "";
                 aplus = "";
+                aplus2 = "";
                 rplus = "";
                 cplus = "";
                 assault = "";
                 counterattack = "";
             }
             let assaultV = values.assault;
+            let assaultV2 = values.assault2;
             let counterV = values.counterattack;
+
             if (assaultV === "-") {
                 aplus = "";
+                aplus2 = "";
             }
             if (counterV === "-") {
                 cplus = "";
             }
+
+            if (assault2) {
+                assault = "Assault vs. Infantry: ";
+                assault2 = "Assault vs. Armour: ";
+            } else {
+                aplus2 = "";
+            }
+
+
+
 
             if (nation === "Soviet") {
                 nationImage = "https://s3.amazonaws.com/files.d20.io/images/324272729/H0Ea79FLkZIn-3riEhuOrA/thumb.png?1674441877";
@@ -678,20 +706,9 @@
                 nationImage = "https://s3.amazonaws.com/files.d20.io/images/366073450/MaE7Hz3ruNZ-2LrDfZQicA/thumb.png?1699036295";       
             }
 
-            let teamnumber = values.startnumber;
-            if (!teamnumber) {teamnumber = 1};
-            let teaminfo;
-            if (type === "Infantry") {
-                teaminfo = "Infantry Teams: " + teamnumber;
-            } else if (type === "Tank") {
-                teaminfo = "Tank Team";
-            } else if (type === "Unarmoured Tank") {
-                teaminfo = "Unarmoured Tank Teams: " + teamnumber;
-            } else if (type === "Aircraft") {
-                teaminfo = "Aircraft Team";
-            } else if (type === "Helicopter") {
-                teaminfo = "Helicopters Team";
-            }
+
+
+
 
             let tact = parseInt(values.tactical);
             let ter = parseInt(values.terrain);
@@ -701,7 +718,7 @@
 
             let tactDisplay = tact.toString();
             if (combined.includes("Stabiliser")) {
-                let second = tact + 2;
+                let second = tact + 4;
                 tactDisplay += ' / ' + second ;
             }
 
@@ -710,11 +727,11 @@
                 move = "Aircraft";
             } 
             if (type === "Infantry") {
-                tact = '4';
-                tactDisplay = '4';
-                ter = '4';
-                count = '6';
-                road = '6';
+                tact = '8';
+                tactDisplay = '8';
+                ter = '8';
+                count = '12';
+                road = '12';
                 cross = "AUTO";
             }
 
@@ -722,20 +739,20 @@
                 "nationimage": nationImage,
                 "rallyname": ralName,
                 "aplus": aplus,
+                "aplus2": aplus2,
                 "cplus": cplus,
                 "rplus": rplus,
                 "movementtype": move,
                 "unique": unique,
                 "tacticaldisplay": tactDisplay,
                 "assaultname": assault,
+                "assault2name": assault2,
                 "counterattackname": counterattack,
                 "tactical": tact,
                 "terrain": ter,
                 "country": count,
                 "road": road,
-                "cross": cross,
-                "teaminfo": teaminfo,
-                "startnumber": teamnumber,
+                "cross": cross
             })
         });    
     });  
