@@ -77,7 +77,18 @@
                 <option value="6">6</option>  
             </select>
             <br>
-            <label for="attr_assault">Assault:</label>
+            <label for="attr_assault">Assault or Assault vs Infantry:</label>
+            <select name="attr_assault">
+                <option value="" selected disabled hidden>Choose here</option>
+                <option value="4">4+</option>
+                <option value="3">3+</option>
+                <option value="5">5+</option>
+                <option value="2">2+</option>   
+                <option value="6">6</option>    
+                <option value="-">-</option>                          
+            </select>
+            <br>
+            <label for="attr_assault">Assault vs Armour if different:</label>
             <select name="attr_assault">
                 <option value="" selected disabled hidden>Choose here</option>
                 <option value="4">4+</option>
@@ -470,6 +481,7 @@
             <div class="info">
               <h2>Skill: <span name="attr_skill"></span>+</h2>
               <h3><span name="attr_assaultname"></span><span name="attr_assault"></span><span name="attr_aplus"></span></h3>
+              <h3><span name="attr_assault2name"></span><span name="attr_assault2"></span><span name="attr_aplus2"></span></h3>
               <h3><span name="attr_counterattackname"></span><span name="attr_counterattack"></span><span name="attr_cplus"></span></h3>
             </div>  
           </section>
@@ -601,7 +613,7 @@
     });
 
     on("change:attrs sheet:opened", function() { 
-        getAttrs(["type","nation","unique","tactical","terrain","country","road","cross","counterattack","assault","special","gamescale","weapon1notes","weapon2notes"], function(values) {
+        getAttrs(["type","nation","unique","tactical","terrain","country","road","cross","counterattack","assault","assault2","special","gamescale","weapon1notes","weapon2notes"], function(values) {
             let nationImage;
             let nation = values.nation;
 
@@ -619,10 +631,12 @@
             let type = values.type;
             let ralName = "Remount: ";
             let aplus = "+";
+            let aplus2 = "+";
             let rplus = "+";
             let cplus = "+";
 
             let assault = "Assault: ";
+            let assault2 = "";
             let counterattack = "Counterattack: "
             if (type === "Infantry") {
                 ralName = "Rally: ";
@@ -630,19 +644,33 @@
             if (type === "Aircraft" || type === "Helicopter") {
                 ralName = "";
                 aplus = "";
+                aplus2 = "";
                 rplus = "";
                 cplus = "";
                 assault = "";
                 counterattack = "";
             }
             let assaultV = values.assault;
+            let assaultV2 = values.assault2;
             let counterV = values.counterattack;
+
             if (assaultV === "-") {
                 aplus = "";
+                aplus2 = "";
             }
             if (counterV === "-") {
                 cplus = "";
             }
+
+            if (assault2) {
+                assault = "Assault vs. Infantry: ";
+                assault2 = "Assault vs. Armour: ";
+            } else {
+                aplus2 = "";
+            }
+
+
+
 
             if (nation === "Soviet") {
                 nationImage = "https://s3.amazonaws.com/files.d20.io/images/324272729/H0Ea79FLkZIn-3riEhuOrA/thumb.png?1674441877";
@@ -702,12 +730,14 @@
                 "nationimage": nationImage,
                 "rallyname": ralName,
                 "aplus": aplus,
+                "aplus2": aplus2,
                 "cplus": cplus,
                 "rplus": rplus,
                 "movementtype": move,
                 "unique": unique,
                 "tacticaldisplay": tactDisplay,
                 "assaultname": assault,
+                "assault2name": assault2,
                 "counterattackname": counterattack,
                 "tactical": tact,
                 "terrain": ter,
