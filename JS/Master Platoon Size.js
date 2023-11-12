@@ -177,9 +177,9 @@ const TY = (() => {
         "woods": {name: "Woods",height: 2,bp: false,type: 2,group: "Woods",dash: 2},
         "ruins": {name: "Ruins",height: 1,bp: true,type: 1,group: "Rough",dash: 2},
         "wreck": {name: "Wreck",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
-        "building 1": {name: "Building - Height 1",height: 1,bp: true,type: 3,group: "Building",dash: 2},
-        "building 2": {name: "Building - Height 2",height: 2,bp: true,type: 3,group: "Building",dash: 2},
-        "building 3": {name: "Building - Height 3",height: 3,bp: true,type: 3,group: "Building",dash: 2},
+        "building 1": {name: "Buildings - Height 1",height: 1,bp: true,type: 3,group: "Building",dash: 2},
+        "building 2": {name: "Buildings - Height 2",height: 2,bp: true,type: 3,group: "Building",dash: 2},
+        "building 3": {name: "Buildings - Height 3",height: 3,bp: true,type: 3,group: "Building",dash: 2},
         "rubble": {name: "Rubble",height: 0,bp: true,type: 1,group: "Rough",dash: 2},
         "anti-tank ditch": {name: "Anti-Tank Ditch",height: 0,bp: true,type: 0,group: "Trench",dash: 3},
         "wall": {name: "Wall",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
@@ -778,13 +778,14 @@ const TY = (() => {
             let hexLabel = hex.label();
             let infoArray = [];
 
+            let starthp = parseInt(attributeArray.startnumber) || 1;
+
             //create array of weapon info
             let weaponArray = [];
+            let atWeapons = [];
             let artilleryWpn;
-            let bestAT = -1;
-            let bestFP = 7;
-            let bestATWpnNum;
             for (let i=1;i<5;i++) {
+                let art = false;
                 let name = attributeArray["weapon"+i+"name"];
                 if (!name || name == " " || name == "") {continue};
                 if (name.includes("(") || name.includes(")")) {
@@ -805,14 +806,12 @@ const TY = (() => {
                 let moving = attributeArray["weapon"+i+"moving"];
 
                 if (halted !== "Artillery" && halted !== "Salvo") {
-                    halted = parseInt(halted);
+                    halted = parseInt(halted) || 0;
                 }
-                if (!halted || halted === "") {halted = 0};
 
                 if (moving !== "Artillery" && moving !== "Salvo") {
-                    moving = parseInt(moving);
+                    moving = parseInt(moving) || 0;
                 }
-                if (!moving || moving === "") {moving = 0};
 
                 let rangeText = attributeArray["weapon"+i+"range"];
                 rangeText = rangeText.split("-");
@@ -822,18 +821,13 @@ const TY = (() => {
                     minRange = rangeText[0].replace(/[^\d]/g, "");
                     maxRange = rangeText[1].replace(/[^\d]/g, "");
                 }
-                minRange = parseInt(minRange);
-                maxRange = parseInt(maxRange);
+                minRange = parseInt(minRange) || 0;
+                maxRange = parseInt(maxRange) || 1;
                 let type = attributeArray["weapon"+i+"type"];
                 if (!type || type === "") {
                     type = "Small Arms";
                 }
-                let at = parseInt(attributeArray["weapon"+i+"at"]);
-                if (at > bestAT || at === bestAT && fp < bestFP) {
-                    bestATWpnNum = (i-1);
-                    bestAT = at;
-                    bestFP = fp;
-                }
+                let at = parseInt(attributeArray["weapon"+i+"at"]) || 0;
 
                 let weapon = {
                     name: name,
@@ -846,6 +840,7 @@ const TY = (() => {
                     notes: notes,
                     type: type,
                 }
+
                 if (notes.includes("Heavy Weapon")) {
                     if (special === " ") {
                         special = "Heavy Weapon"
@@ -863,17 +858,34 @@ const TY = (() => {
                     }
                 }
 
-
-                weaponArray.push(weapon);
                 if (weapon.halted === "Artillery" || weapon.halted === "Salvo" || weapon.moving === "Artillery" || weapon.moving === "Salvo") {
                     artilleryWpn = weapon;
+                    art = true;
                 };
+log(weapon)
+log(art)
+                if (at > 0 && art === false && minRange <= 1) {
+                    for (let a=0;a<weapon.halted;a++) {
+                        atWeapons.push(weapon);
+                    }
+                }
+
+                weaponArray.push(weapon);
+                
             }
 
-            if (bestAT <= 2) {
-                bestATWpnNum = 5; //Hand Grenades
-            }
-
+            atWeapons.sort(function (a,b) {
+                if (a.at > b.at) {return -1};
+                if (a.at < b.at) {return 1};
+                if (a.at === b.at && a.fp > b.fp) {return -1};
+                if (a.at === b.at && a.fp < b.fp) {return 1};
+                return 0;
+            })
+log("AT Weapon Array")
+log(atWeapons)
+            atWeapons.length = starthp;
+log("Final")
+log(atWeapons)
             //update sheet with info
             let specials = attributeArray.special;
             if (!specials || specials === "") {
@@ -981,7 +993,7 @@ const TY = (() => {
             this.location = location;
             this.prevHexLabel = hexLabel;
             this.prevHex = hex;
-            this.starthp = parseInt(attributeArray.startnumber);
+            this.starthp = starthp;
 
             this.order = "";
             this.specialorder = "";
@@ -1018,7 +1030,7 @@ const TY = (() => {
             this.rank = rank;
 
             this.weaponArray = weaponArray;
-            this.assaultWpn = bestATWpnNum;
+            this.assaultWpns = atWeapons;
             this.hitArray = [];
             this.eta = [];
             this.shooterIDs = [];
@@ -2237,7 +2249,6 @@ log(outputCard)
             if (!t) {
                 return;
             };
-
             let vertices = TokenVertices(token);
             let centre = new Point(token.get('left'),token.get('top'));
             let hex = pointToHex(centre);
