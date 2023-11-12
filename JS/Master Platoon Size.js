@@ -170,6 +170,7 @@ const TY = (() => {
         "#b6d7a8": {name: "Scrub",height: 0,bp: false,type: 1,group: "Crops",dash: 2},
         "#980000": {name: "Low Embankment",height: 0.25,bp: false,type: 0,group: "Hill",dash: 2},
         "#ffffff": {name: "Ridgeline",height: .25,bp: true,type: 1,group: "Hill",dash: 1},
+        "#ffff00": {name: "Road",height: 0,bp: false,type: 0,group: "Road",dash: 0},
     }
 
     const MapTokenInfo = {
@@ -2207,7 +2208,7 @@ log(outputCard)
             if (TerrainArray[id]) {
                 id += stringGen();
             }
-            let linear = (t.name === "Ridgeline") ? true:false;
+            let linear = (t.name === "Ridgeline" || t.name === "Road") ? true:false;
 
             let info = {
                 name: t.name,
