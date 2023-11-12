@@ -990,6 +990,8 @@ const TY = (() => {
             this.roaddash = parseInt(attributeArray.road);
             this.cross = crossStat(attributeArray.cross);
 
+            this.airmove = parseInt(attributeArray.airmove) || "Unlimited";
+
             this.armourF = front;
             this.armourS = side;
             this.armourT = top;
