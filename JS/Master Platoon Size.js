@@ -743,7 +743,41 @@ const TY = (() => {
 
         IC() {
             if (this.hqUnit === true || this.type === "System Unit") {return};
-            let unitLeader = TeamArray[this.teamIDs[0]];
+            let array = [];
+            let teamLeader = TeamArray[this.teamIDs[0]];
+            let cohesion = (teamLeader.type.includes("Infantry")) ? 2:4;
+            teamLeader.IC(true);
+            _.forEach(this.teamIDs,id => {
+                let team = TeamArray[id];
+                let dist = team.hex.distance(teamLeader.hex);
+                let info = {
+                    id: id,
+                    dist: dist,
+                }
+                array.push(info);
+            })            
+            array = array.sort(function(a,b) {
+                return a.dist - b.dist;
+            })
+
+            for (let i=1;i<array.length;i++) {
+                let info1 = array[i];
+                let team1 = TeamArray[info1.id];
+                let ic = false;
+                for (let j=0;j<i;j++) {
+                    let info2 = array[j];
+                    let team2 = TeamArray[info2.id];
+                    if (team2.inCommand === false) {continue};
+                    let dist = team1.hex.distance(team2.hex);
+                    if (dist <= cohesion) {
+                        ic = true;
+                        break;
+                    }
+                }
+                team1.IC(ic);
+            }
+
+            /*
             let commandRadius = (this.teamIDs.length < 8) ? 6:8;
             for (let j=0;j<this.teamIDs.length;j++) {
                 let team = TeamArray[this.teamIDs[j]];
@@ -755,6 +789,8 @@ const TY = (() => {
                 } 
                 team.IC(ic);
             }
+            */
+
         }
 
     }
@@ -6117,70 +6153,21 @@ log(unitIDs4Saves)
 
     const InCC = (team1) => {
         if (team1.order !== "Assault" || team1.token.get("layer") === "walls") {return};
-        //determine if this team is now in B2B or if infantry in 2nd row
-        let teamKeys = Object.keys(TeamArray);
-        if (assaultingUnitID !== "") {
-            let currentUnit = UnitArray[team1.unitID];
-            let prevUnit = UnitArray[assaultingUnitID];
-            if (currentUnit.id !== assaultingUnitID) {
-                //check if is mix of HQ and own unit
-                if ((currentUnit.hqUnit === false && prevUnit.hqUnit === false) || prevUnit.formationID !== currentUnit.formationID) {
-                    //new unit charging in, reset markers and IDs
-                    CCTeamIDs = [];
-                    assaultingUnitID = team1.unitID;
-                    for (let i=0;i<teamKeys.length;i++) {
-                        let checkTeam = TeamArray[teamKeys[i]];
-                        checkTeam.token.set(SM.defensive,false);
-                        checkTeam.token.set(SM.surprised,false);
-                    }
-                }
-            }
-        } else {
-            assaultingUnitID !== team1.unitID;
-        }
-
-        let inCC = false;
+        let ccError = false;
+        let teamKeys = Object.keys(TeamArray);        
         for (let i=0;i<teamKeys.length;i++) {
             let team2 = TeamArray[teamKeys[i]];
-            if (team2.id === team1.id) {continue};
+            if (team2.id === team1.id || team2.player === team1.player || team2.type === "System Unit") {continue};
             let dist = team1.hex.distance(team2.hex);
             if (dist > 1) {continue};
-            if (team2.player !== team1.player && team2.type !== "System Unit") {
-                inCC = true;
-                break;
-            } else {
-                if (team1.type === "Infantry" && team2.type === "Infantry" && CCTeamIDs.includes(team2.id)) {
-                    inCC = true;
-                    break;
-                }
-            }
-        }
-        let ccError = false;
-        if (inCC === false) {
-            let index = CCTeamIDs.indexOf(team1.id);
-            log(index)
-            if (index > -1) {
-                CCTeamIDs.splice(index,1);
-                Defensive(team1,"Remove");
-            }
-        } else {
-            let errorMsg;
-            if (state.TY.step !== "Assault") {
-                errorMsg = "Not Assault Step";
-            }
             if (team1.special.includes("Heavy Weapon")) {
-                errorMsg = "This Team is a Heavy Weapons Team and cannot Charge into Contact";
+                sendChat("","This Team is a Heavy Weapons Team and cannot Charge into Contact");
+                ccError = true;
+                break;
             }
             if (team1.queryCondition("AAFire") === true) {
-                errorMsg = "This Team fired AA Fire and cannot Charge into Contact";
-            }
-
-            if (errorMsg !== undefined) {
+                sendChat("","This Team fired AA Fire and cannot Charge into Contact");
                 ccError = true;
-                sendChat("",errorMsg);
-            } else if (CCTeamIDs.includes(team1.id) === false) {
-                CCTeamIDs.push(team1.id);
-                Defensive(team1,"Add");
             }
         }
         return ccError;
@@ -6724,7 +6711,7 @@ log("2nd Row to " + team3.name)
 
 
     const changeGraphic = (tok,prev) => {
-        if (tok.get('subtype') === "token") {
+        if (tok.get('subtype') === "token" && tok.get("layer") !== "map") {
             RemoveLines();
             log(tok.get("name") + " moving");
             if ((tok.get("left") !== prev.left) || (tok.get("top") !== prev.top) || tok.get("rotation") !== prev.rotation) {
