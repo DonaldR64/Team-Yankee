@@ -173,6 +173,8 @@ const TY = (() => {
     }
 
     const MapTokenInfo = {
+        "woods": {name: "Woods",height: 2,bp: false,type: 2,group: "Woods",dash: 2},
+        "ruins": {name: "Ruins",height: 1,bp: true,type: 1,group: "Rough",dash: 2},
         "wreck": {name: "Wreck",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
         "building 1": {name: "Building - Height 1",height: 1,bp: true,type: 3,group: "Building",dash: 2},
         "building 2": {name: "Building - Height 2",height: 2,bp: true,type: 3,group: "Building",dash: 2},
