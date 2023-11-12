@@ -99,6 +99,7 @@ const TY = (() => {
         "One Shot": "Can only be used once per game",
         "Overhead Fire": "Grenade Launchers and Light Mortars capable of Overhead Fire can fire over friendly teams and Short Terrain",
         "Overworked": "Overworked weapons add +1 to the score needed To Hit when moving",
+        "Passengers (X)": "Vehicle can carry X Teams as Passengers",
         "Pinned ROF 1": "These weapons have a ROF of 1 when Pinned Down",
         "Pioneers": 'Can cross Minefields safely on a 2+. If remain in Minefield and not Pinned Down, clear the Minefield automatically',
         "Radar": 'When shooting at Aircraft/Helicopters, weapon range is increased by 6 hexes and there are no penalties for Long Range',
