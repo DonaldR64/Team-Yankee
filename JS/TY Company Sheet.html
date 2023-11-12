@@ -145,6 +145,7 @@
                 <label>Cross Country Dash:</label><input type="number" name="attr_country">
                 <label>Road Dash:</label><input type="number" name="attr_road">
                 <label>Cross On:</label><input type="text" name="attr_cross">
+                <label>Air Move:</label><input type="text" name="attr_airmove">
         </div>        
     </div>
 
@@ -470,7 +471,7 @@
             <div class="airmove">
                 <span>Movement</span>
                 <span>Cross</span>
-                <h4>Unlimited</h4>
+                <h4><span name="attr_airmove"></span></h4>
                 <h4>Auto</h4>
             </div>
           </section>
@@ -610,7 +611,7 @@
     });
 
     on("change:attrs sheet:opened", function() { 
-        getAttrs(["type","nation","unique","tactical","terrain","country","road","cross","counterattack","assault","special","gamescale","weapon1notes","weapon2notes"], function(values) {
+        getAttrs(["type","nation","unique","tactical","terrain","country","road","cross","counterattack","assault","special","gamescale","weapon1notes","weapon2notes","airmove"], function(values) {
             let nationImage;
             let nation = values.nation;
 
@@ -643,6 +644,10 @@
                 cplus = "";
                 assault = "";
                 counterattack = "";
+                let am = values.airmove;
+                if (type === "Aircraft") {
+                    am = "Unlimited";
+                }
             }
             let assaultV = values.assault;
             let counterV = values.counterattack;
@@ -719,7 +724,8 @@
                 "terrain": ter,
                 "country": count,
                 "road": road,
-                "cross": cross
+                "cross": cross,
+                "airmove": am,
             })
         });    
     });  
