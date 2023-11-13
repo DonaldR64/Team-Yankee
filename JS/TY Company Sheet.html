@@ -598,6 +598,7 @@
 
 <script type="text/worker">
     const buttonlist = ["input","display","abilities"];
+    
     buttonlist.forEach(button => {
         on(`clicked:${button}`, function() {
             setAttrs({
@@ -606,29 +607,26 @@
         });
     });
 
-    on("sheet:opened", function() {
-        setAttrs({sheetTab:"display"});
-    });
-
     on("sheet:opened", function() { 
-        getAttrs(["type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","gamescale","weapon1notes","weapon2notes","airmove","startnumber"], function(values) {
+        getAttrs(["type","nation","tactical","counterattack","assault","weapon1notes","weapon2notes","airmove","startnumber"], function(values) {
             let nationImage;
             let nation = values.nation;
 
-            let special = values.special;
-            if (!special) {special = " "};
             let w1Notes = values.weapon1notes;
             if (!w1Notes) {w1Notes = " "};
             let w2Notes = values.weapon2notes;
             if (!w2Notes) {w2Notes = " "};
-            let combined = special + "," + w1Notes + "," + w2Notes;
+            let combined = w1Notes + "," + w2Notes;
 
             let type = values.type;
             let ralName = "Remount: ";
             let aplus = "+";
             let rplus = "+";
             let cplus = "+";
-
+            let am = values.airmove;
+            if (type === "Aircraft") {
+                am = "Unlimited";
+            }
             let assault = "Assault: ";
             let counterattack = "Counterattack: ";
             if (type === "Infantry") {
@@ -641,10 +639,6 @@
                 cplus = "";
                 assault = "";
                 counterattack = "";
-                let am = values.airmove;
-                if (type === "Aircraft") {
-                    am = "Unlimited";
-                }
             }
             let assaultV = values.assault;
             let counterV = values.counterattack;
@@ -682,13 +676,13 @@
             }
 
             let tact = parseInt(values.tactical);
-            let ter = parseInt(values.terrain);
-            let count = parseInt(values.country);
-            let road = parseInt(values.road);
+            let ter = values.terrain;
+            let count = values.country;
+            let road = values.road;
             let cross = values.cross;
+            let second;
 
             let tactDisplay = tact.toString();
-            let second;
             if (combined.includes("Stabiliser")) {
                 second = tact + 2;
                 tactDisplay += ' / ' + second ;
@@ -711,6 +705,7 @@
             } 
 
             setAttrs({
+                "sheetTab" :"display",
                 "nationimage": nationImage,
                 "rallyname": ralName,
                 "aplus": aplus,
