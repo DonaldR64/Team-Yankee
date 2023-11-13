@@ -1,5 +1,5 @@
 const TY = (() => { 
-    const version = '3.11.8';
+    const version = '3.11.13';
     if (!state.TY) {state.TY = {}};
     //Constants and Persistent Variables
 
@@ -691,7 +691,7 @@ const TY = (() => {
                 //pick most central team
                 let newLeader = CentreTeam(this);
                 let old_index = this.teamIDs.indexOf(newLeader.id);
-                this.teamIDs.splice(0, 0, arr.splice(old_index, 1)[0]);
+                this.teamIDs.splice(0, 0, this.teamIDs.splice(old_index, 1)[0]);
                 if (!auraC || auraC === "transparent") {
                     auraC = (this.order === "") ? Colours.green:Colours.black;
                 };
@@ -728,58 +728,71 @@ const TY = (() => {
             return result;
         }
 
-        updateTeamIDs() {
+        resetflags() {
             let newTeamIDs = [];
+            let conditions = ["Dash","Tactical","Hold","Assault","Fired","AAFire","Radio"];
+
             for (let i=0;i<this.teamIDs.length;i++) {
                 let id = this.teamIDs[i];
                 let team = TeamArray[id];
-                if (!team) {continue};
+                if (!team) {
+                    if (state.TY.teams[id]) {
+                        delete state.TY.teams[id];
+                    }
+                    continue
+                };
                 newTeamIDs.push(id);
             }
             this.teamIDs = newTeamIDs;
-        }
+            //this.IC(); ? done after movement
+            this.Size();
+            this.order = "";
+            this.specialorder = "";
 
-        IC() {
-            if (this.hqUnit === true || this.type === "System Unit") {return};
-            /*
-            let array = [];
-            let teamLeader = TeamArray[this.teamIDs[0]];
-            let cohesion = (teamLeader.type === "Infantry") ? 2:4;
-            teamLeader.IC(true);
-            _.forEach(this.teamIDs,id => {
-                let team = TeamArray[id];
-                let dist = team.hex.distance(teamLeader.hex);
-                let info = {
-                    id: id,
-                    dist: dist,
+            if (this.teamIDs.length > 0) {
+                let unitLeader = TeamArray[this.teamIDs[0]];
+                if (unitLeader) {
+                    unitLeader.token.set("bar3_value",0);
+                    if (unitLeader.bailed === true) {
+                        SwapLeader(this);
+                    }
                 }
-                array.push(info);
-            })            
-            array = array.sort(function(a,b) {
-                return a.dist - b.dist;
-            })
-            _.forEach(array,info => {
-                let ic = false;
-                let team1 = TeamArray[info.id];
-                if (info.id === this.teamIDs[0]) {
-                    ic = true;
-                } else {
-                    for (let j=0;j<array.length;j++) {
-                        let info2 = array[j];
-                        if (info2.id === info.id) {continue};
-                        let team2 = TeamArray[info2.id];
-                        if (team2.inCommand === false) {continue};
-                        let dist = team1.hex.distance(team2.hex);
-                        if (dist <= cohesion) {
-                            ic = true;
-                            break;
+                for (let i=0;i<this.teamIDs.length;i++) {
+                    let team = TeamArray[this.teamIDs[i]];
+                    if (state.TY.conditions[team.id]) {
+                        for (let c=0;c<conditions.length;c++) {
+                            if (state.TY.conditions[team.id][conditions[c]]) {
+                                team.removeCondition(conditions[c]);
+                            }
+                        }
+                    }
+                    team.spotAttempts = 0;
+                    team.prevHexLabel = team.hexLabel;
+                    team.prevHex = team.hex;
+                    team.order = "";
+                    team.specialorder = "";
+                    team.hitArray = [];
+                    team.eta = [];
+                    team.moved = false;
+                    team.maxTact = false;
+                    team.fired = false;
+                    team.aaFired = false;
+                    team.oppFireTarget = "";
+                    if (i===0) {
+                        team.token.set("aura1_color",Colours.green);
+                    } else {
+                        if (team.inCommand === true) {
+                            team.token.set("aura1_color","transparent")
+                        } else {
+                            team.token.set("aura1_color",Colours.lightblue)
                         }
                     }
                 }
-                team1.IC(ic);
-            })
-            */
+            } 
+        }
 
+        IC() {
+            if (this.type === "System Unit") {return};
             let commandRadius = (this.size > 7 || this.type === "Aircraft" || this.type === "Helicopter") ? 8:6;
             let unitLeader = TeamArray[this.teamIDs[0]];
             for (let j=0;j<this.teamIDs.length;j++) {
@@ -787,12 +800,11 @@ const TY = (() => {
                 if (!team) {continue};
                 let dist = team.hex.distance(unitLeader.hex);
                 let ic = true;
-                if (dist > commandRadius) {
+                if (dist > commandRadius && team.special.includes("HQ") === false && team.special.includes("Independent") === false) {
                     ic = false
                 } 
                 team.IC(ic);
             }
-
         }
 
         Size() {
@@ -803,7 +815,6 @@ const TY = (() => {
                 size += number;
             })
             this.size = size;
-log("Size: " + size)
         }
 
 
@@ -2285,7 +2296,9 @@ log(hit)
         //add tokens to hex map, rebuild Team/Unit Arrays
         RebuildArrays();
         //check what is in command
-        inCommand("All");
+        _.forEach(UnitArray,unit => {
+            unit.IC();
+        })
         BuildReserve();//places flag on units in reserve when rebuilding a map
     }
 
@@ -3198,7 +3211,6 @@ log(hit)
                 errorMsg = "Team/Unit has already been activated";
         } else if (unit.id !== state.TY.currentUnitID) {
             ClearSmoke(unit.id);
-            ResetFlags(targetTeam,unitActivation);
         }
 
         let noun = "Teams ";
@@ -3962,17 +3974,6 @@ log("Same had 2")
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
     const StartStep = (pass) => {
         if (pass === "ResLeaders") {
             CheckArray = [];
@@ -4121,13 +4122,11 @@ log("Same had 2")
             SetupCard("Turn: " + state.TY.turn,"Starting Step","Neutral");
             ClearSmoke("Smokescreens");
             RemoveFoxholes();
-            //ResetFlags();
             if (state.TY.turn === 1 && state.TY.gametype === "Meeting Engagement") {
-                outputCard.body.push("Aircraft cannot Arrive this turn");                
+                outputCard.body.push("No Artillery or Airstrikes this Turn");
                 outputCard.body.push("Helicopters must Loiter this turn");
                 outputCard.body.push("All Teams start Gone to Ground and Concealed until they activate");
                 outputCard.body.push("All Teams are treated as having moved in the Shooting Step");
-                outputCard.body.push("No Artillery Bombardments this turn");
             } else {
                 outputCard.body.push("In Order:")
                 outputCard.body.push("1 - Reveal/Place Ambushes");
@@ -4136,62 +4135,10 @@ log("Same had 2")
             }
             PrintCard();
             _.forEach(UnitArray,unit => {
-                let unitLeader = TeamArray[unit.teamIDs[0]];
-                if (unitLeader) {
-                    unitLeader.token.set("aura1_color",Colours.green);
-                }
-
-//any other things to do at start of turn to unit                
+                unit.resetflags();
             });
 
-
             state.TY.currentUnitID = "";
-
-
-
-        }
-    }
-
-    const ResetFlags = (targetTeam,unitActivated) => {
-        let unit = UnitArray[targetTeam.unitID];
-        let conditions = ["Dash","Tactical","Hold","Assault","Fired","AAFire","Radio"];
-
-        for (let k=0;k<unit.teamIDs.length;k++) {
-            let team = TeamArray[unit.teamIDs[k]];
-            if (unitActivated === false && targetTeam.id !== team.id) {continue};
-            if (state.TY.conditions[team.id]) {
-                for (let c=0;c<conditions.length;c++) {
-                    if (state.TY.conditions[team.id][conditions[c]]) {
-                        team.removeCondition(conditions[c]);
-                    }
-                }
-            }
-            team.spotAttempts = 0;
-            team.prevHexLabel = team.hexLabel;
-            team.prevHex = team.hex;
-            team.order = "";
-            team.specialorder = "";
-            team.hitArray = [];
-            team.eta = [];
-            team.moved = false;
-            team.maxTact = false;
-            team.fired = false;
-            team.aaFired = false;
-            team.oppFireTarget = "";
-        }
-
-        if (unitActivated === true) {
-            unit.order = ""; 
-            unit.specialorder = "";
-            unit.limited = 0;
-            unit.Size();
-            let unitLeader = TeamArray[unit.teamIDs[0]];
-            if (unitLeader) {
-                unitLeader.token.set("bar3_value",0);
-                if (unitLeader.bailed === true) {
-                    SwapLeader(unit);
-                }
-            }
         }
     }
 
@@ -6071,25 +6018,35 @@ log(marker);
     const SwapLeader = (unit) => {
         let text = "";
         if (unit.teamIDs.length < 2) {return text}; 
-        let team1 = TeamArray[unit.teamIDs[0]];
+        let oldLeader = TeamArray[unit.teamIDs[0]];
+        let newLeader;
+        let closestDist = Infinity;
         for (let i=1;i<unit.teamIDs.length;i++) {
             let team2 = TeamArray[unit.teamIDs[i]];
-            if (team2.inCommand === true) {
-                if (team2.characterID === team1.characterID) {
-                    let name1 = team1.name;
-                    let name2 = team2.name;
-                    team2.token.set("name",name1);
-                    team2.name = name1;
-                    team1.token.set("name",name2);
-                    team1.name = name2;
-                    let t2ID = team2.id;
-                    let pos = unit.teamIDs.indexOf(t2ID);
-                    unit.teamIDs.splice(pos,1);
-                    unit.teamIDs.unshift(t2ID);
-                    text = name1 + " takes command of " + name2;
-                    break;
-                }
+            if (team2.inCommand === false || team2.characterID !== team1.characterID || team2.bailed === true) {continue};
+            let dist = oldLeader.hex.distance(team2.hex);
+            if (dist < closestDist) {
+                newLeader = team2;
+                closestDist = dist;
             }
+        }
+        if (newLeader !== undefined) {
+            let aura1 = oldLeader.token.get("aura1_color");
+            let name1 = oldLeader.name;
+            let name2 = newLeader.name;
+            newLeader.token.set({
+                name: name1,
+                aura1_color: aura1,
+            });
+            oldLeader.token.set({
+                name: name2,
+                aura1_color: "transparent",
+            });
+            oldLeader.name = name2;
+            newLeader.name = name1;
+            let old_index = unit.teamIDs.indexOf(newLeader.id);
+            unit.teamIDs.splice(0, 0, unit.teamIDs.splice(old_index, 1)[0]);
+            text = name1 + " takes command of " + name2;
         }
         return text;
     }
@@ -6260,29 +6217,6 @@ log(unitIDs4Saves)
         return saveResult;
     }
     
-
-
-
-
-
-
-
-
-    const inCommand = (team) => {
-        //'team' could be an actual team or could be "All" or the player #
-        if (team === "All" || team === 0 || team === 1) {
-            let unitKeys = Object.keys(UnitArray);
-            for (let i=0;i<unitKeys.length;i++) {
-                let unit = UnitArray[unitKeys[i]];
-                if (team !== "All" && team !== unit.player) {continue};
-                unit.updateTeamIDs();
-                unit.IC();
-            }
-        } else {
-            let unit = UnitArray[team.unitID];
-            unit.IC();
-        }
-    }
 
     const InCC = (team1) => {
         if (team1.order !== "Assault" || team1.token.get("layer") === "walls") {return};
