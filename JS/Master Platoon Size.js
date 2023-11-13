@@ -692,7 +692,10 @@ const TY = (() => {
             } else if (index === 0) {
                 let auraC = team.token.get("aura1_color");
                 //change name to Sergeant if isnt a Lt or higher
-                let newLeader = TeamArray[teamIDs[0]];
+                //pick most central team
+                let newLeader = CentreTeam(this);
+                let old_index = this.teamIDs.indexOf(newLeader.id);
+                this.teamIDs.splice(0, 0, arr.splice(old_index, 1)[0]);
                 if (!auraC || auraC === "transparent") {
                     auraC = (this.order === "") ? Colours.green:Colours.black;
                 };
@@ -743,9 +746,10 @@ const TY = (() => {
 
         IC() {
             if (this.hqUnit === true || this.type === "System Unit") {return};
+            /*
             let array = [];
             let teamLeader = TeamArray[this.teamIDs[0]];
-            let cohesion = (teamLeader.type.includes("Infantry")) ? 2:4;
+            let cohesion = (teamLeader.type === "Infantry") ? 2:4;
             teamLeader.IC(true);
             _.forEach(this.teamIDs,id => {
                 let team = TeamArray[id];
@@ -759,26 +763,30 @@ const TY = (() => {
             array = array.sort(function(a,b) {
                 return a.dist - b.dist;
             })
-
-            for (let i=1;i<array.length;i++) {
-                let info1 = array[i];
-                let team1 = TeamArray[info1.id];
+            _.forEach(array,info => {
                 let ic = false;
-                for (let j=0;j<i;j++) {
-                    let info2 = array[j];
-                    let team2 = TeamArray[info2.id];
-                    if (team2.inCommand === false) {continue};
-                    let dist = team1.hex.distance(team2.hex);
-                    if (dist <= cohesion) {
-                        ic = true;
-                        break;
+                let team1 = TeamArray[info.id];
+                if (info.id === this.teamIDs[0]) {
+                    ic = true;
+                } else {
+                    for (let j=0;j<array.length;j++) {
+                        let info2 = array[j];
+                        if (info2.id === info.id) {continue};
+                        let team2 = TeamArray[info2.id];
+                        if (team2.inCommand === false) {continue};
+                        let dist = team1.hex.distance(team2.hex);
+                        if (dist <= cohesion) {
+                            ic = true;
+                            break;
+                        }
                     }
                 }
                 team1.IC(ic);
-            }
+            })
+            */
 
-            /*
-            let commandRadius = (this.teamIDs.length < 8) ? 6:8;
+            let commandRadius = (this.teamIDs.length <= 8) ? 6:8;
+            let unitLeader = TeamArray[this.teamIDs[0]];
             for (let j=0;j<this.teamIDs.length;j++) {
                 let team = TeamArray[this.teamIDs[j]];
                 if (!team) {continue};
@@ -789,10 +797,8 @@ const TY = (() => {
                 } 
                 team.IC(ic);
             }
-            */
 
         }
-
     }
 
     class Team {
@@ -1263,7 +1269,29 @@ log(atWeapons)
             }
             this.token.set("tint_color",colour);
         }
-    
+
+        CheckIC() {
+            let ic = false;
+            if (this.special.includes("HQ") || this.special.includes("Independent")) {
+                ic = true;
+            } else {
+                let unit = UnitArray[this.unitID];
+                let unitLeader = TeamArray[unit.teamIDs[0]];
+                let index = unit.teamIDs.indexOf(this.id);
+                if (index === 0) {
+                    ic = true;
+                    unit.IC();
+                } else {
+                    let dist = this.hex.distance(unitLeader.hex);
+                    let commandRadius = (unit.teamIDs.length <= 8) ? 6:8;
+                    if (dist <= commandRadius) {
+                        ic = true;
+                    } 
+                }
+            }
+            this.IC(ic);
+        }
+
         landed() {
             return this.queryCondition("Land");
         }
@@ -1714,6 +1742,34 @@ log(hit)
         points.push(new Point(pts[0].x - 20,pts[0].y + 20));
         return points;
     }
+
+    const CentreTeam = (unit) => {
+        //centroid of points
+        let centre = new Point(0,0);
+        for (let i=0;i<unit.teamIDs.length;i++) {
+            let team = TeamArray[unit.teamIDs[i]];
+            centre.x += team.location.x;
+            centre.y += team.location.y;
+        }
+        centre.x = Math.round(centre.x/unit.teamIDs.length);
+        centre.y = Math.round(centre.y/unit.teamIDs.length);
+        let centreHex = pointToHex(centre);
+        //closest team
+        let closestDist = Infinity;
+        let closestTeam;
+        for (let i=0;i<unit.teamIDs.length;i++) {
+            let team = TeamArray[unit.teamIDs[i]];
+            let dist = team.hex.distance(centreHex);
+            if (dist < closestDist) {
+                closestTeam = team;
+                closestDist = dist;
+            }
+        }
+        return closestTeam
+    }
+
+
+
 
     const Angle = (theta) => {
         while (theta < 0) {
@@ -6609,10 +6665,12 @@ log("2nd Row to " + team3.name)
         DigIn(unit);
     }
 
-
-
-    const Test = () => {
-
+    const Test = (msg) => {
+        let id = msg.selected[0]._id;
+        let team = TeamArray[id];
+        let unit = UnitArray[team.unitID];
+        cTeam = CentreTeam(unit);
+        sendChat("","Central Team: " + cTeam.name)
     }
 
 
@@ -6765,8 +6823,7 @@ log("Move Back: " + moveBack)
                     hexMap[oldHexLabel].teamIDs.splice(index,1);
                 }
                 hexMap[newHexLabel].teamIDs.push(tok.id);
-                inCommand(team);
-
+                team.CheckIC();
                 //let theta = oldHex.angle(newHex);
                 //tok.set("rotation",theta);
                 FlipGraphic(tok.get("rotation"),tok,team);
@@ -6797,7 +6854,7 @@ log("Move Back: " + moveBack)
                         if (team.moved === false) {
                             team.moved = true;
                             let dist = team.hex.distance(team.prevHex);
-                            if (dist > 10) {
+                            if (dist > 5) {
                                 team.maxTact = true;
                             }
                         }
