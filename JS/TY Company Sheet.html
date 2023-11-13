@@ -389,8 +389,7 @@
             </tr>
           </tbody>
         </table>    
-     </div>    
-
+      </div>
     </div>    
 </div>
 
@@ -598,7 +597,6 @@
 
 <script type="text/worker">
     const buttonlist = ["input","display","abilities"];
-    
     buttonlist.forEach(button => {
         on(`clicked:${button}`, function() {
             setAttrs({
@@ -607,28 +605,33 @@
         });
     });
 
-    on("sheet:opened", function() { 
-        getAttrs(["type","nation","tactical","counterattack","assault","weapon1notes","weapon2notes","airmove","startnumber"], function(values) {
+    on("sheet:opened", function() {
+        setAttrs({sheetTab:"display"});
+    });
+
+    on("change:attrs sheet:opened", function() { 
+        getAttrs(["type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","weapon1notes","weapon2notes"], function(values) {
             let nationImage;
             let nation = values.nation;
 
+            let special = values.special;
+            if (!special) {special = " "};
             let w1Notes = values.weapon1notes;
             if (!w1Notes) {w1Notes = " "};
             let w2Notes = values.weapon2notes;
             if (!w2Notes) {w2Notes = " "};
-            let combined = w1Notes + "," + w2Notes;
+            let combined = special + "," + w1Notes + "," + w2Notes;
+
 
             let type = values.type;
             let ralName = "Remount: ";
             let aplus = "+";
+            let aplus2 = "+";
             let rplus = "+";
             let cplus = "+";
-            let am = values.airmove;
-            if (type === "Aircraft") {
-                am = "Unlimited";
-            }
+
             let assault = "Assault: ";
-            let counterattack = "Counterattack: ";
+            let counterattack = "Counterattack: "
             if (type === "Infantry") {
                 ralName = "Rally: ";
             }
@@ -675,37 +678,33 @@
                 nationImage = "https://s3.amazonaws.com/files.d20.io/images/366073450/MaE7Hz3ruNZ-2LrDfZQicA/thumb.png?1699036295";       
             }
 
+
             let tact = parseInt(values.tactical);
-            let ter = values.terrain;
-            let count = values.country;
-            let road = values.road;
+            let ter = parseInt(values.terrain);
+            let count = parseInt(values.country);
+            let road = parseInt(values.road);
             let cross = values.cross;
-            let second;
 
             let tactDisplay = tact.toString();
             if (combined.includes("Stabiliser")) {
-                second = tact + 2;
+                let second = tact + 2;
                 tactDisplay += ' / ' + second ;
             }
 
-            let num = values.startnumber;
-            let teaminfo = type + " Team";
             let move = "Other";
             if (type === "Aircraft" || type === "Helicopter") {
                 move = "Aircraft";
             } 
             if (type === "Infantry") {
-                tact = 4;
-                tactDisplay = 4;
-                ter = 4;
-                count = 6;
-                road = 6;
+                tact = '4';
+                tactDisplay = '4';
+                ter = '4';
+                count = '6';
+                road = '6';
                 cross = "AUTO";
-                teaminfo = "Infantry Teams: " + num;
-            } 
+            }
 
             setAttrs({
-                "sheetTab" :"display",
                 "nationimage": nationImage,
                 "rallyname": ralName,
                 "aplus": aplus,
@@ -719,13 +718,10 @@
                 "terrain": ter,
                 "country": count,
                 "road": road,
-                "cross": cross,
-                "airmove": am,
-                "teaminfo": teaminfo,
+                "cross": cross
             })
         });    
     });  
-
 
 
 

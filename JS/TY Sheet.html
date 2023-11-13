@@ -23,6 +23,16 @@
                 <option value="System Unit">System Unit</option>                
             </select>
             <br>
+            <label for="attr_startnumber">Starting Number of Teams:</label>
+            <select name="attr_startnumber">
+                <option value="" selected disabled hidden>Choose here</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>  
+            <br>
             <label for="attr_nation">Nation:</label>
             <select name="attr_nation">
                 <option value="" selected disabled hidden>Choose here</option>
@@ -34,8 +44,17 @@
                 <option value="Canada">Canada</option>
                 <option value="Israel">Israel</option>
                 <option value="Syria">Syria</option>
-
             </select>
+            <br>
+            <label for="attr_rank">Rank:</label>
+            <select name="attr_rank">
+                <option value="" selected disabled hidden>Choose here</option>
+                <option value="0">Base</option>
+                <option value="1">Specialist Team</option>
+                <option value="2">Platoon Leader</option>
+                <option value="3">Independent</option>
+                <option value="4">HQ</option>
+            </select>   
         </div>
         <div class="col">
             <h3>Attributes</h3>
@@ -77,19 +96,8 @@
                 <option value="6">6</option>  
             </select>
             <br>
-            <label for="attr_assault">Assault or Assault vs Infantry:</label>
+            <label for="attr_assault">Assault:</label>
             <select name="attr_assault">
-                <option value="" selected disabled hidden>Choose here</option>
-                <option value="4">4+</option>
-                <option value="3">3+</option>
-                <option value="5">5+</option>
-                <option value="2">2+</option>   
-                <option value="6">6</option>    
-                <option value="-">-</option>                          
-            </select>
-            <br>
-            <label for="attr_assault2">Assault vs Armour if different:</label>
-            <select name="attr_assault2">
                 <option value="" selected disabled hidden>Choose here</option>
                 <option value="4">4+</option>
                 <option value="3">3+</option>
@@ -137,6 +145,7 @@
                 <label>Cross Country Dash:</label><input type="number" name="attr_country">
                 <label>Road Dash:</label><input type="number" name="attr_road">
                 <label>Cross On:</label><input type="text" name="attr_cross">
+                <label>Air Move:</label><input type="text" name="attr_airmove">
         </div>        
     </div>
 
@@ -388,10 +397,6 @@
     <div class="row">
             <h3>Special</h3>
             <input type="text" name="attr_special">
-            <br>
-            <h3>Mistaken Target</h3>
-            <input type="checkbox" id="unique" name="attr_unique" value="true">
-            <label for="unique">Unique Marker</label>
     </div>
 </div>
 
@@ -408,6 +413,7 @@
           <section class="header f-center">
             <h1><span name="attr_character_name"></span></h1>
             <h3><span>&#8226; </span><span name="attr_type"></span><span> Unit &#8226;</span></h3>
+            <h3><span name="attr_teamInfo"></span></h3>
             <h3><span name="attr_specialText"></span></h3>
           </section>
 
@@ -472,7 +478,7 @@
             <div class="airmove">
                 <span>Movement</span>
                 <span>Cross</span>
-                <h4>Unlimited</h4>
+                <h4><span name="attr_airmove"></span></h4>                 
                 <h4>Auto</h4>
             </div>
           </section>
@@ -613,12 +619,10 @@
     });
 
     on("change:attrs sheet:opened", function() { 
-        getAttrs(["type","nation","unique","tactical","terrain","country","road","cross","counterattack","assault","assault2","special","gamescale","weapon1notes","weapon2notes"], function(values) {
+        getAttrs(["type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","weapon1notes","weapon2notes","startnumber","airmove"], function(values) {
             let nationImage;
             let nation = values.nation;
 
-            let unique = values.unique;
-            if (!unique) {unique = false};
             let special = values.special;
             if (!special) {special = " "};
             let w1Notes = values.weapon1notes;
@@ -627,47 +631,41 @@
             if (!w2Notes) {w2Notes = " "};
             let combined = special + "," + w1Notes + "," + w2Notes;
 
+            let info = "";
+
 
             let type = values.type;
             let ralName = "Remount: ";
             let aplus = "+";
-            let aplus2 = "+";
             let rplus = "+";
             let cplus = "+";
 
             let assault = "Assault: ";
-            let assault2 = "";
-            let counterattack = "Counterattack: "
+            let counterattack = "Counterattack: ";
+            let sn = values.startnumber;
             if (type === "Infantry") {
                 ralName = "Rally: ";
+                info = "Teams: " + sn;
             }
             if (type === "Aircraft" || type === "Helicopter") {
                 ralName = "";
                 aplus = "";
-                aplus2 = "";
                 rplus = "";
                 cplus = "";
                 assault = "";
                 counterattack = "";
             }
             let assaultV = values.assault;
-            let assaultV2 = values.assault2;
             let counterV = values.counterattack;
 
             if (assaultV === "-") {
                 aplus = "";
-                aplus2 = "";
             }
             if (counterV === "-") {
                 cplus = "";
             }
 
-            if (assault2) {
-                assault = "Assault vs. Infantry: ";
-                assault2 = "Assault vs. Armour: ";
-            } else {
-                aplus2 = "";
-            }
+
 
 
 
@@ -707,9 +705,14 @@
             let road = parseInt(values.road);
             let cross = values.cross;
 
+            let am = values.airmove;
+            if (type === "Aircraft") {
+                am = "Unlimited";
+            }
+
             let tactDisplay = tact.toString();
             if (combined.includes("Stabiliser")) {
-                let second = tact + 4;
+                let second = tact + 2;
                 tactDisplay += ' / ' + second ;
             }
 
@@ -718,11 +721,11 @@
                 move = "Aircraft";
             } 
             if (type === "Infantry") {
-                tact = '8';
-                tactDisplay = '8';
-                ter = '8';
-                count = '12';
-                road = '12';
+                tact = '4';
+                tactDisplay = '4';
+                ter = '4';
+                count = '6';
+                road = '6';
                 cross = "AUTO";
             }
 
@@ -730,20 +733,19 @@
                 "nationimage": nationImage,
                 "rallyname": ralName,
                 "aplus": aplus,
-                "aplus2": aplus2,
                 "cplus": cplus,
                 "rplus": rplus,
                 "movementtype": move,
-                "unique": unique,
                 "tacticaldisplay": tactDisplay,
                 "assaultname": assault,
-                "assault2name": assault2,
                 "counterattackname": counterattack,
                 "tactical": tact,
                 "terrain": ter,
                 "country": count,
                 "road": road,
-                "cross": cross
+                "cross": cross,
+                "airmove": am,
+                "teaminfo": info
             })
         });    
     });  
