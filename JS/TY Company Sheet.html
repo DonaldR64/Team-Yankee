@@ -610,13 +610,11 @@
         setAttrs({sheetTab:"display"});
     });
 
-    on("change:attrs sheet:opened", function() { 
-        getAttrs(["type","nation","unique","tactical","terrain","country","road","cross","counterattack","assault","special","gamescale","weapon1notes","weapon2notes","airmove"], function(values) {
+    on("sheet:opened", function() { 
+        getAttrs(["type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","gamescale","weapon1notes","weapon2notes","airmove","startnumber"], function(values) {
             let nationImage;
             let nation = values.nation;
 
-            let unique = values.unique;
-            if (!unique) {unique = false};
             let special = values.special;
             if (!special) {special = " "};
             let w1Notes = values.weapon1notes;
@@ -625,7 +623,6 @@
             if (!w2Notes) {w2Notes = " "};
             let combined = special + "," + w1Notes + "," + w2Notes;
 
-
             let type = values.type;
             let ralName = "Remount: ";
             let aplus = "+";
@@ -633,7 +630,7 @@
             let cplus = "+";
 
             let assault = "Assault: ";
-            let counterattack = "Counterattack: "
+            let counterattack = "Counterattack: ";
             if (type === "Infantry") {
                 ralName = "Rally: ";
             }
@@ -691,23 +688,27 @@
             let cross = values.cross;
 
             let tactDisplay = tact.toString();
+            let second;
             if (combined.includes("Stabiliser")) {
-                let second = tact + 2;
+                second = tact + 2;
                 tactDisplay += ' / ' + second ;
             }
 
+            let num = values.startnumber;
+            let teaminfo = type + " Team";
             let move = "Other";
             if (type === "Aircraft" || type === "Helicopter") {
                 move = "Aircraft";
             } 
             if (type === "Infantry") {
-                tact = '4';
-                tactDisplay = '4';
-                ter = '4';
-                count = '6';
-                road = '6';
+                tact = 4;
+                tactDisplay = 4;
+                ter = 4;
+                count = 6;
+                road = 6;
                 cross = "AUTO";
-            }
+                teaminfo = "Infantry Teams: " + num;
+            } 
 
             setAttrs({
                 "nationimage": nationImage,
@@ -716,7 +717,6 @@
                 "cplus": cplus,
                 "rplus": rplus,
                 "movementtype": move,
-                "unique": unique,
                 "tacticaldisplay": tactDisplay,
                 "assaultname": assault,
                 "counterattackname": counterattack,
@@ -726,9 +726,11 @@
                 "road": road,
                 "cross": cross,
                 "airmove": am,
+                "teaminfo": teaminfo,
             })
         });    
     });  
+
 
 
 
