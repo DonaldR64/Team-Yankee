@@ -23,6 +23,7 @@ const TY = (() => {
     let assaultingUnitID = "";
     let deadHQs = [[],[]]; //formationIDs of any formations that lost leaders in prev. turn, by player
 
+
     const TurnMarkers = ["","https://s3.amazonaws.com/files.d20.io/images/361055772/zDURNn_0bbTWmOVrwJc6YQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055766/UZPeb6ZiiUImrZoAS58gvQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055764/yXwGQcriDAP8FpzxvjqzTg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055768/7GFjIsnNuIBLrW_p65bjNQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055770/2WlTnUslDk0hpwr8zpZIOg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055771/P9DmGozXmdPuv4SWq6uDvw/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055765/V5oPsriRTHJQ7w3hHRBA3A/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055767/EOXU3ujXJz-NleWX33rcgA/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055769/925-C7XAEcQCOUVN1m1uvQ/thumb.png?1695998303"];
 
     let hexMap = {}; 
@@ -1912,7 +1913,7 @@ log(hit)
             darkness: false,
             vision: 5, //randomize if night to d6+2 and show when start
             turn: 0,
-            step: "start",
+            step: "",
             gametype: "",
             timeOfDay: "Day",
             startingPlayer: undefined,
@@ -1927,6 +1928,7 @@ log(hit)
             passengers: {},//keyed on IDs of transports, arrays of passengerIDs
             currentUnitID: "",
             turnMarkerID: "",
+            playerSteps: [],
         }
 
         BuildMap();
@@ -3752,8 +3754,39 @@ log(hit)
         }
     }
 
+    const Initiative = (step) => {
+        let firstNation;
+        let lastPlayer = state.TY.playerSteps[state.TY.playerSteps.length - 1] || 2;
+        let secondLastPlayer = state.TY.playerSteps[state.TY.playerSteps.length - 2] || 3;
+log(step)
+log("LAst: " + lastPlayer)
+log("2nd Last: " + secondLastPlayer)
 
-    const NewTurn = () => {
+
+        if (state.TY.gametype === "Meeting Engagement") {
+            if (lastPlayer === secondLastPlayer && step !== "Assault") {
+log("Same had 2")
+                firstNation = (state.TY.nations[0][0] === lastPlayer) ? state.TY.nations[1][0]:state.TY.nations[0][0];
+            } else {
+                let roll = randomInteger(2) - 1;
+                firstNation = state.TY.nations[roll][0];
+            }
+            if (step !== "Assault") {
+                state.TY.playerSteps.push(firstNation);
+            }
+        } else {
+            firstNation = "Neutral"; //fix
+        }
+        outputCard.body.push(DisplayDice(6,firstNation,36));
+        outputCard.body.push(firstNation + " goes first");
+    }
+
+
+
+
+
+
+    const AdvanceStep = () => {
         RemoveLines();
         RemoveBarrageToken();
         if (state.TY.nations[0].length === 0 && state.TY.nations[1].length === 0) {
@@ -3761,36 +3794,14 @@ log(hit)
             return;
         }
         let turn = state.TY.turn;
-
-        //check no unactivated units on map
-        if (turn > 0) {
-            let keys = Object.keys(UnitArray);
-            for (let i=0;i<keys.length;i++) {
-                let unit = UnitArray[keys[i]];
-                if (unit.bailed === true) {
-                    let text = SwapLeader(unit);
-                    if (text !== "") {
-                        sendChat("",text);
-                    }
-                }
-                let unitLeader = TeamArray[unit.teamIDs[0]];
-                if (!unitLeader) {continue};
-                if (hexMap[unitLeader.hexLabel].terrain.includes("Offboard") || unitLeader.token.get("aura1_color") === Colours.black) {continue};
-                if (unitLeader.bailed === true) {continue};
-                let pos = unitLeader.location;
-                sendPing(pos.x,pos.y, Campaign().get('playerpageid'), null, true); 
-                SetupCard(unit.nation,"",unit.nation);
-                outputCard.body.push("Unit has not been activated");
-                PrintCard();
-                return;
-            }
-        }
+        let currentStep = state.TY.step;
+        let steps = ["Start","Artillery and Air","Move and Fire","Assault"];
 
         if (turn === 0) {
             for (let p=0;p<2;p++) {
                 let num = 100 + parseInt(p);
-                let form = new Formation(p,state.TY.nations[p][0],num,"Barrages");
-                let unit = new Unit(p,state.TY.nations[p][0],num,"Barrages");
+                let form = new Formation(state.TY.nations[p][0],num,"Barrages");
+                let unit = new Unit(state.TY.nations[p][0],num,"Barrages",num);
             }
             if (state.TY.gametype === "") {
                 SetupCard("Setup Game","","Neutral");
@@ -3805,71 +3816,150 @@ log(hit)
                     DigIn(unit);
                     GTG(unit);
                 }
-                
             }
             turn = 1;
             state.TY.turn = 1;
-
+            currentStep = "Start";
+            state.TY.step = "Start";
         } else {
-            turn++;
-            state.TY.turn = turn;
+            let num = steps.indexOf(currentStep) + 1;
+            if (state.TY.gametype === "Meeting Engagement" && turn === 1 && num === 1) {
+                num = 2; //skip artillery and air first turn
+            }
+            if (num >= steps.length) {
+                num = 0;
+                turn++;
+                state.TY.turn = turn;
+            }
+            if (num === 3) {
+                let keys = Object.keys(UnitArray);
+                for (let i=0;i<keys.length;i++) {
+                    let unit = UnitArray[keys[i]];
+                    let unitLeader = TeamArray[unit.teamIDs[0]];
+                    if (!unitLeader) {continue};
+                    if (unitLeader.bailed === true) {
+                        let text = SwapLeader(unit);
+                        if (text !== "") {
+                            sendChat("",text);
+                        }
+                    }
+                    if (hexMap[unitLeader.hexLabel].terrain.includes("Offboard") || unitLeader.token.get("aura1_color") === Colours.black || unitLeader.token.get("aura1_color") === Colours.lightpurple) {continue};
+                    if (unitLeader.bailed === true) {continue};
+                    let pos = unitLeader.location;
+                    sendPing(pos.x,pos.y, Campaign().get('playerpageid'), null, true); 
+                    SetupCard(unit.nation,"",unit.nation);
+                    outputCard.body.push("Unit has not been activated");
+                    PrintCard();
+                    return;
+                }
+            }
+            currentStep = steps[num];
+            state.TY.step = currentStep;
         }
 
-        let tmID = state.TY.turnMarkerID;
-        let turnMarker = findObjs({_type:"graphic", id: tmID})[0];
-        if (!turnMarker) {
-            PlaceTurnMarker()
-        } else {
-            let newImg = getCleanImgSrc(TurnMarkers[state.TY.turn]);
-            turnMarker.set("imgsrc",newImg);
-        }
 
-        if ((state.TY.timeOfDay === "Dawn" || state.TY.timeOfDay === "Dusk") && turn > 2) {
-            let numDice = turn - 2;
-            let flip = false;
-            for (let i=0;i<numDice;i++) {
-                let roll = randomInteger(6);
-                if (roll > 4) {
-                    flip = true;
+        if (currentStep === "Start") {       
+            //Turn Marker
+            let tmID = state.TY.turnMarkerID;
+            let turnMarker = findObjs({_type:"graphic", id: tmID})[0];
+            if (!turnMarker) {
+                PlaceTurnMarker()
+            } else {
+                let newImg = getCleanImgSrc(TurnMarkers[state.TY.turn]);
+                turnMarker.set("imgsrc",newImg);
+            }
+            //check if Time of Day Change
+            if ((state.TY.timeOfDay === "Dawn" || state.TY.timeOfDay === "Dusk") && turn > 2) {
+                let numDice = turn - 2;
+                let flip = false;
+                for (let i=0;i<numDice;i++) {
+                    let roll = randomInteger(6);
+                    if (roll > 4) {
+                        flip = true;
+                        break;
+                    }
+                }
+                if (flip) {
+                    SetupCard("Time Change","","Neutral");
+                    if (state.TY.timeOfDay === "Dawn") {
+                        outputCard.body.push("[#ff0000]Morning has broken, the rest of the battle is fought in Daylight[/#]");
+                        state.TY.timeOfDay = "Daylight";
+                        state.TY.darkness = false;
+                        pageInfo.page.set("dynamic_lighting_enabled",false);
+                    }
+                    if (state.TY.timeOfDay === "Dusk") {
+                        outputCard.body.push("[#ff0000]Night has fallen, the rest of the battle is fought in Darkness[/#]");
+                        state.TY.timeOfDay = "Night";
+                        state.TY.darkness = true;
+                        state.TY.vision = randomInteger(6) + 2;
+                        outputCard.body.push("Visibility is " + state.TY.vision + "hexes");
+                        pageInfo.page.set({
+                            dynamic_lighting_enabled: true,
+                            daylight_mode_enabled: true,
+                            daylightModeOpacity: 0.1,
+                        })
+                    }
+                    PrintCard();
+                }
+            }
+    
+            if (state.TY.darkness === true) {
+                pageInfo.page.set({
+                    dynamic_lighting_enabled: true,
+                    daylight_mode_enabled: true,
+                    daylightModeOpacity: 0.1,
+                })
+            } else {
+                pageInfo.page.set("dynamic_lighting_enabled",false);
+            }
+
+            StartStep("ResLeaders");
+        }
+        if (currentStep === "Artillery and Air") {
+            SetupCard("Artillery and Air","Turn: " + state.TY.turn,"Neutral");
+            outputCard.body.push("Players take turns Calling in Artillery and/or Airstrikes");
+            outputCard.body.push("[hr]");
+            Initiative(currentStep);
+            PrintCard();
+        }
+        if (currentStep === "Move and Fire") {
+            RemoveBarrageToken();
+            SetupCard("Move and Fire","Turn: " + state.TY.turn,"Neutral");
+            outputCard.body.push("Players take turns Activating Units to Move and Fire");
+            outputCard.body.push("[hr]");
+            Initiative(currentStep);
+            PrintCard();
+        }
+        if (currentStep === "Assault") {
+            if (state.TY.currentUnitID !== "") {
+                let curUnit = UnitArray[state.TY.currentUnitID];
+                if (curUnit) {
+                    GTG(curUnit);
+                    curUnit.IC();
+                }
+            }
+            let assaultFlag = false;
+            let keys = Object.keys(UnitArray);
+            for (let i=0;i<keys.length;i++) {
+                let unit = UnitArray[keys[i]];                
+                if (unit.order === "Assault") {
+                    assaultFlag = true;
                     break;
                 }
             }
-            if (flip) {
-                SetupCard("Time Change","","Neutral");
-                if (state.TY.timeOfDay === "Dawn") {
-                    outputCard.body.push("[#ff0000]Morning has broken, the rest of the battle is fought in Daylight[/#]");
-                    state.TY.timeOfDay = "Daylight";
-                    state.TY.darkness = false;
-                    pageInfo.page.set("dynamic_lighting_enabled",false);
-                }
-                if (state.TY.timeOfDay === "Dusk") {
-                    outputCard.body.push("[#ff0000]Night has fallen, the rest of the battle is fought in Darkness[/#]");
-                    state.TY.timeOfDay = "Night";
-                    state.TY.darkness = true;
-                    state.TY.vision = randomInteger(6) + 2;
-                    outputCard.body.push("Visibility is " + state.TY.vision + "hexes");
-                    pageInfo.page.set({
-                        dynamic_lighting_enabled: true,
-                        daylight_mode_enabled: true,
-                        daylightModeOpacity: 0.1,
-                    })
-                }
-                PrintCard();
+            RemoveBarrageToken();
+            SetupCard("Assault","Turn: " + state.TY.turn,"Neutral");
+            if (assaultFlag === false) {
+                outputCard.body.push("No Assaults this turn");
+                outputCard.body.push("Advance to Next Turn when ready");
+            } else {
+                outputCard.body.push("Players take turns conducting Assaults");
+                outputCard.body.push("Defending Units may Defensive Fire if they have not fired this turn");
+                outputCard.body.push("[hr]");
+                Initiative(currentStep);
             }
+            PrintCard();
         }
-
-        state.TY.turn = turn;
-        if (state.TY.darkness === true) {
-            pageInfo.page.set({
-                dynamic_lighting_enabled: true,
-                daylight_mode_enabled: true,
-                daylightModeOpacity: 0.1,
-            })
-        } else {
-            pageInfo.page.set("dynamic_lighting_enabled",false);
-        }
-        StartStep("ResLeaders");
-
     }
 
 
@@ -3978,6 +4068,7 @@ log(hit)
             let keys = Object.keys(UnitArray);
             for (let i=0;i<keys.length;i++) {
                 let unit = UnitArray[keys[i]];
+                if (unit.name === "Barrages") {continue};
                 let unitLeader = TeamArray[unit.teamIDs[0]];
                 if (!unitLeader) {
                     log("Error in Unit Morale Unit Leader")
@@ -4031,10 +4122,10 @@ log(hit)
             ClearSmoke("Smokescreens");
             RemoveFoxholes();
             //ResetFlags();
-            outputCard.body.push("All Teams start Gone to Ground and Concealed until they activate");
             if (state.TY.turn === 1 && state.TY.gametype === "Meeting Engagement") {
                 outputCard.body.push("Aircraft cannot Arrive this turn");                
                 outputCard.body.push("Helicopters must Loiter this turn");
+                outputCard.body.push("All Teams start Gone to Ground and Concealed until they activate");
                 outputCard.body.push("All Teams are treated as having moved in the Shooting Step");
                 outputCard.body.push("No Artillery Bombardments this turn");
             } else {
@@ -4043,27 +4134,11 @@ log(hit)
                 outputCard.body.push("2 - Roll for Reserves");
                 outputCard.body.push("3 - Roll for Strike Aircraft");
             }
-            let firstNation;
-            if (state.TY.gametype === "Meeting Engagement") {
-                //roll to see who starts
-                let roll = randomInteger(2) - 1;
-                firstNation = state.TY.nations[roll][0];
-            } else {
-//fix this
-                firstNation = state.TY.nations[state.TY.startingPlayer][0]
-            }
-            outputCard.body.push("[hr]");
-            outputCard.body.push(DisplayDice(6,firstNation,36));
-            outputCard.body.push(firstNation + " has the First Activation");
             PrintCard();
             _.forEach(UnitArray,unit => {
                 let unitLeader = TeamArray[unit.teamIDs[0]];
                 if (unitLeader) {
                     unitLeader.token.set("aura1_color",Colours.green);
-                }
-                if (unit.id === state.TY.currentUnitID) {
-                    GTG(unit);
-                    unit.IC();
                 }
 
 //any other things to do at start of turn to unit                
@@ -6966,8 +7041,8 @@ log("2nd Row to " + team3.name)
             case '!Cross':
                 Cross(msg);
                 break;
-            case '!NewTurn':
-                NewTurn();
+            case '!AdvanceStep':
+                AdvanceStep();
                 break;
             case '!RemountChecks':
                 RemountChecks();
