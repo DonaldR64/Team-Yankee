@@ -25,7 +25,6 @@ const TY = (() => {
 
     const TurnMarkers = ["","https://s3.amazonaws.com/files.d20.io/images/361055772/zDURNn_0bbTWmOVrwJc6YQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055766/UZPeb6ZiiUImrZoAS58gvQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055764/yXwGQcriDAP8FpzxvjqzTg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055768/7GFjIsnNuIBLrW_p65bjNQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055770/2WlTnUslDk0hpwr8zpZIOg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055771/P9DmGozXmdPuv4SWq6uDvw/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055765/V5oPsriRTHJQ7w3hHRBA3A/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055767/EOXU3ujXJz-NleWX33rcgA/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055769/925-C7XAEcQCOUVN1m1uvQ/thumb.png?1695998303"];
 
-
     let hexMap = {}; 
     let edgeArray = [];
     const DIRECTIONS = ["Northeast","East","Southeast","Southwest","West","Northwest"];
@@ -593,15 +592,12 @@ const TY = (() => {
         }
 
         remove(unit) {
-            log("In remove unit")
             let unitIDs = this.unitIDs;
             let index = unitIDs.indexOf(unit.id);
             if (index > -1) {
                 unitIDs.splice(index,1);
             }
             this.unitIDs = unitIDs;
-            log("New UnitIDs")
-            log(unitIDs)
             if (unitIDs.length === 0 && this.name !== "Support") {
                 delete state.TY.formations[this.id]
                 SetupCard("Formation Destroyed","",this.nation);
@@ -659,6 +655,7 @@ const TY = (() => {
                 } else if (team.special.includes("Transport") && this.hqUnit === false) {
                     this.type = team.type;
                 }
+                this.size += parseInt(team.token.get("bar1_value")) || 1;
             }
         }
 
@@ -678,15 +675,13 @@ const TY = (() => {
                 }
             }
             this.teamIDs = teamIDs;
-            log("New team IDs")
-            log(teamIDs)
+     
             if (teamIDs.length === 0) {
                 let formation = FormationArray[this.formationID];
                 formation.remove(this);
                 if (this.hqUnit === true) {
                     deadHQs[this.player].push(formation.id);
                 }
-                log("Unit Destroyed")
                 delete state.TY.units[this.id];
                 delete UnitArray[this.id];
             } else if (index === 0) {
@@ -706,7 +701,6 @@ const TY = (() => {
                     tint_color: "transparent",
                 })
                 newLeader.inCommand = true;
-                log("new leader")
             } 
         }
 
@@ -785,7 +779,7 @@ const TY = (() => {
             })
             */
 
-            let commandRadius = (this.teamIDs.length <= 8) ? 6:8;
+            let commandRadius = (this.size > 7 || this.type === "Aircraft" || this.type === "Helicopter") ? 8:6;
             let unitLeader = TeamArray[this.teamIDs[0]];
             for (let j=0;j<this.teamIDs.length;j++) {
                 let team = TeamArray[this.teamIDs[j]];
@@ -799,6 +793,20 @@ const TY = (() => {
             }
 
         }
+
+        Size() {
+            let size = 0;
+            _.forEach(this.teamIDs,id => {
+                let team = TeamArray[id];
+                let number = parseInt(team.token.get("bar1_value")) || 1;
+                size += number;
+            })
+            this.size = size;
+log("Size: " + size)
+        }
+
+
+
     }
 
     class Team {
@@ -904,8 +912,7 @@ const TY = (() => {
                     artilleryWpn = weapon;
                     art = true;
                 };
-log(weapon)
-log(art)
+
                 if (at > 0 && art === false && minRange <= 1) {
                     for (let a=0;a<weapon.halted;a++) {
                         atWeapons.push(weapon);
@@ -922,12 +929,9 @@ log(art)
                 if (a.at === b.at && a.fp > b.fp) {return -1};
                 if (a.at === b.at && a.fp < b.fp) {return 1};
                 return 0;
-            })
-log("AT Weapon Array")
-log(atWeapons)
+            });
+
             atWeapons.length = starthp;
-log("Final")
-log(atWeapons)
             //update sheet with info
             let specials = attributeArray.special;
             if (!specials || specials === "") {
@@ -1283,7 +1287,7 @@ log(atWeapons)
                     unit.IC();
                 } else {
                     let dist = this.hex.distance(unitLeader.hex);
-                    let commandRadius = (unit.teamIDs.length <= 8) ? 6:8;
+                    let commandRadius = (unit.size > 7 || this.type === "Aircraft" || this.type === "Helicopter") ? 8:6;
                     if (dist <= commandRadius) {
                         ic = true;
                     } 
@@ -1984,7 +1988,6 @@ log(hit)
         } else {
             output += "/desc ";
         }
-log(outputCard)
         if (!outputCard.nation || !Nations[outputCard.nation]) {
             outputCard.nation = "Neutral";
         }
@@ -2681,7 +2684,6 @@ log(outputCard)
         if (!nation) {nation = "Neutral"};
         SetupCard(team.name,"Hex: " + team.hexLabel,nation);
         let h = hexMap[team.hexLabel];
-        log("Team IDs: " + h.teamIDs)
 
         let terrain = h.terrain;
         terrain = terrain.toString();
@@ -3957,7 +3959,7 @@ log(outputCard)
                     log("# of units: " + unit.teamIDs.length);
                     return;
                 }
-                unit.size = unit.teamIDs.length;
+                unit.Size();
                 unitLeader.token.set("bar1_value",0);
                 if (unit.pinned() === true) {
                     CheckArray.push(unit);
@@ -4107,7 +4109,7 @@ log(outputCard)
             unit.order = ""; 
             unit.specialorder = "";
             unit.limited = 0;
-            unit.size = unit.teamIDs.length;
+            unit.Size();
             let unitLeader = TeamArray[unit.teamIDs[0]];
             if (unitLeader) {
                 unitLeader.token.set("bar3_value",0);
@@ -4389,7 +4391,7 @@ log(outputCard)
             let leader = formationLeaders[i];
             let checkID = leader.id;
             let losCheck = LOS(team.id,checkID);
-            if (losCheck.los === true && losCheck.distance <= 6) {
+            if (losCheck.los === true && losCheck.distance <= 8) {
                 reroll = randomInteger(6);
                 break;
             }
@@ -6802,8 +6804,7 @@ log("2nd Row to " + team3.name)
                 if (hexMap[newHexLabel].dash === 4) {
                     moveBack = true;
                 }
-log("Hex Map Dash: " + hexMap[newHexLabel].dash)
-log("Move Back: " + moveBack)
+
                 let ccError = InCC(team);
                 if (moveBack === true || ccError === true) {
                     PlaySound("No");
