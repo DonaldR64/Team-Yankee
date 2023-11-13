@@ -729,6 +729,7 @@ const TY = (() => {
         }
 
         resetflags() {
+log(this.name + " in resetflags()")
             let newTeamIDs = [];
             let conditions = ["Dash","Tactical","Hold","Assault","Fired","AAFire","Radio"];
 
@@ -746,6 +747,7 @@ const TY = (() => {
             this.teamIDs = newTeamIDs;
             //this.IC(); ? done after movement
             this.Size();
+log("Size: " + this.size)
             this.order = "";
             this.specialorder = "";
 
@@ -759,6 +761,7 @@ const TY = (() => {
                 }
                 for (let i=0;i<this.teamIDs.length;i++) {
                     let team = TeamArray[this.teamIDs[i]];
+log(team.name + " inCommand: " + team.inCommand)
                     if (state.TY.conditions[team.id]) {
                         for (let c=0;c<conditions.length;c++) {
                             if (state.TY.conditions[team.id][conditions[c]]) {
