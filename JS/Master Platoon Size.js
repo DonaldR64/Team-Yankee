@@ -1170,7 +1170,7 @@ log(team.name + " inCommand: " + team.inCommand)
                     charID = "-NhrUN0XxRco5XKwLdSM";
                     size = 40;
                     break;
-                case 'Land':
+                case 'Land/Take Off':
                     imgSrc = "https://s3.amazonaws.com/files.d20.io/images/366077088/FP0gaU13t5SB11Cq4Fq4zQ/thumb.png?1699037802";
                     charID = "-NiLY-VogcGd_EbrZegV";
                     break;
@@ -1181,7 +1181,7 @@ log(team.name + " inCommand: " + team.inCommand)
             }
 
             let leftConditions = ["Tactical","Dash","Hold","Assault"];
-            let rightConditions = ["Fired","AAFire","GTG","Land"];
+            let rightConditions = ["Fired","AAFire","GTG","Land/Take Off"];
             let topConditions = ["Flare"];
             let array = [];
             if (leftConditions.includes(condition)) {
@@ -1310,9 +1310,12 @@ log(team.name + " inCommand: " + team.inCommand)
         }
 
         landed() {
-            return this.queryCondition("Land");
+            return this.queryCondition("Land/Take Off");
         }
 
+        activated() {
+            return (this.token.get("aura1_color") === Colours.black);
+        }
 
         Save(hit,hitNum) {
 log(hit)
@@ -3176,13 +3179,6 @@ log(hit)
         }
         let Tag = msg.content.split(";");
         let order = Tag[1];
-        ActivateUnitTwo(teamID,order);
-    }
-
-    const ActivateUnitTwo = (teamID,order,specialorder) => {
-        if (!specialorder) {
-            specialorder = "";
-        };
         let team = TeamArray[teamID];
         let unit = UnitArray[team.unitID];
         let errorMsg = "";
@@ -3199,33 +3195,38 @@ log(hit)
         let targetTeam,targetName;
         let targetArray = [];
         let unitActivation = false;
+        let spotted = false;
 
-        if (team.inCommand === true && order !== "Spot") {
+        if (team.inCommand === true) {
             targetTeam = unitLeader;
             targetName = unit.name;
             for (let i=0;i<unit.teamIDs.length;i++) {
                 let tm = TeamArray[unit.teamIDs[i]];
                 if (tm.inCommand === true && tm.bailed === false) {
                     targetArray.push(tm);
+                    if (tm.queryCondition("Spot") === true) {
+                        spotted = true;
+                    }
                 }
             }
             unitActivation = true;
         } else {
             targetTeam = team;
+            if (targetTeam.queryCondition("Spot") === true) {
+                spotted = true;
+            };
             targetName = team.name;
             targetArray = [targetTeam];
         }
     
-        if (unit.id === state.TY.currentUnitID && order !== "Spot" && unitActivation === true) {
-                errorMsg = "Team/Unit has already been activated";
-        } else if (unit.id !== state.TY.currentUnitID) {
-            ClearSmoke(unit.id);
+        if (targetTeam.token.activated() === true && order !== "Land") {
+            errorMsg = "Team/Unit has already been activated";
         }
+        ClearSmoke(unit.id);
 
         let noun = "Teams ";
         let verb = " are ";
         let noun2 = " their ";
-    
         let extraLine = ""
         if (team.inCommand === false) {
             noun = "The Team ";
@@ -3238,29 +3239,17 @@ log(hit)
             };
             if (order === "Tactical") {
                 extraLine = "Firing suffers an additional +1 Penalty";
-            } else if (order === "Dash") {
-                extraLine = "It should move towards the Unit Leader";
-            } 
-           }
+            } else if (order === "Dash" && spotted === false) {
+                extraLine = "Team must move towards the Unit Leader";
+            } else if (order === "Dash" && spotted === true) {
+                errorMsg = "Team Called Artillery and Cannot Dash";
+            }
+        }
     
-        if (order.includes("Assault") && unit.pinned() === true) {
+        if (order === "Assault" && unit.pinned() === true) {
             errorMsg = "Unit is Pinned, cannot Assault";
         }
-    
-        if (order === "Spot") {
-            if (targetTeam.spotAttempts >= 3) {
-                errorMsg.push("No further Spotting Attempts by this Team/Unit");
-            }
-            if (targetTeam.moved === true && targetTeam.type !== "Aircraft") {
-                errorMsg.push("Spotter Team Moved or Dug In");
-            }
-            if (targetTeam.fired === true || targetTeam.aaFired === true) {
-                errorMsg.push("Spotter Team has Fired");
-            }
-            if (state.TY.turn === 1 && state.TY.gametype === "Meeting Engagement") {
-                errorMsg.push("No Barrages Turn 1");
-            }
-        }
+        
 
         SetupCard(targetName,"",targetTeam.nation);
     
@@ -3270,28 +3259,30 @@ log(hit)
             return;
         }
 
-        targetTeam.token.set("aura1_color",Colours.black);
-
         if (order.includes("Tactical")) {
             if (unit.type === "Helicopter") {
                 outputCard.body.push(noun + "can move up to" + noun2 + "Speed, and may fire at" + noun2 + "Moving ROF");
                 outputCard.body.push("Alternately the Unit can move off table and Loiter");
             } else {
-                if (specialorder.includes("Dig In") === false) {
-                    if (unit.pinned() === false) {
-                        outputCard.body.push(noun + "can move at Tactical Speed, and may fire at" + noun2 + "Moving ROF");
-                        outputCard.body.push(noun + 'cannot move into contact with enemies');
-                    } else {
-                        outputCard.body.push(noun + "can move at Tactical Speed, and may fire at" + noun2 + "Moving ROF");
-                        outputCard.body.push(noun + "cannot move closer to enemy teams");
-                    } 
+                if (unit.pinned() === false) {
+                    outputCard.body.push(noun + "can move at Tactical Speed, and may fire at" + noun2 + "Moving ROF");
+                    outputCard.body.push(noun + 'cannot move into contact with enemies');
+                } else {
+                    outputCard.body.push(noun + "can move at Tactical Speed, and may fire at" + noun2 + "Moving ROF");
+                    outputCard.body.push(noun + "cannot move closer to enemy teams");
+                } 
+                if (spotted === true) {
+                    outputCard.body.push("Teams that Called Artillery must remain Stationary");
                 }
             }    
-         } else if (order.includes("Dash")) {
+        } else if (order.includes("Dash")) {
             outputCard.body.push(noun + ' can move at Dash Speed, but may not fire');
             outputCard.body.push(noun + ' cannot move within 4 hexes of visible enemies');
             if (state.TY.darkness === true) {
                 outputCard.body.push("Darkness limits speed to Terrain Dash");
+            }
+            if (spotted === true) {
+                outputCard.body.push("Teams that Called Artillery must remain Stationary");
             }
         } else if (order.includes("Hold")) {
             if (unit.pinned() === false) {
@@ -3305,28 +3296,37 @@ log(hit)
             outputCard.body.push('Teams can move at Tactical Speed to a Max of 5 hexes, and may fire at their Moving ROF');
             outputCard.body.push('Teams must target an enemy within 4 hexes of the Team it will charge into');
             outputCard.body.push("Eligible Teams can complete the charge");
-        } else if (order.includes("Spot")) {
-            CreateBarrages(targetTeam.id);
-        } else if (order.includes("Land")) {
-            outputCard.body.push("The Helicopter(s) may move to Speed");
-            outputCard.body.push("At the end of its movement Teams land");
-            outputCard.body.push('They may not land wthin 4 hexes of an enemy team and may not Shoot while Landed');
-            outputCard.body.push('Passengers disembark the following turn');
+            if (spotted === true) {
+                outputCard.body.push("Teams that Called Artillery must remain Stationary and cannot Assault");
+            }
+        } else if (order.includes("Land/Take Off")) {
+            if (targetTeam.landed() === true) {
+                outputCard.body.push("The Helicopter(s) Take Off and may now move");
+            } else {
+                outputCard.body.push('The Helicopter(s) land. They may not land within 4 hexes of an enemy team');
+                outputCard.body.push('Passengers embark/disembark the following turn');
+            }
         }
-
-        state.TY.currentUnitID = unit.id;
+        if (order !== "Land/Take Off") {
+            targetTeam.token.set("aura1_color",Colours.black);
+            if (unitActivation === true && order !== "Land/Take Off") {
+                unit.order = order;
+                state.TY.currentUnitID = unit.id;
+            }
+        }
 
         outputCard.body.push(extraLine);
         for (let i=0;i<targetArray.length;i++) {
-            targetArray[i].order = order;
-            targetArray[i].addCondition(order);
-            if (targetArray[i].specialorder === "") {
-                targetArray[i].specialorder = specialorder;
-            } 
-        }
-        if (team.inCommand === true && order !== "Spot") {
-            unit.order = order;
-            unit.specialorder = specialorder;
+            if (order === "Land/Take Off") {
+                if (targetTeam.landed() === true) {
+                    targetArray[i].removeCondition("Land/Take Off");
+                } else {
+                    targetArray[i].addCondition("Land/Take Off");
+                }
+            } else {
+                targetArray[i].order = order;
+                targetArray[i].addCondition(order);
+            }
         }
         PrintCard();
     }
@@ -3354,7 +3354,6 @@ log(hit)
         if (!team) {return};
 
         let type = team.type;
-        let cross = team.cross;
         let special = team.special;
 
         if (special.includes("Passengers")) {
