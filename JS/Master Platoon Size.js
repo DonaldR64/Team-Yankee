@@ -3219,7 +3219,7 @@ log(hit)
             targetArray = [targetTeam];
         }
     
-        if (targetTeam.token.activated() === true && order !== "Land") {
+        if (targetTeam.activated() === true) {
             errorMsg = "Team/Unit has already been activated";
         }
         ClearSmoke(unit.id);
@@ -3299,34 +3299,17 @@ log(hit)
             if (spotted === true) {
                 outputCard.body.push("Teams that Called Artillery must remain Stationary and cannot Assault");
             }
-        } else if (order.includes("Land/Take Off")) {
-            if (targetTeam.landed() === true) {
-                outputCard.body.push("The Helicopter(s) Take Off and may now move");
-            } else {
-                outputCard.body.push('The Helicopter(s) land. They may not land within 4 hexes of an enemy team');
-                outputCard.body.push('Passengers embark/disembark the following turn');
-            }
-        }
-        if (order !== "Land/Take Off") {
-            targetTeam.token.set("aura1_color",Colours.black);
-            if (unitActivation === true && order !== "Land/Take Off") {
-                unit.order = order;
-                state.TY.currentUnitID = unit.id;
-            }
+        } 
+        targetTeam.token.set("aura1_color",Colours.black);
+        if (unitActivation === true) {
+            unit.order = order;
+            state.TY.currentUnitID = unit.id;
         }
 
         outputCard.body.push(extraLine);
         for (let i=0;i<targetArray.length;i++) {
-            if (order === "Land/Take Off") {
-                if (targetTeam.landed() === true) {
-                    targetArray[i].removeCondition("Land/Take Off");
-                } else {
-                    targetArray[i].addCondition("Land/Take Off");
-                }
-            } else {
-                targetArray[i].order = order;
-                targetArray[i].addCondition(order);
-            }
+            targetArray[i].order = order;
+            targetArray[i].addCondition(order);
         }
         PrintCard();
     }
@@ -3388,16 +3371,11 @@ log(hit)
             } else if (type === "Unarmoured Tank") {
                 action = "!Activate;?{Order|Tactical|Dash|Hold}";
             } else if (type === "Helicopter") {
-                if (special.includes("Passengers")) {
-                    action = "!Activate;?{Order|Tactical|Hold|Land}";
-                } else {
-                    action = "!Activate;?{Order|Tactical|Hold}";
-                }
+                action = "!Activate;?{Order|Tactical|Hold}";
             }
             abilityName = "Order";
             AddAbility(abilityName,action,char.id);
         }
-
 
         let specOrders;
         if (type === "Infantry") {
@@ -3411,8 +3389,13 @@ log(hit)
             }
         } else if (type === "Unarmoured Tank") {
             specOrders = "!SpecialOrders;?{Special Order|Blitz & Move|Blitz & Hold|Cross Here|Follow Me|Shoot and Scoot";
+        } else if (type === "Helicopter") {
+            specOrders = "!SpecialOrders;?{";
+            if (special.includes("Passengers")) {
+                specOrders += "Land/Take Off|";
+            }
+            specOrders += "Blitz|Shoot and Scoot";
         }
-
         specOrders += "}";
 
         if (type !== "Aircraft" && type !== "System Unit") {
@@ -3550,18 +3533,40 @@ log(hit)
         let roll = randomInteger(6);
         let stat = 1;
 
-        if (specialorder === "Clear Minefield") {
-            targetTeam = team;
+        let targetTeam,targetName;
+        let targetArray = [];
+
+        if (team.id !== unitLeader.id) {
+            if (specialorder === "Clear Minefield" || specialorder === "Land/Take Off" || team.special.includes("HQ")) {
+                targetArray.push(team);
+                targetTeam = team;
+                targetName = team.name;
+            } else {
+                errorMsg = "That Special Order must be issued by the Unit Leader";
+            }
         } else {
-            targetTeam = unitLeader;
+            if (specialorder === "Clear Minefield") {
+                targetArray.push(team);
+                targetTeam = team;
+                targetName = team.name;
+            } else {
+                targetTeam = unitLeader;
+                targetName = unit.name;
+                _.forEach(unit.teamIDs,id => {
+                    let tm = TeamArray[id];
+                    if (tm.inCommand === true && tm.bailed === false && tm.queryCondition("Spot") === false) {
+                        targetArray.push(tm);
+                    }
+                });
+            }
         }
 
         if (targetTeam.specialorder !== "") {
             errorMsg.push("Teams can only have one Special Order per turn");
         }
         
-        if (specialorder === "Blitz" || specialorder === "Dig In") {
-            if (targetTeam.moved === true || (step === "Shooting" || step === "Assault")) {
+        if (specialorder === "Blitz" || specialorder === "Dig In" || specialorder === "Clear Minefield") {
+            if (targetTeam.moved === true || state.TY.step === "Assault") {
                 errorMsg.push(specialorder + " Order must be given before movement");
             }
         }
@@ -3569,18 +3574,13 @@ log(hit)
             if (targetTeam.moved === true) {
                 errorMsg.push("Unit has Moved and so cannot be given a Shoot and Scoot Order");
             }
-            if (step !== "Assault") {
+            if (state.TY.step  !== "Assault") {
                 errorMsg.push("Issue this order in the Assault Step");
             }
         }
 
         if (targetTeam.fired === true && specialorder !== "Shoot and Scoot") {
             errorMsg.push("Unit has Fired this turn, cannot be given that Order");
-        }
-        if (specialorder === "Clear Minefield") {
-            if (targetTeam.moved === true) {
-                errorMsg.push("Team has already Moved");
-            }
         }
 
         if (errorMsg.length > 0) {
@@ -3607,7 +3607,7 @@ log(hit)
         }
         
         outputCard.body.push(line);
-
+///////
         switch (specialorder) {
             case "Blitz & Move":
                 if (roll >= stat) {
@@ -3672,6 +3672,19 @@ log(hit)
                 targetTeam.specialorder = specialorder;
                 PrintCard();
                 break;
+            case "Land/Take Off":
+                if (targetTeam.landed() === true) {
+                    outputCard.body.push("The Helicopter(s) Take Off and may now move");
+                    _.forEach(targetArray,team => {
+                        team.removeCondition("Land/Take Off");
+                    })
+                } else {
+                    outputCard.body.push('The Helicopter(s) land. They may not land within 4 hexes of an enemy team');
+                    outputCard.body.push('Passengers may embark/disembark the following turn');
+                    _.forEach(targetArray,team => {
+                        team.addCondition("Land/Take Off");
+                    })
+                }
         }
     }
 
