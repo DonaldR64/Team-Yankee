@@ -3425,7 +3425,13 @@ log(hit)
             AddAbility(abilityName,"!Cross",char.id);
         }
 
-//Spot
+        if (type === "Tank" || type === "Infantry") {
+            abilityName = "Call Artillery";
+            AddAbility(abilityName,"!CreateBarrages",char.id);
+        }
+
+
+
 
 
         let types = {
@@ -3469,9 +3475,9 @@ log(hit)
                 names = names.toString();
                 if (names.charAt(0) === ",") {names = names.replace(",","")};
                 names = names.replaceAll(",","+");
-                if (type === "Artillery") {
-                    if (team.type === "Aircraft") {
-                        AddAbility("Target " + names,"!Activate;Spot",char.id);
+                if (weaponType === "Artillery") {
+                    if (team.type === "Aircraft" || team.type === "Helicopter") {
+                        AddAbility(weaponNum + ": " + names,"!CreateBarrages",char.id);
                     } else {
                         AddAbility("Preplan","!PlaceRangedIn",char.id);
                     }
@@ -4959,26 +4965,25 @@ log(weapons)
                 }
             }
             //place markers on shooter
+            /*
             sTeam.addCondition("Fired");
             if (sTeam.token.get("aura1_color") === Colours.lightpurple) {
                 sTeam.token.set("aura1_color",Colours.black);
             }
             sTeam.fired = true;
-            /*
-            if (target.type === "Aircraft" || target.type === "Helicopter") {
+            */
+            if (sTeam.token.get("aura1_color") === Colours.lightpurple) {
+                sTeam.token.set("aura1_color",Colours.black);
+            }
+            if (target.type === "Aircraft") {
                 sTeam.addCondition("AAFire");
                 sTeam.aaFired = true;
-            } else if (defensive === false) {
+                sTeam.fired = true;
+            } else {
                 sTeam.addCondition("Fired");
                 sTeam.fired = true;
             }
-            if (oppfire === true) {
-                sTeam.oppFireTarget = targetUnit.id;
-            }
-            if (defensive === true) {
-                sTeam.oppFireTarget = "";
-            }
-            */
+            
             if (state.TY.darkness === true) {
                 sTeam.addCondition("Flare");
             }
@@ -5197,8 +5202,8 @@ log("Roll: " + roll)
         }
     }
 
-
-    const CreateBarrages = (observerID) => {
+    const CreateBarrages = (msg) => {
+        let observerID = msg.selected[0]._id;
 log("In Create Barrages")        
         RemoveBarrageToken();
         RemoveLines();
@@ -5265,7 +5270,7 @@ log(ai)
 
         outputCard.body.push("Place Barrage Marker");
         outputCard.body.push("Choose Artillery When in Place");
-        return true; //feeds back to activate unit2
+        //return true; //feeds back to activate unit2
     }
 
     const ArtilleryInfo = (barrageID,spotter,barrageCharID) => {
@@ -5307,7 +5312,7 @@ log(artUnits)
                 let weapon = team.artilleryWpn;
 log(weapon)
                 if (!weapon) {continue}
-                if ((weapon.notes.includes("One Shot") || weapon.notes.includes("One-Shot")) && team.token.get(sm.oneshot) === true) {continue};
+                if ((weapon.notes.includes("One Shot") || weapon.notes.includes("One-Shot")) && team.token.get(SM.oneshot) === true) {continue};
 
                 if (weapon.moving === "Artillery" || weapon.halted === "Artillery") {
                     normal = true;
@@ -5557,7 +5562,7 @@ log(weapon)
                         continue;
                     };
                 }
-                if ((weapon.notes.includes("One Shot") || weapon.notes.includes("One-Shot")) && team.token.get(sm.oneshot) === true) {continue};
+                if ((weapon.notes.includes("One Shot") || weapon.notes.includes("One-Shot")) && team.token.get(SM.oneshot) === true) {continue};
 
                 artilleryTeams.push(team);
             }
@@ -5623,8 +5628,8 @@ log(weapon)
             artTeam.token.set("rotation",phi);
             artTeam.fired = true;
             artTeam.addCondition("Fired");
-            if ((weapon.notes.includes("One Shot") || weapon.notes.includes("One-Shot")) && artTeam.token.get(sm.oneshot) === false) {
-                artTeam.token.set(sm.oneshot,true);
+            if ((weapon.notes.includes("One Shot") || weapon.notes.includes("One-Shot")) && artTeam.token.get(SM.oneshot) === false) {
+                artTeam.token.set(SM.oneshot,true);
             };
             if (state.TY.darkness === true) {
                 shooterTeam.addCondition("Flare");
@@ -6161,7 +6166,6 @@ log(unitIDs4Saves)
             "saved": 0,
             "cover": 0,
         }
-        //let heliFlag = (team.type === "Helicopter" && team.token.get(sm.landed) === false) ? true:false;
         let save; //as single hit's save can then carry onto output part
     
         for (let k=0;k<hits.length;k++) {
