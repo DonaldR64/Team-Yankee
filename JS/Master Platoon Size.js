@@ -18,11 +18,9 @@ const TY = (() => {
 
     let unitCreationInfo = {}; //used during unit creation 
     let unitIDs4Saves = {}; //used during shooting routines
-    let unitFiredThisTurn = false; //marker for smoke bombardments, inCommand
     let CCTeamIDs = []; //array of teams (IDs) in a CC, updated when charge/move
     let assaultingUnitID = "";
     let deadHQs = [[],[]]; //formationIDs of any formations that lost leaders in prev. turn, by player
-
 
     const TurnMarkers = ["","https://s3.amazonaws.com/files.d20.io/images/361055772/zDURNn_0bbTWmOVrwJc6YQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055766/UZPeb6ZiiUImrZoAS58gvQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055764/yXwGQcriDAP8FpzxvjqzTg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055768/7GFjIsnNuIBLrW_p65bjNQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055770/2WlTnUslDk0hpwr8zpZIOg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055771/P9DmGozXmdPuv4SWq6uDvw/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055765/V5oPsriRTHJQ7w3hHRBA3A/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055767/EOXU3ujXJz-NleWX33rcgA/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055769/925-C7XAEcQCOUVN1m1uvQ/thumb.png?1695998303"];
 
@@ -1373,7 +1371,7 @@ log(hit)
                 }
 
                 if (weapon.notes.includes("HEAT") === false && weapon.notes.includes("Krasnopol") === false && weapon.notes.includes("NLOS") === false) {
-                    if (range > Math.round(hit.weapon.maxRange/2)) {
+                    if (range > 16) {
                         saveNeeded++;
                         save.tip += "<br>+1 Armour for Long Range<br>";
                     }
@@ -1941,7 +1939,7 @@ log(hit)
             units: {},//unitIDs -> name
             passengers: {},//keyed on IDs of transports, arrays of passengerIDs
             currentUnitID: "",
-            turnMarkerID: "",
+            turnMarkerIDs: ["",""],
             playerSteps: [],
         }
 
@@ -3267,12 +3265,11 @@ log(hit)
         targetTeam.token.set("aura1_color",Colours.black);
 
         if (order.includes("Tactical")) {
-            if (unit.type === "Aircraft" || unit.type === "Helicopter") {
+            if (unit.type === "Aircraft") {
                 outputCard.body.push("The " + unit.type + " may be placed anywhere on the Field");
-                outputCard.body.push("Teams can Spot for their own Fire");
-                if (unit.type === "Helicopter") {
-                    outputCard.body.push("Alternately the Helicopter can move off table and Loiter");
-                }
+            } else if (unit.type === "Helicopter") {
+                outputCard.body.push(noun + "can move up to" + noun2 + "Speed, and may fire at" + noun2 + "Moving ROF");
+                outputCard.body.push("Alternately the Unit can move off table and Loiter");
             } else {
                 if (specialorder.includes("Dig In") === false) {
                     if (unit.pinned() === false) {
@@ -3281,10 +3278,10 @@ log(hit)
                     } else {
                         outputCard.body.push(noun + "can move at Tactical Speed, and may fire at" + noun2 + "Moving ROF");
                         outputCard.body.push(noun + "cannot move closer to enemy teams");
-                    }
+                    } 
                 }
-            }
-        } else if (order.includes("Dash")) {
+            }    
+         } else if (order.includes("Dash")) {
             outputCard.body.push(noun + ' can move at Dash Speed, but may not fire');
             outputCard.body.push(noun + ' cannot move within 4 hexes of visible enemies');
             if (state.TY.darkness === true) {
@@ -3305,8 +3302,8 @@ log(hit)
         } else if (order.includes("Spot")) {
             CreateBarrages(targetTeam.id);
         } else if (order.includes("Land")) {
-            outputCard.body.push("The Helicopter(s) may be placed anywhere on  the Field");
-            outputCard.body.push("At the end of its movement teams land");
+            outputCard.body.push("The Helicopter(s) may move to Speed");
+            outputCard.body.push("At the end of its movement Teams land");
             outputCard.body.push('They may not land wthin 4 hexes of an enemy team and may not Shoot while Landed');
             outputCard.body.push('Passengers disembark the following turn');
         }
@@ -3361,7 +3358,7 @@ log(hit)
         }
 
         if (type === "Aircraft") {
-            abilityName = "Arrive ?";
+            abilityName = "Order Airstrike";
             action = "!EnterAircraft";
             AddAbility(abilityName,action,char.id);
         }
@@ -3373,28 +3370,28 @@ log(hit)
         }
 
         if (type === "Infantry") {
-            action = "!Activate;?{Order|Tactical|Dash|Hold|Assault|Spot}";
+            action = "!Activate;?{Order|Tactical|Dash|Hold|Assault}";
         } else if (type === "Gun") {
             if (team.tactical === 0) {
-                action = "!Activate;?{Order|Dash|Hold|Spot}";
+                action = "!Activate;?{Order|Dash|Hold}";
             } else {
-                action = "!Activate;?{Order|Tactical|Dash|Hold|Spot}";
+                action = "!Activate;?{Order|Tactical|Dash|Hold}";
             }
         } else if (type === "Tank") {
-            action = "!Activate;?{Order|Tactical|Dash|Hold|Assault|Spot}";
+            action = "!Activate;?{Order|Tactical|Dash|Hold|Assault}";
         } else if (type === "Unarmoured Tank") {
-            action = "!Activate;?{Order|Tactical|Dash|Hold|Spot}";
+            action = "!Activate;?{Order|Tactical|Dash|Hold}";
         } else if (type === "Aircraft") {
-            action = "!Activate;Tactical|Spot}";
+            action = "!Activate;Tactical}";
         } else if (type === "Helicopter") {
             if (special.includes("Passengers")) {
-                action = "!Activate;?{Order|Tactical|Hold|Spot|Land}";
+                action = "!Activate;?{Order|Tactical|Hold|Land}";
             } else {
-                action = "!Activate;?{Order|Tactical|Hold|Spot}";
+                action = "!Activate;?{Order|Tactical|Hold}";
             }
         }
 
-        abilityName = "Activate";
+        abilityName = "Order";
         AddAbility(abilityName,action,char.id);
 
         let specOrders;
@@ -3414,7 +3411,7 @@ log(hit)
         specOrders += "}";
 
         if (type !== "Aircraft" && type !== "System Unit") {
-            abilityName = "Special Orders";
+            abilityName = "Special Order";
             AddAbility(abilityName,specOrders,char.id);
         }
 
@@ -3427,6 +3424,9 @@ log(hit)
             abilityName = "Cross";
             AddAbility(abilityName,"!Cross",char.id);
         }
+
+//Spot
+
 
         let types = {
             "Small Arms": [],
@@ -3488,10 +3488,6 @@ log(hit)
             }
         }
 
-
-        if (type === "Infantry" || type === "Tank") {
-            AddAbility("Close Combat","!CloseCombat;@{selected|token_id}",char.id);
-        }
 
     }
 
@@ -3875,14 +3871,18 @@ log("Same had 2")
 
         if (currentStep === "Start") {       
             //Turn Marker
-            let tmID = state.TY.turnMarkerID;
-            let turnMarker = findObjs({_type:"graphic", id: tmID})[0];
-            if (!turnMarker) {
-                PlaceTurnMarker()
-            } else {
-                let newImg = getCleanImgSrc(TurnMarkers[state.TY.turn]);
-                turnMarker.set("imgsrc",newImg);
+            let tmIDs = state.TY.turnMarkerIDs;
+            for (let i=0;i<tmIDs.length;i++) {
+                let tmID = tmIDs[i];
+                let turnMarker = findObjs({_type:"graphic", id: tmID})[0];
+                if (!turnMarker) {
+                    PlaceTurnMarker(i);
+                } else {
+                    let newImg = getCleanImgSrc(TurnMarkers[state.TY.turn]);
+                    turnMarker.set("imgsrc",newImg);
+                }
             }
+
             //check if Time of Day Change
             if ((state.TY.timeOfDay === "Dawn" || state.TY.timeOfDay === "Dusk") && turn > 2) {
                 let numDice = turn - 2;
@@ -4483,7 +4483,7 @@ log("Same had 2")
         let targetTeamArray = BuildTargetTeamArray(target,shooter);
 
         let mistaken = true;
-        if ((shooter.hex.distance(target.hex) <= 4 && target.type.includes("Tank")) || shooter.hex.distance(target.hex) <= 2) {
+        if ((shooter.hex.distance(target.hex) <= 8 && target.type.includes("Tank")) || shooter.hex.distance(target.hex) <= 4) {
             mistaken = false;
         }
         if (defensive === true) {mistaken = false};
@@ -4738,7 +4738,7 @@ log(weapons)
                     excl = true;
                 }
 
-                if (los.distance > (Math.round(weapon.maxRange/2))) {
+                if (los.distance > 16) {
                     toHit++;
                     toHitTips += "<br>Long Range +1";
                 }
@@ -4790,7 +4790,7 @@ log(weapons)
                 }
                 if (weapon.notes.includes("Stabiliser") && weapon.notes.includes("Advanced Stabiliser") === false && sTeam.maxTact === true) {
                     toHit++;
-                    toHitTips += "<br>+1 for Stabiliser";
+                    toHitTips += "<br>Stabiliser Used +1";
                 }
 
                 if (toHitTips.length === 0) {
@@ -4959,6 +4959,12 @@ log(weapons)
                 }
             }
             //place markers on shooter
+            sTeam.addCondition("Fired");
+            if (sTeam.token.get("aura1_color") === Colours.lightpurple) {
+                sTeam.token.set("aura1_color",Colours.black);
+            }
+            sTeam.fired = true;
+            /*
             if (target.type === "Aircraft" || target.type === "Helicopter") {
                 sTeam.addCondition("AAFire");
                 sTeam.aaFired = true;
@@ -4972,14 +4978,12 @@ log(weapons)
             if (defensive === true) {
                 sTeam.oppFireTarget = "";
             }
-
+            */
             if (state.TY.darkness === true) {
                 sTeam.addCondition("Flare");
             }
 
         } //end shooter(s)
-
-        unitFiredThisTurn = true;
 
         for (let i=0;i<targetTeamArray.length;i++) {
             let tt = TeamArray[targetTeamArray[i].id];
@@ -5121,7 +5125,7 @@ log(weapons)
 
     const Mistaken = (unit) => {
 log("In Mistaken")
-
+        //hits in here should be valid re type, distances etc
         let array = [];
         for (let i=0;i<unit.teamIDs.length;i++) {
             let team = TeamArray[unit.teamIDs[i]];
@@ -5136,7 +5140,7 @@ log("In Mistaken")
                         let hit = team.hitArray[j];
                         if (hit.facing === "Side/Rear") {
                             team.priority += 1;
-                        } else if (hit.range <= Math.round(hit.weapon.maxRange/2)) {
+                        } else if (hit.range <= 16) {
                             team.priority += 1;
                         }
                     }
@@ -5166,9 +5170,11 @@ log("Roll: " + roll)
         for (let i=0;i<array.length;i++) {
             if (roll < 3) {break};
             let t1 = array[i];
+            let team1 = TeamArray[t1.id]
 log("T1: " + t1.name + " / Priority: " + t1.priority)
             for (let j=(array.length - 1);j>i;j--) {
                 let t2 = array[j];
+                let team2 = TeamArray[t2.id]
 log("T2: " + t2.name + " / Priority: " + t2.priority)
                 if (t1.priority === t2.priority) {continue};
                 let hitInfo = CompareHits(t1,t2); //eligible hits for swapping
@@ -5439,7 +5445,7 @@ log(weapon)
             }
 
             let smoke = false;
-            if (artTeam.artilleryWpn.notes.includes("Smoke Bombardment") && state.TY.smokeScreens[artUnit.player].includes(artUnit.id) === false && unitFiredThisTurn === false) {
+            if (artTeam.artilleryWpn.notes.includes("Smoke Bombardment") && state.TY.smokeScreens[artUnit.player].includes(artUnit.id) === false) {
                 smoke = true;
             }
             if (tooClose[0] === true) {
@@ -5751,7 +5757,6 @@ log(weapon)
                 if (num > 1) {s = "s"};
                 outputCard.body.push("Place " + num + ' Minefield Marker' + s + ' within 2 hexes of the Ranged In Target');
                 state.TY.minelets[currentPlayer].push(artilleryUnit.id);
-                unitFiredThisTurn = true;
                 PrintCard();
                 return;
             } else if (ammoType === "Laser Guided") {
@@ -5771,7 +5776,6 @@ log(weapon)
                     outputCard.body.push("The Spotting Unit can still Spot for other Artillery Units");
                     outputCard.body.push((3 - observerTeam.spotAttempts) + " Spot Attempts Left");
                 }
-                unitFiredThisTurn = true;
             }
         }
         //roll hits and saves
@@ -6721,9 +6725,9 @@ log("2nd Row to " + team3.name)
         PrintCard();
     }
     
-    const PlaceTurnMarker = () => {
+    const PlaceTurnMarker = (num) => {
         let turnMarker = getCleanImgSrc(TurnMarkers[state.TY.turn]);        
-        let x = Math.floor((pageInfo.width + edgeArray[1]) / 2);
+        let x = Math.floor(((pageInfo.width * num) + edgeArray[num]) / 2);
         let y = Math.floor((pageInfo.height/2));
         let newToken = createObj("graphic", {   
             left: x,
@@ -6736,7 +6740,7 @@ log("2nd Row to " + team3.name)
             layer: "map",
         });
         toFront(newToken);
-        state.TY.turnMarkerID = newToken.id;
+        state.TY.turnMarkerIDs[num] = newToken.id;
     }
 
     const TestKill = (msg) => {
