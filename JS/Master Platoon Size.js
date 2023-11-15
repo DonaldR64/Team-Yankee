@@ -19,7 +19,6 @@ const TY = (() => {
     let unitCreationInfo = {}; //used during unit creation 
     let unitIDs4Saves = {}; //used during shooting routines
     let CCTeamIDs = []; //array of teams (IDs) in a CC, updated when charge/move
-    let assaultingUnitID = "";
     let deadHQs = [[],[]]; //formationIDs of any formations that lost leaders in prev. turn, by player
 
     const TurnMarkers = ["","https://s3.amazonaws.com/files.d20.io/images/361055772/zDURNn_0bbTWmOVrwJc6YQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055766/UZPeb6ZiiUImrZoAS58gvQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055764/yXwGQcriDAP8FpzxvjqzTg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055768/7GFjIsnNuIBLrW_p65bjNQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055770/2WlTnUslDk0hpwr8zpZIOg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055771/P9DmGozXmdPuv4SWq6uDvw/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055765/V5oPsriRTHJQ7w3hHRBA3A/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055767/EOXU3ujXJz-NleWX33rcgA/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055769/925-C7XAEcQCOUVN1m1uvQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/367683734/l-zY78IZqDwwBmvKudj7Fg/thumb.png?1699992368","https://s3.amazonaws.com/files.d20.io/images/367683736/KTSyH0bTNRtF06h8F3t0kQ/thumb.png?1699992368","https://s3.amazonaws.com/files.d20.io/images/367683726/MCFihVq52aTlUkv-ijdg6w/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683728/YUy1bSEu44Hu_HlVSzv6ZQ/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683730/pw5PgLNFCkExUtJA4JwM1Q/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683729/wF4gNH1WKg9xB_OSrAkxsg/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683727/PVrwoByB_5PETsd9ObPQlA/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683732/g8kknD1sqvInESGM1X6itg/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683731/N3KKC6lLhlZ59KOqtdQzFw/thumb.png?1699992367"];
@@ -778,7 +777,6 @@ log(team.name + " inCommand: " + team.inCommand)
                     team.maxTact = false;
                     team.fired = false;
                     team.aaFired = false;
-                    team.oppFireTarget = "";
                     if (i===0) {
                         team.token.set("aura1_color",Colours.green);
                     } else {
@@ -1097,7 +1095,6 @@ log(team.name + " inCommand: " + team.inCommand)
             this.ccIDs = []; //ids of team in defensive fire range
             this.assaultTargetIDs = []; //ids of teams in CC with
             this.frontLine = false;
-            this.oppFireTarget = "";
 
             this.bailed = this.queryCondition("Bailed Out");
             this.fired = this.queryCondition("Fired");
@@ -3192,64 +3189,71 @@ log(hit)
         }
     
         let unitLeader = TeamArray[unit.teamIDs[0]];
-        let targetTeam,targetName;
+        let targetTeam,targetName,noun,verb,noun2;
+        let extraLine = "";
         let targetArray = [];
         let unitActivation = false;
         let spotted = false;
 
-        if (team.inCommand === true) {
+        if (team.id === unitLeader.id) {
             targetTeam = unitLeader;
             targetName = unit.name;
-            for (let i=0;i<unit.teamIDs.length;i++) {
-                let tm = TeamArray[unit.teamIDs[i]];
+            _.forEach(unit.teamIDs,id => {
+                let tm = TeamArray[id];
                 if (tm.inCommand === true && tm.bailed === false) {
                     targetArray.push(tm);
                     if (tm.queryCondition("Spot") === true) {
                         spotted = true;
                     }
                 }
-            }
+            });
             unitActivation = true;
+            noun = "Teams ";
+            verb = " are ";
+            noun2 = " their ";
         } else {
             targetTeam = team;
+            targetName = team.name;
+            targetArray.push(team);
             if (targetTeam.queryCondition("Spot") === true) {
                 spotted = true;
             };
-            targetName = team.name;
-            targetArray = [targetTeam];
+            noun = "The Team ";
+            verb = " is ";
+            noun2 = " its ";
+            if (targetTeam.inCommand === false) {
+                outputCard.body.push("Out of Command Team");
+                outputCard.body.push("[hr]");
+                if (order === "Assault") {
+                    errorMsg = "Out of Command Teams cannot Assault";
+                };
+                if (order === "Tactical" || order === "Hold") {
+                    extraLine = "Firing suffers an additional +1 Penalty";
+                };
+                if (order === "Dash") {
+                    if (spotted === false) {
+                        extraLine = "Team must move towards the Unit Leader";
+                    } else if (spotted === true) {
+                        errorMsg = "Team Called Artillery and Cannot Dash";
+                    };
+                };
+            }
         }
-    
+
+        if (order === "Dash" && targetTeam.specialorder === "Failed Blitz") {errorMsg = "Cannot Dash due to Failed Blitz"};
+        if (order !== "Hold" && targetTeam.specialorder.includes("Dig In")) {errorMsg = "Cannot due to Dig In Special Order"};
+
         if (targetTeam.activated() === true) {
             errorMsg = "Team/Unit has already been activated";
         }
         ClearSmoke(unit.id);
-
-        let noun = "Teams ";
-        let verb = " are ";
-        let noun2 = " their ";
-        let extraLine = ""
-        if (team.inCommand === false) {
-            noun = "The Team ";
-            verb = " is ";
-            noun2 = " its ";
-            outputCard.body.push("Out of Command Team");
-            outputCard.body.push("[hr]");
-            if (order === "Assault") {
-                errorMsg = "Out of Command Teams cannot Assault";
-            };
-            if (order === "Tactical") {
-                extraLine = "Firing suffers an additional +1 Penalty";
-            } else if (order === "Dash" && spotted === false) {
-                extraLine = "Team must move towards the Unit Leader";
-            } else if (order === "Dash" && spotted === true) {
-                errorMsg = "Team Called Artillery and Cannot Dash";
-            }
-        }
     
         if (order === "Assault" && unit.pinned() === true) {
             errorMsg = "Unit is Pinned, cannot Assault";
         }
         
+        if (order === "")
+
 
         SetupCard(targetName,"",targetTeam.nation);
     
@@ -3533,14 +3537,15 @@ log(hit)
         let roll = randomInteger(6);
         let stat = 1;
 
-        let targetTeam,targetName;
+        let targetTeam,targetName,noun;
         let targetArray = [];
 
         if (team.id !== unitLeader.id) {
-            if (specialorder === "Clear Minefield" || specialorder === "Land/Take Off" || team.special.includes("HQ")) {
+            if (specialorder === "Clear Minefield" || specialorder === "Land/Take Off" || team.special.includes("HQ") || specialorder === "Dig In") {
                 targetArray.push(team);
                 targetTeam = team;
                 targetName = team.name;
+                noun = "Team";
             } else {
                 errorMsg = "That Special Order must be issued by the Unit Leader";
             }
@@ -3549,9 +3554,11 @@ log(hit)
                 targetArray.push(team);
                 targetTeam = team;
                 targetName = team.name;
+                noun = "Team";
             } else {
                 targetTeam = unitLeader;
                 targetName = unit.name;
+                noun = "Unit";
                 _.forEach(unit.teamIDs,id => {
                     let tm = TeamArray[id];
                     if (tm.inCommand === true && tm.bailed === false && tm.queryCondition("Spot") === false) {
@@ -3565,7 +3572,7 @@ log(hit)
             errorMsg.push("Teams can only have one Special Order per turn");
         }
         
-        if (specialorder === "Blitz" || specialorder === "Dig In" || specialorder === "Clear Minefield") {
+        if (specialorder === "Blitz" || specialorder === "Dig In" || specialorder === "Clear Minefield" || specialorder === "Cross Here") {
             if (targetTeam.moved === true || state.TY.step === "Assault") {
                 errorMsg.push(specialorder + " Order must be given before movement");
             }
@@ -3580,7 +3587,7 @@ log(hit)
         }
 
         if (targetTeam.fired === true && specialorder !== "Shoot and Scoot") {
-            errorMsg.push("Unit has Fired this turn, cannot be given that Order");
+            errorMsg.push(noun + " has Fired this turn, cannot be given that Order");
         }
 
         if (errorMsg.length > 0) {
@@ -3606,43 +3613,36 @@ log(hit)
             line += " Failure!";
         }
         
+        let condition;
         outputCard.body.push(line);
-///////
         switch (specialorder) {
-            case "Blitz & Move":
+            case "Blitz":
                 if (roll >= stat) {
-                    outputCard.body.push("The Unit Leader and any Teams that are In Command may immediately Move up to 2 hexes before making a normal Tactical Move");
+                    outputCard.body.push("The Unit Leader and any Teams that are In Command may immediately Move up to 2 hexes");
                 } else {    
-                    outputCard.body.push("Teams from the Unit can only Move at Tactical speed and automatically suffer a +1 to hit penalty as if they had Moved Out of Command");
+                    outputCard.body.push("Teams from the Unit can not receive a Dash Order and automatically suffer a +1 to hit penalty as if they had Moved Out of Command");
                     specialorder = "Failed Blitz";
-                }
-                ActivateUnitTwo(unitLeader.id,"Tactical",specialorder);
-                break;
-            case "Blitz & Hold":
-                if (roll >= stat) {
-                    outputCard.body.push("The Unit Leader and any Teams that are In Command may immediately Move up to 2 hexes and then take up a Hold Order");
-                    ActivateUnitTwo(unitLeader.id,"Hold",specialorder);
-                } else {    
-                    outputCard.body.push("Teams from the Unit count as Moving at Tactical speed and automatically suffer a +1 to hit penalty as if they had Moved Out of Command");
-                    specialorder = "Failed Blitz";
-                    ActivateUnitTwo(unitLeader.id,"Tactical",specialorder);
                 }
                 break;
             case "Cross Here":
                 outputCard.body.push("Any Teams (including the Unit Leader) from the Unit rolling to Cross Difficult Terrain within 3 hexes of where the Unit Leader crosses improve their chance of crossing safely, reducing the score they need to pass a Cross Test by 1.");
-                ActivateUnitTwo(unitLeader.id,"Dash",specialorder);
                 break;
             case "Dig In":
+                let line;
                 if (roll >= stat) {
-                    outputCard.body.push("In Command Infantry Teams Dig In");
-                    DigIn(unit);
+                    if (noun === "Team") {
+                        line = "The Team Digs In"
+                    } else {
+                        line = "In Command Teams Dig In";
+                    } 
+                    outputCard.body.push(line);
+                    DigIn(targetArray);
                 } else {
-                    outputCard.body.push("The Unit failed to Dig In");
+                    outputCard.body.push("The " + noun + " failed to Dig In");
                     specialorder = "Failed Dig In";
                 }
-                outputCard.body.push("The Teams can fire at their moving ROF (but cannot fire a Bombardment)");
-                outputCard.body.push("If they do not Shoot or Assault, they are Gone to Ground");
-                ActivateUnitTwo(unitLeader.id,"Tactical",specialorder)
+                outputCard.body.push(noun + " can fire at a moving ROF");
+                outputCard.body.push("If Teams do not Shoot or Assault, they are Gone to Ground");
                 break;
             case "Follow Me":
                 if (roll >= stat) {
@@ -3652,7 +3652,6 @@ log(hit)
                     specialorder = "Failed Follow Me";
                 }
                 outputCard.body.push("Teams may not fire");
-                PrintCard();
                 break;
             case "Shoot and Scoot":
                 if (roll >= stat) {
@@ -3660,17 +3659,14 @@ log(hit)
                 } else {
                     outputCard.body.push("Teams remain where they are")
                 }
-                PrintCard();
                 break;
             case "Clear Minefield":
                 outputCard.body.push('The Team is ordered to clear a Minefield within 2 Hexes');
                 outputCard.body.push("That Team counts as having Dashed, and cannot Shoot or Assault");
                 outputCard.body.push("The Minefield can be removed immediately");
-                outputCard.body.push("Other Teams may be given the same order");
-                targetTeam.addCondition("Dash");
+                outputCard.body.push("Other Teams may be given the same order");   
+                condition = "Dash";
                 targetTeam.moved = true;
-                targetTeam.specialorder = specialorder;
-                PrintCard();
                 break;
             case "Land/Take Off":
                 if (targetTeam.landed() === true) {
@@ -3681,47 +3677,49 @@ log(hit)
                 } else {
                     outputCard.body.push('The Helicopter(s) land. They may not land within 4 hexes of an enemy team');
                     outputCard.body.push('Passengers may embark/disembark the following turn');
-                    _.forEach(targetArray,team => {
-                        team.addCondition("Land/Take Off");
-                    })
+                    condition = "Land/Take Off";
                 }
         }
+        _.forEach(targetArray,team => {
+            team.specialOrder = specialOrder;
+            if (condition) {
+                team.addCondition(condition);
+            }
+        })
+        PrintCard();
     }
 
-    const DigIn = (unit) => {
-        for (let i=0;i<unit.teamIDs.length;i++) {
-            let team = TeamArray[unit.teamIDs[i]];
-            if (team.type !== "Infantry" && team.type !== "Gun") {continue};
-            if (team.inCommand === false || team.token.get("layer") === "walls") {continue};
-            let hex = hexMap[team.hexLabel];
-            if (team.artilleryWpn !== undefined) {
-                RemoveRangedInMarker(unit.id);
+    const DigIn = (array) => {
+        _.forEach(array,team => {
+            if (team.token.get("layer") !== "walls" && (team.type === "Infantry" || team.type === "Gun")) {
+                RemoveRangedInMarker(team.unitID);
+                let hex = hexMap[team.hexLabel];
+                if (hex.terrain.includes("Building") === false && hex.terrain.includes("Foxholes") === false && hex.terrain.includes("Offboard") === false) {
+                    let dimensions = Math.max(team.token.get("height"), team.token.get("width")) + 25
+                    let newToken = createObj("graphic", {   
+                        left: team.location.x,
+                        top: team.location.y,
+                        width: dimensions, 
+                        height: dimensions,
+                        name: "Foxholes",  
+                        rotation: 30,
+                        isdrawing: true,
+                        pageid: team.token.get("pageid"),
+                        imgsrc: "https://s3.amazonaws.com/files.d20.io/images/253100240/1FOuKa7fU3YYi0Gf_Yz8DQ/thumb.png?1635623427",
+                        layer: "map",
+                        gmnotes: "GM"
+                    });
+                    toFront(newToken);
+                    hexMap[team.hexLabel].terrain.push("Foxholes");
+                    hexMap[team.hexLabel].foxholes = true;
+                    let fInfo = {
+                        hexLabel: team.hexLabel,
+                        id: newToken.id, //id of the Foxholes token, can be used to remove later
+                    }
+                    FoxholeArray.push(fInfo);
+                }
             }
-            if (hex.terrain.includes("Building") || hex.terrain.includes("Foxholes")) {continue};
-            if (hex.terrain.includes("Offboard")) {continue};
-            let dimensions = Math.max(team.token.get("height"), team.token.get("width")) + 25
-            let newToken = createObj("graphic", {   
-                left: team.location.x,
-                top: team.location.y,
-                width: dimensions, 
-                height: dimensions,
-                name: "Foxholes",  
-                rotation: 30,
-                isdrawing: true,
-                pageid: team.token.get("pageid"),
-                imgsrc: "https://s3.amazonaws.com/files.d20.io/images/253100240/1FOuKa7fU3YYi0Gf_Yz8DQ/thumb.png?1635623427",
-                layer: "map",
-                gmnotes: "GM"
-            });
-            toFront(newToken);
-            hexMap[team.hexLabel].terrain.push("Foxholes");
-            hexMap[team.hexLabel].foxholes = true;
-            let fInfo = {
-                hexLabel: team.hexLabel,
-                id: newToken.id, //id of the Foxholes token, can be used to remove later
-            }
-            FoxholeArray.push(fInfo);
-        }
+        });
     }
     
     const RemoveFoxholes = () => {
@@ -3845,12 +3843,12 @@ log("Same had 2")
                 return;
             }
             if (state.TY.gametype === "Meeting Engagement") {
-                let keys = Object.keys(UnitArray);
-                for (let i=0;i<keys.length;i++) {
-                    let unit = UnitArray[keys[i]];
-                    DigIn(unit);
+                _.forEach(TeamArray,team => {
+                    DigIn([team])
+                })
+                _.forEach(UnitArray,unit => {
                     GTG(unit);
-                }
+                })
             }
             turn = 1;
             state.TY.turn = 1;
@@ -4481,23 +4479,19 @@ log("Same had 2")
         }
 
         if (shooterUnit.id !== state.TY.currentUnitID) {
-            if (assaultingUnitID === "") {
-                oppfire = true;
-                if (targetUnit.id !== state.TY.currentUnitID) {
-                    errorMsg = "Opportunity Fire has to be against currently activated unit";
-                }
-            } else {
+            oppfire = true;
+            if (state.TY.step === "Assault") {
                 defensive = true;
-                outputCard.subtitle = "Defensive Fire";
-                if (shooter.ccIDs.includes(targetID) === false || state.TY.step !== "Assault") {
-                    errorMsg = 'This Team cannot conduct Defensive Fire'
-                }
+                oppfire = false;
             }
         }
         let shootingType = (defensive === true) ? "Defensive":"Normal";
 
-        if (shooter.order === "Dash" && defensive === false) {
+        if (shooter.order === "Dash") {
             errorMsg = 'Team Dashed and cannot Fire'
+        }
+        if (shooter.specialorder.includes("Follow Me")) {
+            errorMsg = "Follow Me Special Order, Cannot Fire";
         }
 
         if (errorMsg !== "") {
@@ -4522,42 +4516,27 @@ log("Mistaken: " + mistaken)
 
         for (let i=0;i<shooterUnit.teamIDs.length;i++) {
             let excluded;
-
             let st = TeamArray[shooterUnit.teamIDs[i]];
-            if (CCTeamIDs.includes(st.id)) {
-                outputCard.body.push("Teams that have Charged In cannot fire");
-                outputCard.body.push("Use the Assault Button");
-                PrintCard();
-                return;
-            }
             if (unitFire === false && shooterID !== st.id) {continue}; //single team firing
             if (st.inCommand === false && unitFire === true) {continue};
-            if (defensive === false) {
-                if (st.fired === true) {
-                    excluded = " Fired Already";
-                }
-                if (st.aaFired === true) {
-                    excluded = " Fired AA";
-                }
-                if (st.order === "Dash") {
-                    excluded = " Dashed";
-                }
-                if (st.specialorder === "Clear Minefield") {
-                    excluded = " is clearing Mines";
-                }
-                if (st.spotAttempts > 0) {
-                    excluded = " Spotted for Artillery";
-                }
-            } else if (defensive === true) {
-                if (st.oppFireTarget === targetUnit.id) {
-                    excluded = " Fired at this unit using Opportunity Fire";
-                }
+            if (st.fired === true) {
+                excluded = " Fired Already";
             }
-
+            if (st.aaFired === true) {
+                excluded = " Fired AA";
+            }
+            if (st.order === "Dash") {
+                excluded = " Dashed";
+            }
+            if (st.specialorder === "Clear Minefield") {
+                excluded = " is clearing Mines";
+            }
+            if (st.spotAttempts > 0) {
+                excluded = " Spotted for Artillery";
+            }
             if (st.type === "Tank" && st.bailed === true) {
                 excluded = " is Bailed Out";
             }
-
             if (excluded === undefined) {
                 let weaponExclusion;
                 let flag = false;
@@ -4774,10 +4753,6 @@ log(weapons)
                     toHit++;
                     toHitTips += "<br>Long Range +1";
                 }
-                if (oppfire === true && target.type !== "Aircraft" && target.type !== "Helicopter") {
-                    toHit++;
-                    toHitTips += "<br>Opportunity Fire +1";
-                }
 
                 if (state.TY.turn === 1 && target.gonetoground === true) {
                     los.concealed = true;
@@ -4816,17 +4791,21 @@ log(weapons)
                     toHit++;
                     toHitTips += "<br>Overworked & Moved +1";
                 }
+                if (sTeam.special.includes("Overworked") && oppfire === true) {
+                    toHit++;
+                    toHitTips += "<br>Overworked & Opp Fire +1";
+                }
                 if (weapon.notes.includes("Slow Firing") && moved === true) {
                     toHit++;
                     toHitTips += "<br>Slow Firing & Moved +1";
                 }
+                if (weapon.notes.includes("Slow Firing") && oppfire === true) {
+                    toHit++;
+                    toHitTips += "<br>Slow Firing & Opp Fire +1";
+                }
                 if (weapon.notes.includes("Stabiliser") && weapon.notes.includes("Advanced Stabiliser") === false && sTeam.maxTact === true) {
                     toHit++;
                     toHitTips += "<br>Stabiliser Used +1";
-                }
-
-                if (toHitTips.length === 0) {
-                    toHitTips = "No Modifiers";
                 }
 
                 let rof = weapon.halted;
@@ -4842,6 +4821,10 @@ log(weapons)
                     } else {
                         rof = weapon.moving;
                     }
+                }
+
+                if (oppfire === true && target.type !== "Aircraft" && target.type !== "Helicopter") {
+                    rof = weapon.moving;
                 }
 
                 if (target.type === "Aircraft") {
@@ -4875,6 +4858,10 @@ log(weapons)
                     if (weapon.notes.includes("Dedicated AA") || weapon.notes.includes("Guided AA")) {
                         rof = weapon.halted;
                     }
+                }
+
+                if (toHitTips.length === 0) {
+                    toHitTips = "No Modifiers";
                 }
 
                 if (rof === 0) {
@@ -6264,7 +6251,16 @@ log(unitIDs4Saves)
     
 
     const InCC = (team1) => {
-        if (team1.order !== "Assault" || team1.token.get("layer") === "walls") {return};
+        if (team1.token.get("layer") === "walls" || state.TY.step !== "Assault" ) {return};
+        let unit = UnitArray[team1.unitID];
+        if (state.TY.step === "Assault" && team.order !== "Assault") {
+            sendChat("","Team does not have an Assault Order");
+            return true;
+        };
+        if (unit.pinned() === true) {
+            sendChat("","Unit is Pinned");
+            return true;
+        }
         let ccError = false;
         let teamKeys = Object.keys(TeamArray);        
         for (let i=0;i<teamKeys.length;i++) {
@@ -6715,10 +6711,14 @@ log("2nd Row to " + team3.name)
     }
 
     const PlaceInFoxholes = (msg) => {
-        let id = msg.selected[0]._id;
-        let team = TeamArray[id];
-        let unit = UnitArray[team.unitID];
-        DigIn(unit);
+        let unit = UnitArray[TeamArray[msg.selected[0]._id].unitID];
+        if (unit) {
+            let array = [];
+            _.forEach(unit.teamIDs,id=>{
+                array.push(TeamArray[id]);
+            })
+            DigIn(array);
+        }
     }
 
     const Test = (msg) => {
@@ -6872,6 +6872,9 @@ log("2nd Row to " + team3.name)
                     moveBack = true;
                 }
                 if (hexMap[newHexLabel].dash === 4) {
+                    moveBack = true;
+                }
+                if (team.queryCondition("Spot") === true) {
                     moveBack = true;
                 }
 
