@@ -3403,7 +3403,7 @@ log(hit)
         } else if (type === "Unarmoured Tank") {
             specOrders = "!SpecialOrders;?{Special Order|Blitz & Move|Blitz & Hold|Cross Here|Follow Me|Shoot and Scoot";
         } else if (type === "Helicopter") {
-            specOrders = "!SpecialOrders;?{";
+            specOrders = "!SpecialOrders;?{Special Order|";
             if (special.includes("Passengers")) {
                 specOrders += "Land/Take Off|";
             }
@@ -3607,19 +3607,21 @@ log(hit)
             return;
         }
         let line = DisplayDice(roll,unitLeader.nation,24) + " vs. ";
-        if (specialorder === "Cross Here" || specialorder === "Clear Minefield" || specialorder === "Land") {
+        if (specialorder === "Cross Here" || specialorder === "Clear Minefield" || specialorder === "Land/Take Off") {
             line = "Auto";
-        } else if (specialorder === "Follow Me") {
-            stat = unitLeader.motivation;
-            line += stat + "+  ";
         } else {
-            stat = unitLeader.skill;
-            line += stat + "+  ";
-        }
-        if (roll >= stat) {
-            line += " Success!";
-        } else {
-            line += " Failure!";
+            if (specialorder === "Follow Me") {
+                stat = unitLeader.motivation;
+                line += stat + "+  ";
+            } else {
+                stat = unitLeader.skill;
+                line += stat + "+  ";
+            }
+            if (roll >= stat) {
+                line += " Success!";
+            } else {
+                line += " Failure!";
+            }
         }
         
         let condition;
@@ -3690,7 +3692,7 @@ log(hit)
                 }
         }
         _.forEach(targetArray,team => {
-            team.specialOrder = specialOrder;
+            team.specialorder = specialorder;
             if (condition) {
                 team.addCondition(condition);
             }
@@ -5820,6 +5822,8 @@ log(weapon)
             outputCard.body.push("No Targets Under Template");
         }
     
+        pinningUnits = [];
+
         for (let i=0;i<targetArray.length;i++) {
             let team = targetArray[i];
             let unitID = team.unitID;
@@ -5860,8 +5864,7 @@ log(weapon)
             if (roll >= neededToHit) {
                 team.hitArray = [hit];
                 if (team.type === "Infantry" || team.type === "Unarmoured Tank" || team.type === "Gun") {
-                    let unitLeaderToken = TeamArray[unit.teamIDs[0]].token;
-                    unitLeaderToken.set("aura1_color",Colours.yellow);                 
+                    pinningUnits.push(unit);                             
                 }
                 if (!unitIDs4Saves[unitID]) {
                     unitIDs4Saves[unitID] = false; //no mistaken for artillery
@@ -5871,8 +5874,20 @@ log(weapon)
                 outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + team.name + ": Missed");
             }
         }
-        //RemoveBarrageToken()
-    
+        pinningUnits = [...new Set(pinningUnits)];
+        if (pinningUnits.length > 0) {
+            outputCard.body.push("[hr]");
+            _.forEach(pinningUnits,unit => {
+                let courage = TeamArray[unit.teamIDs[0]].courage;
+                let roll = randomInteger(6);
+                let end = "Not Pinned";
+                if (roll < courage) {
+                    end = "Pinned";
+                    unit.pin();
+                } 
+                let tip = '[🎲](#" class="showtip" title="Roll: ' + roll + " vs. " + courage +  '+)' + unit.name + ": " + end;
+            });
+        }
         PrintCard();
         ProcessSaves("Artillery");
     }
