@@ -5869,7 +5869,7 @@ log(weapon)
                 if (!unitIDs4Saves[unitID]) {
                     unitIDs4Saves[unitID] = false; //no mistaken for artillery
                 }
-                outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + team.name + ": Hit");
+                outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + "[#ff0000]" + team.name + ": Hit[/#]");
             } else {
                 outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + team.name + ": Missed");
             }
@@ -5880,12 +5880,12 @@ log(weapon)
             _.forEach(pinningUnits,unit => {
                 let courage = TeamArray[unit.teamIDs[0]].courage;
                 let roll = randomInteger(6);
-                let end = "Not Pinned";
+                let end = unit.name + ": Not Pinned";
                 if (roll < courage) {
-                    end = "Pinned";
+                    end = "[#ff0000]" + unit.name + ": Pinned";
                     unit.pin();
                 } 
-                let line = '[🎲](#" class="showtip" title="Roll: ' + roll + " vs. " + courage +  '+)' + unit.name + ": " + end;
+                let line = '[🎲](#" class="showtip" title="Roll: ' + roll + " vs. " + courage +  '+)' + end;
                 outputCard.body.push(line);
             });
         }
