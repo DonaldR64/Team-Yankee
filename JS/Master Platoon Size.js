@@ -5696,15 +5696,15 @@ log(weapon)
         let tip2 = "";
         if (crossTerrainCheck === true) {
             needed += 1;
-            tip2 += "<br>+1 Template over Terrain or Smoke"; 
+            tip2 += "<br>Template over Terrain or Smoke +1"; 
         };
         if (state.TY.darkness === true) {
             needed += 1;
-            tip2 += "<br>+1 Night Time";
+            tip2 += "<br>Night Time +1";
         };
         if (observerTeam.special.includes("Observer")) {
             needed -=1;
-            tips2 += "<br>Specialist Observer -1";
+            tip2 += "<br>Specialist Observer -1";
         }
 
 
@@ -5885,7 +5885,8 @@ log(weapon)
                     end = "Pinned";
                     unit.pin();
                 } 
-                let tip = '[🎲](#" class="showtip" title="Roll: ' + roll + " vs. " + courage +  '+)' + unit.name + ": " + end;
+                let line = '[🎲](#" class="showtip" title="Roll: ' + roll + " vs. " + courage +  '+)' + unit.name + ": " + end;
+                outputCard.body.push(line);
             });
         }
         PrintCard();
