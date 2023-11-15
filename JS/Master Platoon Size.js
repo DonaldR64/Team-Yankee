@@ -5500,7 +5500,7 @@ log(weapon)
                 artTeam = TeamArray[artIDs[j]];
                 let dist = artTeam.hex.distance(barrageTeam.hex);
                 if (hexMap[artTeam.hexLabel].terrain.includes("Offboard") ){
-                    dist += 20; //1 km extra
+                    dist += 100; //5km off map
                 }
 
 
@@ -5580,7 +5580,7 @@ log(weapon)
 
                 let dist = team.hex.distance(barrageTeam.hex);
                 if (hexMap[team.hexLabel].terrain.includes("Offboard") ){
-                    dist += 20; //1km off map
+                    dist += 100; //5km off map
                 }  
                 if (dist > team.artilleryWpn.maxRange || dist < team.artilleryWpn.minRange) {
                     continue;
