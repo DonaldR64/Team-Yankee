@@ -127,6 +127,7 @@ const TY = (() => {
         "flees": "[#ff0000]Hit Destroys Tank as the Crew Flees![/#]",
         "saved": "Hit Saved",
         "cover": "Hit Saved by Cover",
+        "smoked": "Target Smoked",
     }
 
     const SaveResultsMult = {
@@ -1332,6 +1333,14 @@ log(hit)
             let save = {
                 result: "",
                 tip: hitNum + ": ",
+            }
+
+            if (weapon.name === "Smoke") {
+                save = {
+                    result: "smoked",
+                    tip: hitNum + ": Smoke Round",
+                }
+                return save;
             }
 
             if (bp === "Artillery") {
@@ -5047,7 +5056,7 @@ log(weapons)
         }
         for (let i=0;i<TeamArray[ta1.id].hitArray.length;i++) {
             let hit = TeamArray[ta1.id].hitArray[i];
-            if (ta2.shooterIDs.includes(hit.shooterID)) {
+            if (ta2.shooterIDs.includes(hit.shooterID) && hit.weapon.name !== "Smoke") {
                 let newLOS = LOS(hit.shooterID,ta2.id,hit.special);
                 hit.bp = newLOS.bp;
                 hit.facing = newLOS.facing;
@@ -5059,7 +5068,7 @@ log(weapons)
         }
         for (let i=0;i<TeamArray[ta2.id].hitArray.length;i++) {
             let hit = TeamArray[ta2.id].hitArray[i];
-            if (ta1.shooterIDs.includes(hit.shooterID)) {
+            if (ta1.shooterIDs.includes(hit.shooterID) && hit.weapon.name !== "Smoke") {
                 let newLOS = LOS(hit.shooterID,ta1.id,hit.special);
                 hit.bp = newLOS.bp;
                 hit.facing = newLOS.facing;
@@ -6186,6 +6195,7 @@ log(unitIDs4Saves)
             "flees": 0,
             "saved": 0,
             "cover": 0,
+            "smoked": 0,
         }
         let save; //as single hit's save can then carry onto output part
     
@@ -6215,16 +6225,22 @@ log(unitIDs4Saves)
                     saveResult.push(SaveResultsMult.bailed);
                 } else if (outputArray.minor > 0) {
                     saveResult.push(SaveResultsMult.minor);
-                } else {
+                } else if (outputArray.deflect > 0) {
                     saveResult.push("All Hits Deflected by Armour");
+                }
+                if (outputArray.smoked > 0) {
+                    saveResult.push("Target Smoked");
                 }
             } else if (team.type === "Infantry" || team.type === "Unarmoured Tank" || team.type === "Gun") {
                 if (outputArray.destroyed > 0) {
                     saveResult.push(SaveResultsMult.destroyed);
                 } else if (outputArray.cover > 0) {
                     saveResult.push(SaveResultsMult.cover);
-                } else {
+                } else if (outputArray.saved > 0) {
                     saveResult.push(SaveResultsMult.saved);
+                }
+                if (outputArray.smoked > 0) {
+                    saveResult.push("Target Smoked");
                 }
             } else if (team.type === "Aircraft" || team.type === "Helicopter") {
                 if (outputArray.destroyed > 0) {
