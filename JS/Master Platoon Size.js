@@ -2911,50 +2911,64 @@ log(hit)
             air2 = true;
         }
 
+
+log(interHexes)        
+log("Air1: " + air1)
+log("Air2: " + air2)
         if (air1 === true && air2 === true) {
+log("Both Air")
             if (team2.special.includes("Hunter-Killer")) {
                 let st = Math.max(interHexes.length - (2 + 1),0); //2 hexes before target plus target hex
                 for (let i=st;i<interHexes.length;i++) {
                     let qrs = interHexes[i];
                     let interHex = hexMap[qrs.label()];
-                    if (interHex.type === "Tall" || interHex.type === "Building") {
+                    if (interHex.type > 1) {
                         concealed = true;
                     }
                     if (interHex.smoke === true || interHex.smokescreen) {smoke = true};
                 }
             }
         } else if (air1 === true && air2 === false) {
+log("Shooter is Air")
             let st = Math.max(interHexes.length - (2 + 1),0); //2 hexes before target plus target hex
             for (let i=st;i<interHexes.length;i++) {
                 let qrs = interHexes[i];
                 let interHex = hexMap[qrs.label()];
-                if (interHex.type === "Tall" || interHex.type === "Building") {
+                if (interHex.type > 1) {
                     concealed = true;
                 }
                 if (interHex.smoke === true || interHex.smokescreen) {smoke = true};
             }
         } else if (air1 === false && air2 === true) {
+log("Target is Air")
             let en = Math.min(interHexes.length,(2 + 1)); //2 hexes from shooter plus shooters hex
             for (let i=0;i<en;i++) {
                 let qrs = interHexes[i];
+log(qrs.label())
                 let interHex = hexMap[qrs.label()];
-                if (interHex.type === "Tall" || interHex.type === "Building") {
+                if (interHex.type > 1) {
                     concealed = true;
                 }                
                 if (interHex.smoke === true) {smoke = true};
+log(concealed)
             }
             if (team2.special.includes("Hunter-Killer")) {
+log("HK")
                 let st = Math.max(interHexes.length - (2 + 1),0); //2 hexes before target plus target hex
                 for (let i=st;i<interHexes.length;i++) {
                     let qrs = interHexes[i];
+log(qrs.label())                    
                     let interHex = hexMap[qrs.label()];
-                    if (interHex.type === "Tall" || interHex.type === "Building") {
+log(interHex)
+                    if (interHex.type > 1) {
                         concealed = true;
                     }
                     if (interHex.smoke === true || interHex.smokescreen) {smoke = true};
+log(concealed)
                 }
             }
         } else if (air1 === false && air2 === false) {
+log("Neither is Air")
             for (let i=0;i<interHexes.length;i++) {
                 let qrs = interHexes[i];
                 let qrsLabel = qrs.label();
