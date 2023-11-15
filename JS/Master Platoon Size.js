@@ -2901,9 +2901,18 @@ log(hit)
             concealed = true;
             bulletproof = true;
         }
-    
-        if (team1.type === "Aircraft" || team2.type === "Aircraft") {
-            if (team1.type === "Aircraft") {
+
+        let air1 = false;
+        if (team1.type === "Aircraft" || (team1.type === "Helicopter" && team1.landed() === false)) {
+            air1 = true;
+        }
+        let air2 = false;
+        if (team2.type === "Aircraft" || (team2.type === "Helicopter" && team2.landed() === false)) {
+            air2 = true;
+        }
+
+        if (air1 === true && air2 === true) {
+            if (team2.special.includes("Hunter-Killer")) {
                 let st = Math.max(interHexes.length - (2 + 1),0); //2 hexes before target plus target hex
                 for (let i=st;i<interHexes.length;i++) {
                     let qrs = interHexes[i];
@@ -2913,18 +2922,39 @@ log(hit)
                     }
                     if (interHex.smoke === true || interHex.smokescreen) {smoke = true};
                 }
-            } else {
-                let en = Math.min(interHexes.length,(2 + 1)); //2 hexes from shooter plus shooters hex
-                for (let i=0;i<en;i++) {
+            }
+        } else if (air1 === true && air2 === false) {
+            let st = Math.max(interHexes.length - (2 + 1),0); //2 hexes before target plus target hex
+            for (let i=st;i<interHexes.length;i++) {
+                let qrs = interHexes[i];
+                let interHex = hexMap[qrs.label()];
+                if (interHex.type === "Tall" || interHex.type === "Building") {
+                    concealed = true;
+                }
+                if (interHex.smoke === true || interHex.smokescreen) {smoke = true};
+            }
+        } else if (air1 === false && air2 === true) {
+            let en = Math.min(interHexes.length,(2 + 1)); //2 hexes from shooter plus shooters hex
+            for (let i=0;i<en;i++) {
+                let qrs = interHexes[i];
+                let interHex = hexMap[qrs.label()];
+                if (interHex.type === "Tall" || interHex.type === "Building") {
+                    concealed = true;
+                }                
+                if (interHex.smoke === true) {smoke = true};
+            }
+            if (team2.special.includes("Hunter-Killer")) {
+                let st = Math.max(interHexes.length - (2 + 1),0); //2 hexes before target plus target hex
+                for (let i=st;i<interHexes.length;i++) {
                     let qrs = interHexes[i];
                     let interHex = hexMap[qrs.label()];
                     if (interHex.type === "Tall" || interHex.type === "Building") {
                         concealed = true;
-                    }                
-                    if (interHex.smoke === true) {smoke = true};
+                    }
+                    if (interHex.smoke === true || interHex.smokescreen) {smoke = true};
                 }
             }
-        } else {
+        } else if (air1 === false && air2 === false) {
             for (let i=0;i<interHexes.length;i++) {
                 let qrs = interHexes[i];
                 let qrsLabel = qrs.label();
@@ -3031,6 +3061,8 @@ log(hit)
         //log("Infantry didnt move = Concealed")
             }
         }
+
+
     
         if (special.includes("Defensive")) {
             bulletproof = false
@@ -4182,9 +4214,20 @@ log("Same had 2")
         let teamIDs = unit.teamIDs;
         for (let i=0;i<teamIDs.length;i++) {
             let team = TeamArray[teamIDs[i]];
-            if (team.type === "System Unit" || team.type === "Aircraft" || team.type === "Helicopter") {continue};
+            if (team.type === "System Unit" || team.type === "Aircraft") {continue};
+            if (team.type === "Helicopter" && team.landed() === false && team.special.includes("Hunter-Killer") === false) {continue};
             let gtg = (team.moved === true || team.fired === true) ? false:true;
-            if (team.moved === true || team.fired === true) {
+
+            let movexceptions = ["Hunter-Killer","Scout"];
+            _.forEach(movexceptions,exception => {
+                if (team.special.includes(exception) && team.fired === false) {gtg = true};
+            })
+            let fireexceptions = ["Swingfire","Hammerhead"];
+            _.forEach(fireexceptions,exception => {
+                if (team.special.includes(exception) && team.moved === false) {gtg = true};
+            })
+
+            if (gtg === false) {
                 team.removeCondition("GTG")
                 team.gonetoground = false;
                 if (team.token.get("aura1_color") === Colours.lightpurple) {
@@ -6968,25 +7011,11 @@ log("2nd Row to " + team3.name)
                         if (team.moved === true) {
                             team.moved = false;
                             team.maxTact = false;
-                            if (team.order === "Hold" && team.fired === false) {
-                                team.addCondition("GTG");
-                                team.gonetoground = true;
-                                if (team.id === unitLeader.id && state.TY.turn > 0) {
-                                    team.token.set("aura1_color",Colours.lightpurple)
-                                }
-                            }
                         }
                     }
      
                     if (team.moved === true) {
-                        team.removeCondition("GTG")
-                        team.gonetoground = false;
-                        if (team.token.get("aura1_color") === Colours.lightpurple) {
-                            team.token.set("aura1_color",Colours.black);
-                        }
-                        if (team.artilleryWpn !== undefined) {
-                            RemoveRangedInMarker(team.unitID);
-                        }
+                        RemoveRangedInMarker(team.unitID);
                     }
                 }
             
