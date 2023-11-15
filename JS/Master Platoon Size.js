@@ -1132,15 +1132,15 @@ log(team.name + " inCommand: " + team.inCommand)
                     charID = "-Nht9LnFvLCRVCbmcCZd";
                     break;
                 case 'Dash':
-                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/364738371/8Ov_DJPGHECoVdVUaEQG8w/thumb.png?1698192635";
+                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/367732138/K6sIzwifj9tIXcgYPIaw6g/thumb.png?1700012748";
                     charID = "-NhnnimsL_fUE_I44tij";
                     break;
                 case 'Tactical':
-                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/364738370/zNsS7qwUbv3hWKhHmdhQFw/thumb.png?1698192635";
+                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/367732123/yi-DF0tNtuUCiFf5qQJGsw/thumb.png?1700012741";
                     charID = "-Nhno-si_pOx9WcyqX8Q";
                     break;
                 case 'Hold':
-                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/364740800/zgiEA5heOJag10qcrKWlhA/thumb.png?1698193671";
+                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/367733007/GPUaJjq4Y3VkbNAjypBGkg/thumb.png?1700013183";
                     charID = "-Nhno4KrMYcgi0c6_keC";
                     break;
                 case 'Assault':
