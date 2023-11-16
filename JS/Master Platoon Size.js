@@ -652,9 +652,9 @@ const TY = (() => {
                     this.type = team.type;
                 } 
 
-                if (team.special.includes("Transport") === false) {
+                if (team.special.includes("Passengers") === false) {
                     this.type = team.type;
-                } else if (team.special.includes("Passengers") && this.hqUnit === true) {
+                } else if (team.special.includes("Passengers") === true && this.hqUnit === false) {
                     this.type = team.type;
                 }
                 this.size += parseInt(team.token.get("bar1_value")) || 1;
