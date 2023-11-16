@@ -112,7 +112,6 @@ const TY = (() => {
         "Swingfire": "Team firing Swingfire Missiles can remain Gone to Ground",
         "Tandem Warhead": "Tandem Warhead HEAT weapons are unaffected by ERA Armour",
         "Thermal Imaging": "Visibility to 1000m (20 hexes) at night. No To Hit penalties for Night and Smoke",
-        "Transport": "A Transport Team can carry Infantry Teams as Passengers",
         "2nd Gen Thermal Imaging": "Visibility to 2000m (40 hexes) at night. No To Hit penalties for Night and Smoke",
         "Tractor": "A Tractor Team can tow a single Gun Team as a Passenger, placing the Gun Team behind it",
         "Unarmoured": "An Unarmoured Tank Team cannot Charge into Contact and must Break Off if Assaulted",
@@ -649,9 +648,13 @@ const TY = (() => {
                 if (team.special.includes("Artillery")) {
                     this.artillery = true;
                 }
+                if (team.special.includes("Passengers") === false || (team.special.includes("Passengers") === true && this.hqUnit === false)) {
+                    this.type = team.type;
+                } 
+
                 if (team.special.includes("Transport") === false) {
                     this.type = team.type;
-                } else if (team.special.includes("Transport") && this.hqUnit === false) {
+                } else if (team.special.includes("Passengers") && this.hqUnit === true) {
                     this.type = team.type;
                 }
                 this.size += parseInt(team.token.get("bar1_value")) || 1;
@@ -903,14 +906,6 @@ log(team.name + " inCommand: " + team.inCommand)
                     type: type,
                 }
 
-                if (notes.includes("Heavy Weapon")) {
-                    if (special === " ") {
-                        special = "Heavy Weapon"
-                    } else {
-                        special += ",Heavy Weapon";
-                    }
-                }
-
                 if (notes !== " ") {
                     //puts info on weapon specials on sheet
                     let ws = notes.split(",");
@@ -1024,7 +1019,7 @@ log(team.name + " inCommand: " + team.inCommand)
 
             //passengers
             let maxPass = 0;
-            if (special.includes("Transport") || special.includes("Passengers")) {
+            if (special.includes("Passengers")) {
                 let s = special.split(",");
                 for (let a=0;a<s.length;a++) {
                     let sub = s[a];
@@ -1035,7 +1030,7 @@ log(team.name + " inCommand: " + team.inCommand)
                 }
             }
 
-            let uat = (special.includes("Transport") && (weaponArray.length === 0 || type === "Unarmoured Tank")) ? true:false;
+            let uat = (special.includes("Passengers") && (weaponArray.length === 0 || type === "Unarmoured Tank")) ? true:false;
 
             this.id = tokenID;
             this.token = token;
@@ -2678,7 +2673,7 @@ log(hit)
             }  else if (i === 0) {
                 rank = 2;
                 if (WarsawPact.includes(team.nation) && unit.artillery === true) {rank=3};
-                if (team.special.includes("Passengers") || team.special.includes("Transport")) {rank++}
+                if (team.special.includes("Passengers")) {rank++}
                 name = Ranks[Nations[team.nation].ranks][rank] + Name(Nations[team.nation].names);
             } 
         }
@@ -4071,7 +4066,7 @@ log("Same had 2")
                         for (let i=0;i<eligibleUnitIDs.length;i++) {
                             let unit = UnitArray[eligibleUnitIDs[i]];
                             let unitLeader = TeamArray[unit.teamIDs[0]];
-                            if (unitLeader.special.includes("Transport")) {continue};
+                            if (unitLeader.special.includes("Passengers")) {continue};
                             if ((unit.teamIDs.length > (lastStandCount[unit.type] + 1)) || unit.teamIDs.length === 1) {
                                 team = unitLeader;
                                 break;
@@ -4349,7 +4344,7 @@ log("Same had 2")
                 let needed = parseInt(Tag[3]);
                 let neededText = needed.toString() + "+";
                 let team = TeamArray[id];
-                if (team.special.includes("Transport") && hexMap[team.hexLabel].terrain.includes("Offboard")) {
+                if (team.special.includes("Passengers") && hexMap[team.hexLabel].terrain.includes("Offboard")) {
                     needed = 1;
                     neededText = "Auto"
                 }
