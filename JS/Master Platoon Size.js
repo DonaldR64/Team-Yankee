@@ -184,11 +184,15 @@ const TY = (() => {
         "dragon's teeth": {name: "Dragon's Teeth",height: 0,bp: true,type: 1,group: "Obstacle",dash: 3},
         "road block": {name: "Road Block",height: 0,bp: true,type: 1,group: "Obstacle",dash: 3},
         "crater": {name: "Craters",height: 0,bp: true,type: 0,group: "Rough",dash: 2},        
-        "crops": {name: "Crops",height: 0,bp: false,type: 1,group: "Crops",dash: 1},
+        "crops": {name: "Crops",height: 0,bp: false,type: 1,group: "Crops",dash: 2},
         "foxholes": {name: "Foxholes",height: 0,bp: false,type: 0,group: "Foxholes",dash: 2}, //bp tracked in LOS, and in hexMap
         "smoke": {name: "Smoke",height: 0,bp: false,type: 0,group: "Smoke",dash: 1},
         "smokescreen": {name: "SmokeScreen",height: 10,bp:false,type: 0,group: "Smoke",dash: 1},
         "rangedin": {name: "rangedin",height: 0,bp:false,type: 0,group: "Marker",dash: 1},
+        "scrub": {name: "Scrub",height: 0,bp: false,type: 1,group: "Crops",dash: 2},
+        "stream": {name: "Stream",height: 0,bp: false,type: 0,group: "Water",dash: 2},
+
+    
     }
 
     const Nations = {
