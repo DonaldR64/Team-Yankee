@@ -645,7 +645,7 @@ const TY = (() => {
                 if (team.special.includes("HQ") || team.token.get(SM.HQ)) {
                     this.hqUnit = true;
                 }
-                if (team.special.includes("Artillery")) {
+                if (team.artillery === true) {
                     this.artillery = true;
                 }
                 if (team.special.includes("Passengers") === false || (team.special.includes("Passengers") === true && this.hqUnit === false)) {
@@ -1066,6 +1066,7 @@ log(team.name + " inCommand: " + team.inCommand)
             this.counterattack = parseStat(attributeArray.counterattack);
             this.hit = parseStat(attributeArray.hit);
 
+            this.artillery = art;
             this.artilleryWpn = artilleryWpn;
             this.spotAttempts = 0;
             this.rangedInHex = {};
@@ -3284,7 +3285,7 @@ log("Neither is Air")
             }
         }
 
-        if (order === "Dash" && targetTeam.specialorder === "Failed Blitz") {errorMsg = "Cannot Dash due to Failed Blitz"};
+        if (order === "Dash" && targetTeam.specialorder.includes("Blitz")) {errorMsg = "Cannot Dash due to Blitz"};
         if (order !== "Hold" && targetTeam.specialorder.includes("Dig In")) {errorMsg = "Cannot due to Dig In Special Order"};
 
         if (targetTeam.activated() === true) {
@@ -3427,22 +3428,22 @@ log("Neither is Air")
 
         let specOrders;
         if (type === "Infantry") {
-             specOrders = "!SpecialOrders;?{Special Order|Blitz & Move|Blitz & Hold|Dig In|Follow Me|Shoot and Scoot|Clear Minefield"
+             specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Dig In|Follow Me|Shoot and Scoot|Clear Minefield"
         } else if (type === "Gun") {
             specOrders = "!SpecialOrders;?{Special Order|Dig In|Cross Here"
         } else if (type === "Tank") {
-            specOrders = "!SpecialOrders;?{Special Order|Blitz & Move|Blitz & Hold|Cross Here|Follow Me|Shoot and Scoot";
+            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Cross Here|Follow Me|Shoot and Scoot";
             if (special.includes("Mine")) {
                 specOrders += "|Clear Minefield";
             }
         } else if (type === "Unarmoured Tank") {
-            specOrders = "!SpecialOrders;?{Special Order|Blitz & Move|Blitz & Hold|Cross Here|Follow Me|Shoot and Scoot";
+            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Cross Here|Follow Me|Shoot and Scoot";
         } else if (type === "Helicopter") {
             specOrders = "!SpecialOrders;?{Special Order|";
             if (special.includes("Passengers")) {
                 specOrders += "Land/Take Off|";
             }
-            specOrders += "Blitz|Shoot and Scoot";
+            specOrders += "Blitz Move|Shoot and Scoot";
         }
         specOrders += "}";
 
@@ -3616,7 +3617,7 @@ log("Neither is Air")
             errorMsg.push("Teams can only have one Special Order per turn");
         }
         
-        if (specialorder === "Blitz" || specialorder === "Dig In" || specialorder === "Clear Minefield" || specialorder === "Cross Here") {
+        if (specialorder === "Blitz Move" || specialorder === "Dig In" || specialorder === "Clear Minefield" || specialorder === "Cross Here") {
             if (targetTeam.moved === true || state.TY.step === "Assault") {
                 errorMsg.push(specialorder + " Order must be given before movement");
             }
@@ -3662,11 +3663,12 @@ log("Neither is Air")
         let condition;
         outputCard.body.push(line);
         switch (specialorder) {
-            case "Blitz":
+            case "Blitz Move":
                 if (roll >= stat) {
                     outputCard.body.push("The Unit Leader and any Teams that are In Command may immediately Move up to 2 hexes");
+                    outputCard.body.push("Teams may make a normal Tactical Move, but if Hold are not considered to have Moved and can shoot at a Halted ROF");
                 } else {    
-                    outputCard.body.push("Teams from the Unit can not receive a Dash Order and automatically suffer a +1 to hit penalty as if they had Moved Out of Command");
+                    outputCard.body.push("Teams from the Unit cannot Dash and automatically suffer a +1 to hit penalty as if they had Moved Out of Command");
                     specialorder = "Failed Blitz";
                 }
                 break;
