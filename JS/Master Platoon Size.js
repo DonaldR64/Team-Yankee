@@ -1108,7 +1108,6 @@ log("Special Text: " + specialText)
 
         addCondition(condition) {
             let imgSrc,charID;
-            let rotation = 0;
             let size = 70;
             switch (condition) {
                 case 'Bailed Out':
@@ -3348,8 +3347,8 @@ log("Neither is Air")
             outputCard.body.push(noun + " may also take Opportunity Fire during this turn");
         } else if (order === "Assault") {
             outputCard.body.push('Teams can move at Tactical Speed to a Max of 5 hexes, and may fire at their Moving ROF');
-            outputCard.body.push('Teams must target an enemy within 4 hexes of the Team it will charge into');
-            outputCard.body.push("Eligible Teams can complete the charge");
+            outputCard.body.push('For Firing: Teams must target an enemy within 4 hexes of the Team it will charge into');
+            outputCard.body.push("Eligible Teams can complete the charge during the Assault Step");
             if (spotted === true) {
                 outputCard.body.push("Teams that Called Artillery must remain Stationary and cannot Assault");
             }
@@ -6341,10 +6340,11 @@ log(unitIDs4Saves)
     }
     
 
-    const InCC = (team1) => {
+    const InCC = (team1,newHex) => {
+log(team1.name + " is Moving")
         if (team1.token.get("layer") === "walls" || state.TY.step !== "Assault" ) {return};
         let unit = UnitArray[team1.unitID];
-        if (state.TY.step === "Assault" && team.order !== "Assault") {
+        if (state.TY.step === "Assault" && team1.order !== "Assault") {
             sendChat("","Team does not have an Assault Order");
             return true;
         };
@@ -6353,12 +6353,16 @@ log(unitIDs4Saves)
             return true;
         }
         let ccError = false;
-        let teamKeys = Object.keys(TeamArray);        
+        let teamKeys = Object.keys(TeamArray);   
+        let defendingUnit;     
         for (let i=0;i<teamKeys.length;i++) {
             let team2 = TeamArray[teamKeys[i]];
             if (team2.id === team1.id || team2.player === team1.player || team2.type === "System Unit") {continue};
-            let dist = team1.hex.distance(team2.hex);
+log(team2.name)
+
+            let dist = newHex.distance(team2.hex);
             if (dist > 1) {continue};
+log("In B2B")
             if (team1.special.includes("Heavy Weapon")) {
                 sendChat("","This Team is a Heavy Weapons Team and cannot Charge into Contact");
                 ccError = true;
@@ -6367,8 +6371,21 @@ log(unitIDs4Saves)
             if (team1.queryCondition("AAFire") === true) {
                 sendChat("","This Team fired AA Fire and cannot Charge into Contact");
                 ccError = true;
+                break;
+            }
+            defendingUnit = UnitArray[team2.unitID];
+            if (defendingUnit.order === "Assault") {
+                defendingUnit.order = "Tactical";
+                _.forEach(defendingUnit.teamIDs,id => {
+                    let tm = TeamArray[id];
+                    if (tm.order === "Assault") {
+                        tm.order = "Tactical";
+                        tm.addCondition("Tactical");
+                    }
+                });
             }
         }
+
         return ccError;
     }
 
@@ -6936,7 +6953,7 @@ log("Charge Dist: " + chargeDist)
                     moveBack = true;
                 }
 
-                let ccError = InCC(team);
+                let ccError = InCC(team,newHex);
                 if (moveBack === true || ccError === true) {
                     PlaySound("No");
                     tok.set("height",prev.height);
