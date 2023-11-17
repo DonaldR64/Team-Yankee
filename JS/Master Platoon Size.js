@@ -18,7 +18,7 @@ const TY = (() => {
 
     let unitCreationInfo = {}; //used during unit creation 
     let unitIDs4Saves = {}; //used during shooting routines
-    let CCTeamIDs = []; //array of teams (IDs) in a CC, updated when charge/move
+    let AssaultIDs = [[],[]]; //array of teams (IDs) in a CC, updated when charge/move
     let deadHQs = [[],[]]; //formationIDs of any formations that lost leaders in prev. turn, by player
 
     const TurnMarkers = ["","https://s3.amazonaws.com/files.d20.io/images/361055772/zDURNn_0bbTWmOVrwJc6YQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055766/UZPeb6ZiiUImrZoAS58gvQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055764/yXwGQcriDAP8FpzxvjqzTg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055768/7GFjIsnNuIBLrW_p65bjNQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055770/2WlTnUslDk0hpwr8zpZIOg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055771/P9DmGozXmdPuv4SWq6uDvw/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055765/V5oPsriRTHJQ7w3hHRBA3A/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055767/EOXU3ujXJz-NleWX33rcgA/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055769/925-C7XAEcQCOUVN1m1uvQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/367683734/l-zY78IZqDwwBmvKudj7Fg/thumb.png?1699992368","https://s3.amazonaws.com/files.d20.io/images/367683736/KTSyH0bTNRtF06h8F3t0kQ/thumb.png?1699992368","https://s3.amazonaws.com/files.d20.io/images/367683726/MCFihVq52aTlUkv-ijdg6w/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683728/YUy1bSEu44Hu_HlVSzv6ZQ/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683730/pw5PgLNFCkExUtJA4JwM1Q/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683729/wF4gNH1WKg9xB_OSrAkxsg/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683727/PVrwoByB_5PETsd9ObPQlA/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683732/g8kknD1sqvInESGM1X6itg/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683731/N3KKC6lLhlZ59KOqtdQzFw/thumb.png?1699992367"];
@@ -843,6 +843,8 @@ log(team.name + " inCommand: " + team.inCommand)
             let weaponArray = [];
             let atWeapons = [];
             let artilleryWpn;
+            let artilleryTeam = false;
+
             for (let i=1;i<5;i++) {
                 let art = false;
                 let name = attributeArray["weapon"+i+"name"];
@@ -912,6 +914,7 @@ log(team.name + " inCommand: " + team.inCommand)
                 if (weapon.halted === "Artillery" || weapon.halted === "Salvo" || weapon.moving === "Artillery" || weapon.moving === "Salvo") {
                     artilleryWpn = weapon;
                     art = true;
+                    artilleryTeam = true;
                 };
 
                 if (at > 0 && art === false && minRange <= 1) {
@@ -1066,7 +1069,7 @@ log(team.name + " inCommand: " + team.inCommand)
             this.counterattack = parseStat(attributeArray.counterattack);
             this.hit = parseStat(attributeArray.hit);
 
-            this.artillery = art;
+            this.artillery = artilleryTeam;
             this.artilleryWpn = artilleryWpn;
             this.spotAttempts = 0;
             this.rangedInHex = {};
@@ -1083,9 +1086,6 @@ log(team.name + " inCommand: " + team.inCommand)
             this.eta = [];
             this.shooterIDs = [];
             this.priority = 0;
-            this.ccIDs = []; //ids of team in defensive fire range
-            this.assaultTargetIDs = []; //ids of teams in CC with
-            this.frontLine = false;
 
             this.bailed = this.queryCondition("Bailed Out");
             this.fired = this.queryCondition("Fired");
@@ -6392,106 +6392,73 @@ log("Charge Dist: " + chargeDist)
     }
 
     const CloseCombat = (msg) => {
+        //initial feed in, subsequent should go to Two ie. round 2 on
         if (!msg.selected) {return};
-        let id = msg.selected[0]._id
-        if (!id) {return};
-        let team = TeamArray[id];
-        SetupCard("Start Close Combat","",team.nation);
-        ButtonInfo("Click Button to Start","!CloseCombatTwo;" + id);
+        let assaultingPlayer,id;
+        AssaultIDs = [[],[]];
+        for (let i=0;i<msg.selected.length;i++) {
+            let id = msg.selected[i]._id;
+            let team = TeamArray[id];
+            if (!team) {continue};
+            let unit = UnitArray[team.unitID];
+            if (unit.order.includes("Assault")) {
+                assaultingPlayer = unit.player;
+            }
+            AssaultIDs[team.player].push(id);
+        }
+        if (assaultingPlayer === undefined) {
+            sendChat("",'No Teams Selected with Assault Orders');
+            return;
+        }
+        SetupCard("Start Close Combat","",state.TY.nations[assaultingPlayer][0]);
+        ButtonInfo("Click Button to Start","!CloseCombatTwo;" + assaultingPlayer + ";1");
         PrintCard();
     }
 
     const CloseCombatTwo = (msg) => {
         let Tag = msg.content.split(";");
-        let id = Tag[1];
-        let team = TeamArray[id];
-        let attackingNation = team.nation;
-        let defendingNation;
-        if (!team) {return};
-        let attackingPlayer = team.player;
-        SetupCard("Assault","",attackingNation);
-        let errorMsg;
-        let array1 = [];
-        for (let i=0;i<CCTeamIDs.length;i++) {
-            let team = TeamArray[CCTeamIDs[i]];
-            if (team) {
-                let token = team.token;
-                if (token) {array1.push(team.id)};
-            }
-        }
-        let array2 = [],attackingTeamIDs = [],defendingTeamIDs = [],defendingUnitIDs = [];
-        let teamKeys = Object.keys(TeamArray);
-        for (let i=0;i<teamKeys.length;i++) {
-            let team = TeamArray[teamKeys[i]];
-            if (team.token.get(SM.defensive) === true || team.token.get(SM.surprised) === true) {
-                array2.push(team.id); //filter out the further away ones later
-            }
-        }
-        if (attackingPlayer === state.TY.currentPlayer) {
-            attackingTeamIDs = array1;
-            defendingTeamIDs = array2;
-        } else {
-            attackingTeamIDs = array2;
-            defendingTeamIDs = array1;
-        }
-        if (attackingTeamIDs.length === 0) {
-            errorMsg = "No Attackers in Base to Base Contact";
-        }
-        if (defendingTeamIDs.length === 0) {
-            errorMsg = "No Defenders left";
-        }
+        let attackingPlayer = parseInt(Tag[1]);
+        let defendingPlayer = (attackingPlayer === 0) ? 1:0;
+        let round = Tag[2];
+        //AssaultIDs has 2 sides worth of IDs
+        SetupCard("Assault","",state.TY.nations[attackingPlayer]);
+        //check which are in B2B contact
+        b2bFlag = false;
+        let attackingTeamIDs = {};
+        let defendingTeamIDs = {};
 
-        for (let i=0;i<defendingTeamIDs.length;i++) {
-            let dt = TeamArray[defendingTeamIDs[i]];
-            defendingNation = dt.nation;
-            if (defendingUnitIDs.includes(dt.unitID) === false) {
-                defendingUnitIDs.push(dt.unitID);
-            }
-        }
-
-        if (errorMsg !== undefined) {
-            outputCard.body.push(errorMsg);
-            PrintCard();
-            return;
-        }
-
-log(attackingTeamIDs)
-log(defendingTeamIDs)
-
-
-        //define possible targets for attacking teams
-        for (let i=0;i<attackingTeamIDs.length;i++) {
-            let team1 = TeamArray[attackingTeamIDs[i]];
-log("Attacker: " + team1.name)
-            team1.assaultTargetIDs = [];
-            team1.frontLine = false;
-            let team2;
-            for (let j=0;j<defendingTeamIDs.length;j++) {
-                team2 = TeamArray[defendingTeamIDs[j]];
-                if (team1.type === "Tank" && team2.type === "Tank") {continue}
-                if (team1.hex.distance(team2.hex) === 1) {
-                    team1.assaultTargetIDs.push(team2.id);
-                    team1.frontLine = true;
-log("Target: " + team2.name)
-                }
-            }
-            if (team1.assaultTargetIDs.length === 0 && team1.type === "Infantry") {
-                //check if 2nd row infantry
-                for (let j=0;j<attackingTeamIDs.length;j++) {
-                    let team3 = TeamArray[attackingTeamIDs[j]];
-                    if (team3.frontLine === false) {continue};
-                    if (team3.type !== "Infantry" || team3.id === team1.id) {continue};
-                    if (team1.hex.distance(team3.hex) === 1) {
-log("2nd Row to " + team3.name)
-                        if (team3.assaultTargetIDs.length !== 0) {
-                            team1.assaultTargetIDs = team1.assaultTargetIDs.concat(team3.assaultTargetIDs);
-                        }
+        for (let i=0;i<AssaultIDs[attackingPlayer].length;i++) {
+            let team1 = TeamArray[AssaultIDs[attackingPlayer][i]];
+            for (let j=0;j<AssaultIDs[defendingPlayer].length;j++) {
+                let team2 = TeamArray[AssaultIDs[defendingPlayer][j]];
+                let dist = team1.hex.distance(team2.hex);
+                if (dist < 2) {
+                    b2bFlag = true;
+                    if (!attackingTeamIDs[team1.id]) {
+                        attackingTeamIDs[team1.id] = [team2.id];
+                    } else {
+                        attackingTeamIDs[team1.id].push(team2.id);
+                    }
+                    if (!defendingTeamIDs[team2.id]) {
+                        defendingTeamIDs[team2.id] = [team1.id];
+                    } else {
+                        defendingTeamIDs[team2.id].push(team1.id);
                     }
                 }
             }
         }
+
+        if (b2bFlag === false) {
+            outputCard.body.push("There are no Teams in Base to Base Contact");
+            outputCard.body.push("The Assault is over");
+            PrintCard();
+            return;
+        }
+        //each array will be an array indexed by the attacker/defender team's id, with the contents being the target IDs in B2B contact
+        // eg. attackingTeamIDs[attackers Team ID] = [defenders Team ID1, defenders Team ID2, ...]
+////////////
+
         //for each attacker, roll to hit etc
-        let limited = 0;
         for (let i=0;i<attackingTeamIDs.length;i++) {
             let attTeam = TeamArray[attackingTeamIDs[i]];
             let line,end;
