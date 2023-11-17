@@ -3627,6 +3627,12 @@ log("Neither is Air")
                 errorMsg.push(specialorder + " Order must be given before movement");
             }
         }
+        if (specialorder === "Dig In") {
+            if (targetTeam.queryCondition("Spot") === true && noun === "Team") {
+                errorMsg.push("This Team Called in Artillery and so cannot Dig In");
+            }
+        }
+
         if (specialorder === "Shoot and Scoot") {
             if (targetTeam.moved === true) {
                 errorMsg.push("Unit has Moved and so cannot be given a Shoot and Scoot Order");
@@ -3686,7 +3692,7 @@ log("Neither is Air")
                     if (noun === "Team") {
                         line = "The Team Digs In"
                     } else {
-                        line = "In Command Teams Dig In";
+                        line = "In Command Teams that did not Call Artillery Dig In";
                     } 
                     outputCard.body.push(line);
                     DigIn(targetArray);
