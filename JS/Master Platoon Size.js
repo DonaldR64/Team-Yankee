@@ -59,7 +59,6 @@ const TY = (() => {
         "Amphibious": "Treat Impassable Water as Difficult Terrain",
         "Anti-Helicopter": "Can shoot at Helicopters with a ROF of 1",
         "Applique Armour": 'Front and Side Armour is 13 against HEAT weapons',
-        "Artillery": "Team has a weapon capable of an Artillery Barrage",
         "Bazooka Skirts": "Front and Side Armour is minimum 10 against HEAT Weapons",
         "BDD Armour": "Front and Side Armour is minimum 13 against HEAT Weapons",
         "Bomblets": "Bomblets scatter over a wider area, using a SALVO template",
@@ -937,22 +936,19 @@ log(team.name + " inCommand: " + team.inCommand)
 
             atWeapons.length = starthp;
             //update sheet with info
-            let specials = attributeArray.special;
-            if (!specials || specials === "") {
-                specials = " ";
-            }
+            let specials = attributeArray.special || " "
+log("Specials: " + specials)
             let specialText = "";
 
 
             specials = specials.split(",");
             for (let i=0;i<specials.length;i++) {
                 let special = specials[i].trim();
+                if (special === "") {continue};
                 if (i>0) {
                     specialText += ' • ';
                 }
                 specialText += special;
-                let attName = "special" + i;
-                AttributeSet(char.id,attName,special);
                 infoArray.push(special);
             }
 
@@ -965,7 +961,7 @@ log(team.name + " inCommand: " + team.inCommand)
                 if (a1>b1) {return 1};
                 return 0;
             });
-
+log(infoArray)
             for (let i=0;i<10;i++) {
                 let specName = infoArray[i];
                 if (!specName || specName === "") {continue}
@@ -1000,12 +996,14 @@ log(team.name + " inCommand: " + team.inCommand)
                 }
             }
 
-            let special = infoArray.toString();
-            if (!special || special === "" || special === " ") {
-                special = " ";
+            let special = infoArray.toString() || " "
+log("Special: " + special)
+log("Special Text: " + specialText)
+            if (specialText === "") {
+                DeleteAttribute(char.id,"specialText");
+            } else {
+                AttributeSet(char.id,"specialText",specialText);
             }
-
-            AttributeSet(char.id,"specialText",specialText);
 
             let rank = parseInt(attributeArray.rank) || 0;
 
@@ -1996,6 +1994,13 @@ log(hit)
                 //change token image here
             }
         });
+    }
+
+    const DeleteAttribute = (characterID,attributeName) => {
+        let attributeObj = findObjs({type:'attribute',characterid: characterID, name: attributeName})[0]
+        if (attributeObj) {
+            attributeObj.remove();
+        }
     }
 
 
