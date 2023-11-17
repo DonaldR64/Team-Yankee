@@ -2367,6 +2367,9 @@ log(hit)
         mta.forEach((token) => {
             let truncName = token.get("name").toLowerCase();
             truncName = truncName.trim();
+            if (truncName.includes("rubble")) {
+                truncName === "rubble";
+            }
             if (truncName.includes("building")) {
                 truncName = truncName.slice(0,-1);
             }
@@ -3305,9 +3308,6 @@ log("Neither is Air")
             errorMsg = "Unit is Pinned, cannot Assault";
         }
         
-        if (order === "")
-
-
         SetupCard(targetName,"",targetTeam.nation);
     
         if (errorMsg !== "") {
@@ -4138,7 +4138,7 @@ log("Same had 2")
                     return;
                 }
                 unit.Size();
-                unitLeader.token.set("bar1_value",0);
+                unitLeader.token.set("bar3_value",0);
                 if (unit.pinned() === true) {
                     CheckArray.push(unit);
                 };
@@ -4322,6 +4322,16 @@ log("Same had 2")
         }
     }
     
+    const BreakOff = (msg) => {
+        let defendingPlayer = msg.content.split(";")[1];
+        SetupCard("Break Off","",state.TY.nations[defendingPlayer]);
+        outputCard.body.push('Breaking Off Teams must move at Tactical speed the shortest distance to be further than 3 hexes away from all Assaulting Teams');
+        outputCard.body.push("Any Teams not able to do so surrender and are destroyed");
+        outputCard.body.push("The Winning Teams may Consolidate 2 hexes, this Move may not bring them into contact with an enemy team");
+        PrintCard();
+        AssaultIDs = [[],[]];
+    }
+
     const RollD6 = (msg) => {
         let Tag = msg.content.split(";");
         PlaySound("Dice");
@@ -4478,6 +4488,60 @@ log("Same had 2")
                     part1 = "Next Formation";
                 }
                 ButtonInfo(part1,"!FieldPromotions");
+                PrintCard();
+            } else if (type === "Counterattack") {
+                let defUnitIDs = [];
+                for (let i=2;i<Tag.length - 1;i++) {
+                    defUnitIDs.push(Tag[i]);
+                }
+                let defendingPlayer = UnitArray[defUnitIDs[0]].player;
+                SetupCard("Counterattack","",state.TY.nations[defendingPlayer][0]);
+                let round = parseInt(Tag[Tag.length-1]) + 1;
+                let roll = randomInteger(6);
+                let counterAttackingUnitIDs = [];
+                let countercounterAttackingTeamIDs = [];
+                let breakingOffUnits = 0;
+                _.forEach(defUnitIDs,unitID => {
+                    let unit = UnitArray[unitID];
+                    let defendingPlayer = unit.player;
+                    outputCard.body.push("[U]" + unit.name + "[/u]");
+                    let unitLeader = TeamArray[unit.teamIDs[0]];
+                    let needed = unitLeader.counterattack;
+                    let reroll = CommandReroll(unitLeader);
+                    let line = "Roll: " + DisplayDice(roll,unit.nation,24);
+                    if (reroll > 0) {
+                        line += " / Reroll: " + DisplayDice(reroll,unit.nation,24);
+                    }
+                    roll = Math.max(roll,reroll);
+                    if (roll < needed) {
+                        outputCard.body.push("Unit must break off");
+                        breakingOffUnits++;
+                    } else {
+                        outputCard.body.push("Unit may Counterattack");
+                        unit.order = "Assault";
+                        _.forEach(unit.teamIDs,id => {
+                            let team = TeamArray[id];
+                            countercounterAttackingTeamIDs.push(team.id);
+                            team.addCondition("Assault");
+                            team.order = "Assault";
+                        })
+                        counterAttackingUnitIDs.push(unitID);
+                    }
+                });
+                if (breakingOffUnits > 0) {
+                    outputCard.body.push('Breaking Off Teams must move at Tactical speed the shortest distance to be further than 3 hexes away from all Assaulting Teams');
+                    outputCard.body.push("Any Teams not able to do so surrender and are destroyed");
+                }
+                if (counterAttackingUnitIDs.length === 0) {
+                    outputCard.body.push("The Assault is Over");
+                    outputCard.body.push("The Winning Teams may Consolidate 2 hexes, this Move may not bring them into contact with an enemy team");
+                } else {
+                    outputCard.body.push("Counterattacking Teams not in contact may charge (if possible)");
+                    outputCard.body.push("Once Set, click Button");
+                    //revise AssaultIDs, button will start CCTwo with defending player now the attacker
+                    AssaultIDs[defendingPlayer] = countercounterAttackingTeamIDs;
+                    ButtonInfo("Start Next Round of Close Combat","!CloseCombatTwo;" + defendingPlayer +";" + round);
+                }
                 PrintCard();
             }
         }
@@ -6179,8 +6243,8 @@ log(marker);
 
     const ProcessSaves = (shootingType) => {
 log("In Process Saves")
-log(unitIDs4Saves)
         let keys = Object.keys(unitIDs4Saves);
+log(keys)
         if (keys.length === 0) {return};
         for (let i=0;i<keys.length;i++) {
             let unit = UnitArray[keys[i]];
@@ -6196,32 +6260,33 @@ log(unitIDs4Saves)
             let flamethrowerFlag = false;
             let unitLeader = TeamArray[unit.teamIDs[0]];
             let unitHits = parseInt(unitLeader.token.get("bar3_value"));
-            unit.teamIDs.forEach((id) => {
+
+            log(unit.teamIDs)
+            let teamIDs = DeepCopy(unit.teamIDs)
+
+            _.forEach(teamIDs,id => {
                 let team = TeamArray[id];
-                if (team.hitArray.length === 0) {return};
-            
-            //seperate out smoke from regular hits, weapon.name will be "Smoke"
-            //use DirectSmoke(team)
-
-            //if has passengers - if riders then they all take hits, if in transport then only if killed
-
+log(team.name)
+log("Hits: " + team.hitArray.length)
                 unitHits += team.hitArray.length;
                 let results = ProcessSavesTwo(team);
-                for (let m=0;m<results.length;m++) {
-                    outputCard.body.push(results[m]);
+log(results)
+                if (results) {
+                    for (let m=0;m<results.length;m++) {
+                        outputCard.body.push(results[m]);
+                    }
                 }
                 //turn  flamethrowerflag true if hit by flamethrower
                 team.hitArray = [];
                 team.shooterIDs = [];
-            });
+            })
 
 
             if (unitHits === 0) {
                 outputCard.body.push("(Swapped)");
                 continue;
             }
-    
-
+            unit = UnitArray[keys[i]];
             if (unit) {
                 if (unit.type === "Infantry" || unit.type === "Gun" || unit.type.includes("Unarmoured")) {
                     unitLeader = TeamArray[unit.teamIDs[0]]; //in case original killed
@@ -6237,6 +6302,10 @@ log(unitIDs4Saves)
                         outputCard.body.push("The Unit is Pinned");
                         unit.pin();
                     }
+                    if (shootingType === "Close Combat" && unitHits > 0) {
+                        outputCard.body.push("The Unit is Pinned");
+                        unit.pin();
+                    }
                 } else if (unit.type === "Tank" && shootingType === "Defensive") {
                     unitLeader = TeamArray[unit.teamIDs[0]]; //in case original killed
                     if ((bailedOut + casualties) >= 2) {
@@ -6246,10 +6315,9 @@ log(unitIDs4Saves)
                         outputCard.body.push("The Unit must Fall Back");
                     }
                 }
+            } else {
+                outputCard.body.push("Entire Unit Killed");
             }
-
-
-
 
             unit.linkedUnitID = "";
             PrintCard();
@@ -6262,6 +6330,7 @@ log(unitIDs4Saves)
 
     const ProcessSavesTwo = (team) => {
         let hits = team.hitArray;
+        if (hits.length === 0 || hits === undefined) {return};
         let tip = "";
         let saveResult = [];
         let outputArray = {
@@ -6337,8 +6406,6 @@ log(unitIDs4Saves)
     
         team.hitArray = [];
         team.priority = 0;
-    
-
     
         return saveResult;
     }
@@ -6432,6 +6499,7 @@ log("Charge Dist: " + chargeDist)
             let id = msg.selected[i]._id;
             let team = TeamArray[id];
             if (!team) {continue};
+            if (team.type === "Aircraft" || team.type === "Helicopter") {continue};
             let unit = UnitArray[team.unitID];
             if (unit.order.includes("Assault")) {
                 assaultingPlayer = unit.player;
@@ -6448,14 +6516,16 @@ log("Charge Dist: " + chargeDist)
     }
 
     const CloseCombatTwo = (msg) => {
+        unitIDs4Saves = [];
         let Tag = msg.content.split(";");
         let attackingPlayer = parseInt(Tag[1]);
         let defendingPlayer = (attackingPlayer === 0) ? 1:0;
         let round = Tag[2];
         //AssaultIDs has 2 sides worth of IDs
-        SetupCard("Assault","",state.TY.nations[attackingPlayer]);
+        SetupCard("Assault","Round: " + round,state.TY.nations[attackingPlayer]);
         //check which are in B2B contact
         b2bFlag = false;
+        tankVtankFlag = false;
         let attackingTeamIDs = {};
         let defendingTeamIDs = {};
 
@@ -6465,6 +6535,10 @@ log("Charge Dist: " + chargeDist)
                 let team2 = TeamArray[AssaultIDs[defendingPlayer][j]];
                 let dist = team1.hex.distance(team2.hex);
                 if (dist < 2) {
+                    if (team1.type === "Tank" && team2.type === "Tank") {
+                        tankVtankFlag = true;
+                        continue;
+                    }
                     b2bFlag = true;
                     if (!attackingTeamIDs[team1.id]) {
                         attackingTeamIDs[team1.id] = [team2.id];
@@ -6482,190 +6556,134 @@ log("Charge Dist: " + chargeDist)
 
         if (b2bFlag === false) {
             outputCard.body.push("There are no Teams in Base to Base Contact");
+            if (tankVtankFlag === true) {
+                outputCard.body.push("Tanks cannot Assault other Tanks");
+            }
             outputCard.body.push("The Assault is over");
             PrintCard();
             return;
         }
         //each array will be an array indexed by the attacker/defender team's id, with the contents being the target IDs in B2B contact
         // eg. attackingTeamIDs[attackers Team ID] = [defenders Team ID1, defenders Team ID2, ...]
-////////////
 
-        //for each attacker, roll to hit etc
-        for (let i=0;i<attackingTeamIDs.length;i++) {
-            let attTeam = TeamArray[attackingTeamIDs[i]];
-            let line,end;
-            let bracket1 = "";
-            let bracket2 = "";
-            let weapon = DeepCopy(attTeam.weaponArray[0]);
-            if (attTeam.assaultTargetIDs.length === 0) {
-                line = attTeam.name + " has no Targets";
-                end = "";
-            } else {
+        let attackerIDs = Object.keys(attackingTeamIDs);
+
+        _.forEach(attackerIDs,attackerID => {
+                let attTeam = TeamArray[attackerID];
+                let line,end,bracket1,bracket2;
+                let defenders = []; //teams
+                _.forEach(attackingTeamIDs[attackerID],defenderID => {
+                        let team = TeamArray[defenderID];
+                        if (team) {defenders.push(team)}
+                })
+        
                 let needed = attTeam.assault;
-                if (attTeam.special.includes("Mounted Assault")) {
-                    if (state.TY.passengers[attTeam.id]) {
-                        let passengerNumber = state.TY.passengers[attTeam.id].length;
-                        if (attTeam.amounted === "Mounted Assault: 1P/4+, 2P/3+") {
-                            if (passengerNumber === 1) {needed = 4};
-                            if (passengerNumber > 1) {needed = 3};
-                        }
-                        if (attTeam.amounted === "Mounted Assault: 1P+/5+") {
-                            needed = 5;
-                        }
-//others here later 
-                    }
-                }
-                let roll = randomInteger(6);
-                if (roll < needed) {
-                    end = " Misses";
-                } else {
-                    let targNum = 0;
-                    let facing = "Side/Rear";
-                    let tIDs = attTeam.assaultTargetIDs;
-                    if (tIDs.length > 1) {    
-                        for (let t=0;t<(tIDs.length-1);t++) {
-                            let t1 = TeamArray[tIDs[t]];
-                            let num1 = t1.hitArray.length;
-                            let t2 = TeamArray[tIDs[t+1]];
-                            let num2 = t2.hitArray.length;
-                            if (num2 < num1) {
-                                targNum = (t+1);
-                                break;
-                            }
-                        }
-                    }
-                    let targetTeam = TeamArray[tIDs[targNum]];
-                    end = " Hits " + targetTeam.name;
-                    if (targetTeam.type === "Tank") {
-                        let wpnNum = parseInt(attTeam.assaultWpn);
-                        if (wpnNum < 5) {
-                            weapon = attTeam.weaponArray[attTeam.assaultWpn];
-                            if (weapon.notes.includes("Limited")) {
-                                let num = 0;
-                                let wn = weapon.notes.split(",");
-                                for (let i=0;i<wn.length;i++) {
-                                    if (wn[i].includes("Limited")) {
-                                        num = wn[i].replace(/[^0-9]+/g, "");
-                                    }
-                                }
-                                if (limited >= num) {
-                                    wpnNum = 5; //used the limited # already
-                                } else {
-                                    limited++;
-                                }
-                            }
-                        }
-                        if (wpnNum === 5) {
-                            weapon = {
-                                name: "Improvised AT Weapons",
-                                minRange: 1,
-                                maxRange: 1,
-                                halted: 1,
-                                moving: 1,
-                                at: 2,
-                                fp: 1,
-                                notes: " ",
-                                type: "Handheld AT",
-                            }
-                            facing = "Top";
-                        }
-                    } else if (targetTeam.type !== "Tank" && attTeam.type === "Tank") {
-                        weapon.name = "MGs and Tank Treads"
-                    }
-                    hit = {
-                        weapon: weapon,
-                        bp: false,
-                        facing: facing,
-                        range: 1,
-                        shooterID: attTeam.id,
-                        shooterType: attTeam.type,
-                        rangedIn: false,
-                        closeCombat: true,
-                        special: "nil",
-                    }
-                    targetTeam.hitArray.push(hit);
-                    end += ' w/ ' + weapon.name;
-                    bracket1 = "[#ff0000]";
-                    bracket2 = "[/#]";
-                }            
+                let attacks = parseInt(attTeam.token.get("bar1_value")) || 1;
+                if (attTeam.type === "Unarmoured Tank" || attTeam.bailed === true) {attacks = 0};
 
-                line = '[🎲](#" class="showtip" title="Roll: ' + roll + " vs " + needed + '+ )' + bracket1 + attTeam.name + end + bracket2;
-            }
-            outputCard.body.push(line)
-        }
+                // attTeam.assaultWpns
+                let weapon = attTeam.weaponArray[0];
+        
+                for (let i=0;i<attacks;i++) {
+                        let roll = randomInteger(6);
+                        if (roll < needed) {
+                                bracket1 = "";
+                                bracket2 = "";
+                                end = " Misses";
+                        } else {
+                                let targNum = 0;
+                                let facing = "Side/Rear";
+                                if (defenders.length > 1) {
+                                        for (let t=0;t<defenders.length - 1;t++) {
+                                                let t1 = defenders[t];
+                                                let num1 = t1.hitArray.length;
+                                                let t2 = defenders[t+1];
+                                                let num2 = t2.hitArray.length;
+                                                if (num2 < num1) {
+                                                    targNum = (t+1);
+                                                    break;
+                                                }
+                                        }
+                                }
+                                let targetTeam = defenders[targNum];
+                                end = " Hits " + targetTeam.name;
+        
+                                if (targetTeam.type === "Tank") {
+                                        weapon = attTeam.assaultWpns[i];
+                                        if (weapon.name.includes("Improvised")) {facing = "Top"};
+                                } else if (targetTeam.type !== "Tank" && attTeam.type === "Tank") {
+                                        weapon.name = "MGs and Tank Treads"
+                                }
+                                hit = {
+                                        weapon: weapon,
+                                        bp: false,
+                                        facing: facing,
+                                        range: 1,
+                                        shooterID: attTeam.id,
+                                        shooterType: attTeam.type,
+                                        rangedIn: false,
+                                        closeCombat: true,
+                                        special: "nil",
+                                }
+                                targetTeam.hitArray.push(hit);
+                                end += ' w/ ' + weapon.name;
+                                bracket1 = "[#ff0000]";
+                                bracket2 = "[/#]";
+                                if (!unitIDs4Saves[targetTeam.unitID]) {
+                                    unitIDs4Saves[targetTeam.unitID] = false;
+                                } 
+                        }
+                        line = '[🎲](#" class="showtip" title="Roll: ' + roll + " vs " + needed + '+ )' + bracket1 + attTeam.name + end + bracket2;
+                        outputCard.body.push(line);
+                }
+        });
+
         PrintCard(); //outputs the hits
-        //Process Saves for defenders and output these
-        //print card for saves here if needed, have pinning in saves also
+        ProcessSaves("Close Combat");
 
-        //See if remaining defenders
-        let finalDUnitIDs = [];
-        for (let i=0;i<defendingUnitIDs.length;i++) {
-            let unit = UnitArray[defendingUnitIDs[i]];
-            if (!unit) {continue};
-            finalDUnitIDs.push(unit.id);
-        }
-        let combatOver = true;
-        if (finalDUnitIDs.length > 0) {
-            for (let i=0;i<attackingTeamIDs.length;i++) {
-                let team1 = TeamArray[attackingTeamIDs[i]];
-                for (let j=0;j<defendingTeamIDs.length;j++) {
-                    let team2 = TeamArray[defendingTeamIDs[j]];
-                    if (!team2) {continue};
-                    if (team2.type === "Unarmoured Tank") {continue}; //cant counterattack
-                    let dist = team1.hex.distance(team2.hex);
-                    if (team2.type === "Tank" && team1.hex.dash > 2) {continue}; //cant counterattack into that terrain
-                    if (dist <= 2 && team2.bailed === false) {
-                        combatOver = false;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (combatOver === true) {
-            SetupCard("Assault Over","",attackingNation);
-            outputCard.body.push("The Assault is Over");
-            outputCard.body.push('Any surviving Losing Teams must move at Tactical speed the shortest distance to be further than 3 hexes away from all enemy Teams');
-            outputCard.body.push("Any Teams not able to do so surrender and are destroyed");
-            outputCard.body.push('The Winning Teams may Consolidate 2 hexes, this Move may not bring them into contact with an enemy Team.')  
-            let teamKeys = Object.keys(TeamArray);
-            for (let i=0;i<teamKeys.length;i++) {
-                let team = TeamArray[teamKeys[i]];
-                team.set(SM.defensive,false);
-                team.set(SM.surprised,false);
-                CCTeamIDs = [];
-                assaultingUnitID = "";
-            }
-        } else {
-            let noun = "The ";
-            SetupCard("Counterattack","",defendingNation);
-            outputCard.body.push("The Defenders may now choose to Counterattack");
-            outputCard.body.push("One roll is made and compared to each Units Counterattack");
-            outputCard.body.push("Any failing must Break Off")
-            outputCard.body.push('Breaking Off Teams must move at Tactical speed the shortest distance to be further than 3 hexes away from all Assaulting Teams');
-            outputCard.body.push("Any Teams not able to do so surrender and are destroyed");
-            outputCard.body.push("The Winning Teams may Consolidate 2 hexes, this Move may not bring them into contact with an enemy team");
-            outputCard.body.push("[hr]");
-            for (let i=0;i<finalDUnitIDs.length;i++) {
-                let unit = UnitArray[finalDUnitIDs[i]];
-                let unitLeader = TeamArray[unit.teamIDs[0]];
-                let reroll = CommandReroll(unitLeader);
-                let rerollText = "";
-                if (reroll > 0) {
-                    rerollText = " (Reroll allowed)"
-                }
-                let needed = unitLeader.counterattack;
-                if (unitLeader.special.includes("Mounted Assault")) {
-                    if (state.TY.passengers[unitLeader.id]) {
-                        let passengerNumber = state.TY.passengers[unitLeader.id].length;
-                        if (passengerNumber > 0) {
-                            needed = unitLeader.camounted;
+        let finalDefIDs = [];
+        let defUnitIDs = [];
+        _.forEach(AssaultIDs[defendingPlayer],id2 => {
+                let team2 = TeamArray[id2];
+                if (team2) {
+                        if (team2.type !== "Unarmoured Tank" && team2.bailed === false) {
+                                for (let i=0;i<AssaultIDs[attackingPlayer].length;i++) {
+                                        let id1 = AssaultIDs[attackingPlayer][i];
+                                        let team1 = TeamArray[id1];
+                                        if (team1) {
+                                                let dist = team1.hex.distance(team2.hex);
+                                                if (dist <= 2) {
+                                                        finalDefIDs.push(id2);
+                                                        defUnitIDs.push(team2.unitID);
+                                                        break;
+                                                }
+                                        }
+                                }
                         }
-                    }
                 }
-                outputCard.body.push(unit.name + ": " + needed + "+" + rerollText);
-            }
+        })
+
+        defUnitIDs = [...new Set(defUnitIDs)];
+
+        if (finalDefIDs.length === 0) {
+                SetupCard("Assault Over","",state.TY.nations[attackingPlayer]);
+                outputCard.body.push("The Assault is Over");
+                outputCard.body.push('Any surviving Losing Teams must move at Tactical speed the shortest distance to be further than 3 hexes away from all enemy Teams');
+                outputCard.body.push("Any Teams not able to do so (due to Bailed or Movement) surrender and are destroyed");
+                outputCard.body.push('The Winning Teams may Consolidate 2 hexes, this Move may not bring them into contact with an enemy Team.')  
+                AssaultIDs = [[],[]];
+        } else {
+                SetupCard("Counterattack","",state.TY.nations[defendingPlayer]);
+                outputCard.body.push("The Defenders may now choose to Counterattack or may Break Off");
+                let part2 = "!RollD6;Counterattack;";
+                _.forEach(defUnitIDs,unitID => {
+                    part2 += unitID + ";";
+                })
+                part2 += round;
+                ButtonInfo("Counterattack Roll",part2);
+                ButtonInfo("Break Off","!BreakOff;" + defendingPlayer);
         }
+
         PrintCard();
     }
 
@@ -7172,6 +7190,9 @@ log("Charge Dist: " + chargeDist)
                 break;
             case '!Kill':
                 TestKill(msg);
+                break;
+            case '!BreakOff':
+                BreakOff(msg);
                 break;
         }
     };
