@@ -7,21 +7,16 @@ const TY = (() => {
     const rowLabels = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","AA","BB","CC","DD","EE","FF","GG","HH","II","JJ","KK","LL","MM","NN","OO","PP","QQ","RR","SS","TT","UU","VV","WW","XX","YY","ZZ","AAA","BBB","CCC","DDD","EEE","FFF","GGG","HHH","III","JJJ","KKK","LLL","MMM","NNN","OOO","PPP","QQQ","RRR","SSS","TTT","UUU","VVV","WWW","XXX","YYY","ZZZ"];
 
     let TerrainArray = {};
-    let TeamArray = {}; //Individual Squads, Tanks etc
-    let UnitArray = {}; //Units of Teams eg. Platoon
-    let FormationArray = {}; //to track formations
+    let TeamArray = {}; //Individual Platoons or Squads
+    let UnitArray = {}; //Units of Teams - Company or Battery
     let SmokeArray = [];
     let FoxholeArray = [];
     let CheckArray = []; //used by Remount, Rally and Morale checks
     let RangedInArray = {};
-    let WreckArray = {};//used for night vision
-    let delayedOut = [];
-
 
     let unitCreationInfo = {}; //used during unit creation 
     let unitIDs4Saves = {}; //used during shooting routines
     let AssaultIDs = [[],[]]; //array of teams (IDs) in a CC, updated when charge/move
-    let deadHQs = [[],[]]; //formationIDs of any formations that lost leaders in prev. turn, by player
 
     const TurnMarkers = ["","https://s3.amazonaws.com/files.d20.io/images/361055772/zDURNn_0bbTWmOVrwJc6YQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055766/UZPeb6ZiiUImrZoAS58gvQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055764/yXwGQcriDAP8FpzxvjqzTg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055768/7GFjIsnNuIBLrW_p65bjNQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055770/2WlTnUslDk0hpwr8zpZIOg/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055771/P9DmGozXmdPuv4SWq6uDvw/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055765/V5oPsriRTHJQ7w3hHRBA3A/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055767/EOXU3ujXJz-NleWX33rcgA/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/361055769/925-C7XAEcQCOUVN1m1uvQ/thumb.png?1695998303","https://s3.amazonaws.com/files.d20.io/images/367683734/l-zY78IZqDwwBmvKudj7Fg/thumb.png?1699992368","https://s3.amazonaws.com/files.d20.io/images/367683736/KTSyH0bTNRtF06h8F3t0kQ/thumb.png?1699992368","https://s3.amazonaws.com/files.d20.io/images/367683726/MCFihVq52aTlUkv-ijdg6w/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683728/YUy1bSEu44Hu_HlVSzv6ZQ/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683730/pw5PgLNFCkExUtJA4JwM1Q/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683729/wF4gNH1WKg9xB_OSrAkxsg/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683727/PVrwoByB_5PETsd9ObPQlA/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683732/g8kknD1sqvInESGM1X6itg/thumb.png?1699992367","https://s3.amazonaws.com/files.d20.io/images/367683731/N3KKC6lLhlZ59KOqtdQzFw/thumb.png?1699992367"];
 
@@ -42,17 +37,19 @@ const TY = (() => {
     }
 
     const SM = {
-        "defensive": "status_green",
-        "surprised": "status_yellow",
-        "HQ": "status_black-flag",
         "oneshot": "status_oneshot::5503748",
     };
 
-    const NightVision = {
+    const Visibility = {
+        Good: 70,
+        Moderate: 30,
+        Bad: 15,
+        Night: 8,
         IR: 20,
         Gen1Thermal: 20,
         Gen2Thermal: 40,
     }
+
 
     let specialInfo = {
         "Air Assault": "An Air Assault Unit may only be held in Reserve if all the Units deployed on table are Air Assault Units",
@@ -122,25 +119,25 @@ const TY = (() => {
         "deflect": "Hit deflected by Armour",
         "minor": "Hit caused Minor damage only",
         "destroyed": "[#ff0000]Hit Destroys the Team[/#]",
-        "bailed": "[#0000ff]Hit caused Moderate Damage to Vehicle, Crew Suppressed[/#]",
-        "bailedAgain": "[#0000ff]Hit caused Moderate Damage to Vehicle, Crew Remains Suppressed[/#]",
-        "flees": "[#ff0000]Hit Destroys Tank as the Crew Flees![/#]",
+        "bailed": "[#0000ff]Hit caused Moderate Damage to Vehicles, Crews Suppressed[/#]",
+        "bailedAgain": "[#0000ff]Hit caused Moderate Damage to Vehicles, Crews Remain Suppressed[/#]",
+        "flees": "[#ff0000]Hit causes Crews to Flee, Vehicles Destroyed![/#]",
         "saved": "Hit Saved",
         "cover": "Hit Saved by Cover",
         "smoked": "Target Smoked",
-        "injury": "[#0000ff]Hit kills some of the Squad[/#]",
+        "injury": "[#0000ff]Hit kills some of the Men[/#]",
     }
 
     const SaveResultsMult = {
         "deflect": "All Hits deflected by Armour",
         "minor": "Hits cause Minor damage only",
         "destroyed": "[#ff0000]Hits Destroy the Team[/#]",
-        "bailed": "[#0000ff]Hits cause Moderate Damage to Vehicle, Crew Suppressed[/#]",
-        "bailedAgain": "[#0000ff]Hits cause Moderate Damage to Vehicle, Crew Remains Suppressed[/#]",
-        "flees": "[#ff0000]Hits Destroy Tank as the Crew Flees![/#]",
+        "bailed": "[#0000ff]Hits cause Moderate Damage to Vehicles, Crews Suppressed[/#]",
+        "bailedAgain": "[#0000ff]Hits cause Moderate Damage to Vehicles, Crews Remain Suppressed[/#]",
+        "flees": "[#ff0000]Hit causes Crews to Flee, Vehiclse Destroyed![/#]",
         "saved": "All Hits Saved",
         "cover": "All Hits Saved (Cover)",
-        "injury": "[#0000ff]Hits kills some of the Squad[/#]",
+        "injury": "[#0000ff]Hits kills some of the Men[/#]",
     }
 
     let outputCard = {title: "",subtitle: "",nation: "",body: [],buttons: []};
@@ -572,47 +569,8 @@ const TY = (() => {
     }
 
     //core classes
-    class Formation {
-        constructor(nation,id,name){
-            if (!id) {
-                id = stringGen();
-            }
-            this.id = id;
-            this.name = name;
-            this.nation = nation;
-            this.player = (WarsawPact.includes(nation)) ? 0:1;
-            this.unitIDs = [];
-
-            if (!state.TY.formations[id]) {
-                state.TY.formations[id] = name;
-            }
-            FormationArray[id] = this;
-        }
-
-        add(unit) {
-            if (this.unitIDs.includes(unit.id) === false) {
-                this.unitIDs.push(unit.id);
-                unit.formationID = this.id;
-            }
-        }
-
-        remove(unit) {
-            let unitIDs = this.unitIDs;
-            let index = unitIDs.indexOf(unit.id);
-            if (index > -1) {
-                unitIDs.splice(index,1);
-            }
-            this.unitIDs = unitIDs;
-            if (unitIDs.length === 0 && this.name !== "Support") {
-                delete state.TY.formations[this.id]
-                SetupCard("Formation Destroyed","",this.nation);
-                PrintCard();
-            }
-        }
-    }
-
     class Unit {
-        constructor(nation,id,name,formationID){
+        constructor(nation,id,name){
             if (!id) {
                 id = stringGen();
             }
@@ -622,17 +580,11 @@ const TY = (() => {
             this.specialorder = "";
             this.nation = nation;
             this.player = (WarsawPact.includes(nation)) ? 0:1;
-            this.formationID = formationID;
-            this.number = 0;
             this.teamIDs = [];
-            this.hqUnit = false;
             this.artillery = false;
             this.type = "";
             this.num = 0;
-            this.linkedUnitID = ""; //used in Mistaken for HQ units
-            this.limited = 0; //used to track limited use weapons
             this.inReserve = false;
-            this.size; //used for pinning purposes, size of unit at start of turn
 
             if (!state.TY.units[id]) {
                 state.TY.units[id] = name;
@@ -643,22 +595,14 @@ const TY = (() => {
 
         add(team) {
             if (this.teamIDs.includes(team.id) === false) {
-                if (team.token.get("status_black-flag") === true) {
-                    this.teamIDs.unshift(team.id);
-                } else {
-                    this.teamIDs.push(team.id);
-                }
+                this.teamIDs.push(team.id);
                 team.unitID = this.id;
-                if (team.special.includes("HQ") || team.token.get(SM.HQ)) {
-                    this.hqUnit = true;
-                }
                 if (team.artillery === true) {
                     this.artillery = true;
                 }
-                if (team.special.includes("Passengers") === false || (team.special.includes("Passengers") === true && this.hqUnit === false)) {
+                if (team.special.includes("Passengers") === false) {
                     this.type = team.type;
                 } 
-                this.size += parseInt(team.token.get("bar1_value")) || 1;
             }
         }
 
@@ -669,37 +613,19 @@ const TY = (() => {
             log("Index of Team ID: " + index)
             if (index > -1) {
                 teamIDs.splice(index,1);
-                if (teamIDs.length === 1 && this.hqUnit === true) {
-                    let team = TeamArray[teamIDs[0]];
-                    if (team.special.includes("Transport")) {
-                        sendChat("","Remaining Team is Transport and Leaves the Field");
-                        team.flees();
-                    }
-                }
             }
             this.teamIDs = teamIDs;
      
             if (teamIDs.length === 0) {
-                let formation = FormationArray[this.formationID];
-                formation.remove(this);
-                if (this.hqUnit === true) {
-                    deadHQs[this.player].push(formation.id);
-                }
                 delete state.TY.units[this.id];
                 delete UnitArray[this.id];
             } else if (index === 0) {
                 let auraC = team.token.get("aura1_color");
-                //change name to Sergeant if isnt a Lt or higher
-                //pick most central team
-                let newLeader = CentreTeam(this);
-                let old_index = this.teamIDs.indexOf(newLeader.id);
-                this.teamIDs.splice(0, 0, this.teamIDs.splice(old_index, 1)[0]);
+                let newLeader = this.teamIDs[0];
                 if (!auraC || auraC === "transparent") {
                     auraC = (this.order === "") ? Colours.green:Colours.black;
                 };
-                newLeader.name = PromotedName(newLeader,team);
                 newLeader.token.set({
-                    name: newLeader.name,
                     aura1_color: auraC,
                     tint_color: "transparent",
                 })
@@ -707,33 +633,10 @@ const TY = (() => {
             } 
         }
 
-        unpin() {
-            let leaderTeam = TeamArray[this.teamIDs[0]];
-            leaderTeam.token.set("aura1_color",Colours.green);
-            leaderTeam.removeCondition("Pinned");
-        }
-
-        pin() {
-            let leaderTeam = TeamArray[this.teamIDs[0]];
-            leaderTeam.token.set("aura1_color",Colours.yellow);
-            leaderTeam.addCondition("Pinned");
-        }
-
-        pinned() {
-            let result = false;
-            let leaderTeam = TeamArray[this.teamIDs[0]];
-            if (state.TY.conditions[leaderTeam.id]) {
-                if (state.TY.conditions[leaderTeam.id]["Pinned"]) {
-                    result = true;
-                }
-            }
-            return result;
-        }
-
         resetflags() {
 log(this.name + " in resetflags()")
             let newTeamIDs = [];
-            let conditions = ["Dash","Tactical","Hold","Assault","Fired","AAFire","Spot"];
+            let conditions = ["Dash","Tactical","Hold","Assault","Fired","AAFire"];
 
             for (let i=0;i<this.teamIDs.length;i++) {
                 let id = this.teamIDs[i];
@@ -747,23 +650,19 @@ log(this.name + " in resetflags()")
                 newTeamIDs.push(id);
             }
             this.teamIDs = newTeamIDs;
-            //this.IC(); ? done after movement
-            this.Size();
-log("Size: " + this.size)
             this.order = "";
             this.specialorder = "";
 
-            if (this.teamIDs.length > 0) {
+            if (this.teamIDs.length > 1) {
                 let unitLeader = TeamArray[this.teamIDs[0]];
                 if (unitLeader) {
                     unitLeader.token.set("bar3_value",0);
-                    if (unitLeader.bailed === true) {
+                    if (unitLeader.suppressed === true) {
                         SwapLeader(this);
                     }
                 }
                 for (let i=0;i<this.teamIDs.length;i++) {
                     let team = TeamArray[this.teamIDs[i]];
-log(team.name + " inCommand: " + team.inCommand)
                     if (state.TY.conditions[team.id]) {
                         for (let c=0;c<conditions.length;c++) {
                             if (state.TY.conditions[team.id][conditions[c]]) {
@@ -797,28 +696,33 @@ log(team.name + " inCommand: " + team.inCommand)
 
         IC() {
             if (this.type === "System Unit") {return};
-            let commandRadius = (this.size > 7 || this.type === "Aircraft" || this.type === "Helicopter") ? 8:6;
             let unitLeader = TeamArray[this.teamIDs[0]];
-            for (let j=0;j<this.teamIDs.length;j++) {
-                let team = TeamArray[this.teamIDs[j]];
-                if (!team) {continue};
-                let dist = team.hex.distance(unitLeader.hex);
-                let ic = true;
-                if (dist > commandRadius && team.special.includes("HQ") === false && team.special.includes("Independent") === false) {
-                    ic = false
-                } 
-                team.IC(ic);
-            }
-        }
-
-        Size() {
-            let size = 0;
-            _.forEach(this.teamIDs,id => {
-                let team = TeamArray[id];
-                let number = parseInt(team.token.get("bar1_value")) || 1;
-                size += number;
+            unitLeader.IC(true);
+            if (this.teamIDs.length === 1) {return};
+            let array = this.teamIDs.map(id => {
+                let team2 = TeamArray[id];
+                let dist = team2.hex.distance(unitLeader.hex);
+                let info = {
+                    id: id,
+                    dist: dist,
+                }
+                return info;
             })
-            this.size = size;
+            array.sort((a,b) => {
+                return a.dist - b.dist;
+            });
+            for (let i=1;i<array.length;i++) {
+                let a1 = array[i-1];
+                let a2 = array[i];
+                let team1 = TeamArray[a1.id];
+                let team2 = TeamArray[a2.id];
+                let d12 = a2.dist - a1.dist;
+                if (team1.inCommand === true && d12 < 3) {
+                    team2.IC(true);
+                } else {
+                    team2.IC(false);
+                }
+            }
         }
 
 
@@ -826,7 +730,7 @@ log(team.name + " inCommand: " + team.inCommand)
     }
 
     class Team {
-        constructor(tokenID,formationID,unitID) {
+        constructor(tokenID,unitID) {
             let token = findObjs({_type:"graphic", id: tokenID})[0];
             if (!token) {sendChat("","No Token?"); return}
             let char = getObj("character", token.get("represents")); 
@@ -844,7 +748,7 @@ log(team.name + " inCommand: " + team.inCommand)
             let hexLabel = hex.label();
             let infoArray = [];
 
-            let starthp = parseInt(attributeArray.startnumber) || 1;
+            let starthp = (type === "Infantry") ? 3:1;
 
             //create array of weapon info
             let weaponArray = [];
@@ -852,7 +756,7 @@ log(team.name + " inCommand: " + team.inCommand)
             let artilleryWpn;
             let artilleryTeam = false;
 
-            for (let i=1;i<5;i++) {
+            for (let i=1;i<6;i++) {
                 let art = false;
                 let name = attributeArray["weapon"+i+"name"];
                 if (!name || name == " " || name == "") {continue};
