@@ -56,16 +56,6 @@
                 <option value="2">2+</option>
             </select>
             <br>
-            <label for="attr_remount">Rally/Remount:</label>
-            <select name="attr_remount">
-                <option value="" selected disabled hidden>Choose here</option>
-                <option value="4">4+</option>
-                <option value="3">3+</option>
-                <option value="5">5+</option>
-                <option value="2">2+</option>
-            </select>
-            <br>
-
             <label for="attr_skill">Skill:</label>
             <select name="attr_skill">
                 <option value="" selected disabled hidden>Choose here</option>
@@ -471,7 +461,6 @@
             <div class="info">
               <h2>Courage: <span name="attr_courage"></span>+</h2>
               <h3>Morale: <span name="attr_morale"></span>+</h3>
-              <h3><span name="attr_rallyname"></span><span name="attr_remount"></span><span name="attr_rplus"></span></h3>      
             </div>  
           </section>
 
@@ -669,7 +658,7 @@
     });
 
     on("change:attrs sheet:opened", function() { 
-        getAttrs(["type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","weapon1notes","weapon2notes","startnumber","airmove"], function(values) {
+        getAttrs(["type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","weapon1notes","weapon2notes","airmove"], function(values) {
             let nationImage;
             let nation = values.nation;
 
@@ -689,10 +678,7 @@
 
             let assault = "Assault: ";
             let counterattack = "Counterattack: ";
-            let sn = values.startnumber;
-            if (type === "Infantry") {
-                ralName = "Rally: ";
-            }
+
             if (type === "Aircraft" || type === "Helicopter") {
                 ralName = "";
                 aplus = "";
@@ -710,10 +696,6 @@
             if (counterV === "-") {
                 cplus = "";
             }
-
-
-
-
 
 
             if (nation === "Soviet") {
@@ -777,7 +759,6 @@
 
             setAttrs({
                 "nationimage": nationImage,
-                "rallyname": ralName,
                 "aplus": aplus,
                 "cplus": cplus,
                 "rplus": rplus,
