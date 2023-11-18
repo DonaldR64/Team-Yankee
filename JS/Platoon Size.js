@@ -4013,9 +4013,9 @@ log("Same had 2")
         if (team) {
             let location = team.location;
             sendPing(location.x,location.y, Campaign().get('playerpageid'), null, true); 
-            SetupCard(team.name,"Morale",team.nation);
-            outputCard.body.push("Roll Against: " + team.rally);
-            ButtonInfo("Roll","!RollD6;Rally;" + team.id + ";" + team.rally);
+            SetupCard(team.name,"Rally",team.nation);
+            outputCard.body.push("Roll Against: " + team.morale);
+            ButtonInfo("Roll","!RollD6;Rally;" + team.id + ";" + team.morale);
             PrintCard();
         } else {
             StartStep("Final");
