@@ -5216,6 +5216,8 @@ log(weapons)
             } 
         }
 
+        GTG(shooterUnit);
+
         //total hits
         outputCard.body.push("[hr]");
         outputCard.body.push("Total Hits: " + totalHits);
