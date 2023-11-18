@@ -45,7 +45,7 @@ const TY = (() => {
         Moderate: 30,
         Bad: 15,
         Night: 8,
-        IR: 20,
+        "Infra-Red": 20,
         Gen1Thermal: 20,
         Gen2Thermal: 40,
     }
@@ -119,8 +119,8 @@ const TY = (() => {
         "deflect": "Hit deflected by Armour",
         "minor": "Hit caused Minor damage only",
         "destroyed": "[#ff0000]Hit Destroys the Team[/#]",
-        "bailed": "[#0000ff]Hit caused Moderate Damage to Vehicles, Crews Suppressed[/#]",
-        "bailedAgain": "[#0000ff]Hit caused Moderate Damage to Vehicles, Crews Remain Suppressed[/#]",
+        "suppressed": "[#0000ff]Hit caused Moderate Damage to Vehicles, Crews Suppressed[/#]",
+        "suppressedAgain": "[#0000ff]Hit caused Moderate Damage to Vehicles, Crews Remain Suppressed[/#]",
         "flees": "[#ff0000]Hit causes Crews to Flee, Vehicles Destroyed![/#]",
         "saved": "Hit Saved",
         "cover": "Hit Saved by Cover",
@@ -132,8 +132,8 @@ const TY = (() => {
         "deflect": "All Hits deflected by Armour",
         "minor": "Hits cause Minor damage only",
         "destroyed": "[#ff0000]Hits Destroy the Team[/#]",
-        "bailed": "[#0000ff]Hits cause Moderate Damage to Vehicles, Crews Suppressed[/#]",
-        "bailedAgain": "[#0000ff]Hits cause Moderate Damage to Vehicles, Crews Remain Suppressed[/#]",
+        "suppressed": "[#0000ff]Hits cause Moderate Damage to Vehicles, Crews Suppressed[/#]",
+        "suppressedAgain": "[#0000ff]Hits cause Moderate Damage to Vehicles, Crews Remain Suppressed[/#]",
         "flees": "[#ff0000]Hit causes Crews to Flee, Vehiclse Destroyed![/#]",
         "saved": "All Hits Saved",
         "cover": "All Hits Saved (Cover)",
@@ -209,7 +209,7 @@ const TY = (() => {
             "names": "Soviet",
             "rangedIn": "https://s3.amazonaws.com/files.d20.io/images/307909232/aEbkdXCShELgc4zcz89srg/thumb.png?1665016513",
             "pinned": "https://s3.amazonaws.com/files.d20.io/images/364582400/VKa2E3Avx1Jd4OKUcuWjxA/thumb.png?1698090348",
-            "bailed": "https://s3.amazonaws.com/files.d20.io/images/364582400/VKa2E3Avx1Jd4OKUcuWjxA/thumb.png?1698090348",
+            "suppressed": "https://s3.amazonaws.com/files.d20.io/images/364582400/VKa2E3Avx1Jd4OKUcuWjxA/thumb.png?1698090348",
             "pinnedCharID": "-NhltPoS8_P4_rslcUsA",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/319032004/qf3aHgIiFnJ0aYoPOFR-TA/thumb.png?1671325647",
             "objectiveimage": "https://s3.amazonaws.com/files.d20.io/images/365313516/Bpy0UrmmYYph7t5xLL0o9A/thumb.png?1698546715",
@@ -227,7 +227,7 @@ const TY = (() => {
             "names": "German",
             "rangedIn": "https://s3.amazonaws.com/files.d20.io/images/307909216/Cqm8z6ZX2WPDQkodhdLVqQ/thumb.png?1665016507",
             "pinned": "https://s3.amazonaws.com/files.d20.io/images/364580773/vg85YjKhl8LBdp-FSbTBtQ/thumb.png?1698089517",
-            "bailed": "https://s3.amazonaws.com/files.d20.io/images/364580773/vg85YjKhl8LBdp-FSbTBtQ/thumb.png?1698089517",
+            "suppressed": "https://s3.amazonaws.com/files.d20.io/images/364580773/vg85YjKhl8LBdp-FSbTBtQ/thumb.png?1698089517",
             "pinnedCharID": "",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/319029852/xSAh0T5hTSCOSHrRZKBrtA/thumb.png?1671324745",
             "objectiveimage": "",
@@ -245,7 +245,7 @@ const TY = (() => {
             "names": "British",
             "rangedIn": "https://s3.amazonaws.com/files.d20.io/images/328837544/KrWC027rT0Lw_ghCuu_5DQ/thumb.png?1676838067",
             "pinned": "https://s3.amazonaws.com/files.d20.io/images/365311899/aJNi6yvCdnwEINZWsAL63g/thumb.png?1698545921",
-            "bailed": "https://s3.amazonaws.com/files.d20.io/images/365311899/aJNi6yvCdnwEINZWsAL63g/thumb.png?1698545921",
+            "suppressed": "https://s3.amazonaws.com/files.d20.io/images/365311899/aJNi6yvCdnwEINZWsAL63g/thumb.png?1698545921",
             "pinnedCharID": "-NhtBzw_bXWrJORCxWZK",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/327891446/xsAVVJ0Ft-xZW92JUtZBdw/thumb.png?1676321000",
             "objectiveimage": "https://s3.amazonaws.com/files.d20.io/images/365313551/2_miHmMrIheFFKq-5m3Iyw/thumb.png?1698546731",
@@ -263,7 +263,7 @@ const TY = (() => {
             "names": "USA",
             "rangedIn": "https://s3.amazonaws.com/files.d20.io/images/328835139/zd6jnMDVIEEvRg_cNkHxeQ/thumb.png?1676837399",
             "pinned": "https://s3.amazonaws.com/files.d20.io/images/365311909/Gu6sVBnrKauP0gibski5CQ/thumb.png?1698545925",
-            "bailed": "https://s3.amazonaws.com/files.d20.io/images/365311909/Gu6sVBnrKauP0gibski5CQ/thumb.png?1698545925",
+            "suppressed": "https://s3.amazonaws.com/files.d20.io/images/365311909/Gu6sVBnrKauP0gibski5CQ/thumb.png?1698545925",
             "pinnedCharID": "-NhtC--h2t90ayjtfXPx",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/327891469/QfaYQvRbVs7tA_3jGFwQ9Q/thumb.png?1676321007",
             "objectiveimage": "https://s3.amazonaws.com/files.d20.io/images/365313723/o7CvHeJhHOVJ9h2tUECKfQ/thumb.png?1698546825",
@@ -350,7 +350,7 @@ const TY = (() => {
             "names": "Israel",
             "rangedIn": "https://s3.amazonaws.com/files.d20.io/images/365910297/BxbRCFdLS1KrSemBhPXWKw/thumb.png?1698940486",
             "pinned": "https://s3.amazonaws.com/files.d20.io/images/365910077/5T9JPuKR1O5Kd9wlXqsfpQ/thumb.png?1698940338",
-            "bailed": "https://s3.amazonaws.com/files.d20.io/images/365910072/lx9C4uLHSh7XnCrzdJWPHg/thumb.png?1698940336",
+            "suppressed": "https://s3.amazonaws.com/files.d20.io/images/365910072/lx9C4uLHSh7XnCrzdJWPHg/thumb.png?1698940336",
             "pinnedCharID": "",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/327891446/xsAVVJ0Ft-xZW92JUtZBdw/thumb.png?1676321000",
             "platoonmarkers": ["letters_and_numbers0148::4815284","letters_and_numbers0149::4815285","letters_and_numbers0150::4815286","letters_and_numbers0151::4815287","letters_and_numbers0152::4815288","letters_and_numbers0153::4815289","letters_and_numbers0154::4815290","letters_and_numbers0155::4815291","letters_and_numbers0156::4815292","letters_and_numbers0157::4815293","letters_and_numbers0158::4815294","letters_and_numbers0159::4815295","letters_and_numbers0160::4815296","letters_and_numbers0161::4815297","letters_and_numbers0162::4815298","letters_and_numbers0163::4815299","letters_and_numbers0164::4815300","letters_and_numbers0165::4815301","letters_and_numbers0166::4815302","letters_and_numbers0167::4815303","letters_and_numbers0168::4815304","letters_and_numbers0169::4815305","letters_and_numbers0170::4815306","letters_and_numbers0171::4815307","letters_and_numbers0172::4815308","letters_and_numbers0173::4815309"],
@@ -367,7 +367,7 @@ const TY = (() => {
             "names": "Arabic",
             "rangedIn": "https://s3.amazonaws.com/files.d20.io/images/307909232/aEbkdXCShELgc4zcz89srg/thumb.png?1665016513",
             "pinned": "https://s3.amazonaws.com/files.d20.io/images/365910088/V1IH9ElaoOQANm96ChVnRw/thumb.png?1698940344",
-            "bailed": "https://s3.amazonaws.com/files.d20.io/images/365910087/WnjytMMCK-NJROZviRF6YA/thumb.png?1698940344",
+            "suppressed": "https://s3.amazonaws.com/files.d20.io/images/365910087/WnjytMMCK-NJROZviRF6YA/thumb.png?1698940344",
             "pinnedCharID": "",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/319032004/qf3aHgIiFnJ0aYoPOFR-TA/thumb.png?1671325647",
             "platoonmarkers": ["letters_and_numbers0197::4815333","letters_and_numbers0198::4815334","letters_and_numbers0199::4815335","letters_and_numbers0200::4815336","letters_and_numbers0201::4815337","letters_and_numbers0202::4815338","letters_and_numbers0203::4815339","letters_and_numbers0204::4815340","letters_and_numbers0205::4815341","letters_and_numbers0206::4815342","letters_and_numbers0207::4815343","letters_and_numbers0208::4815344","letters_and_numbers0209::4815345","letters_and_numbers0210::4815346","letters_and_numbers0211::4815347","letters_and_numbers0212::4815348","letters_and_numbers0213::4815349","letters_and_numbers0214::4815350","letters_and_numbers0215::4815351","letters_and_numbers0216::4815352","letters_and_numbers0217::4815353","letters_and_numbers0218::4815354","letters_and_numbers0219::4815355","letters_and_numbers0220::4815356","letters_and_numbers0221::4815357","letters_and_numbers0222::4815358"],
@@ -570,7 +570,8 @@ const TY = (() => {
 
     //core classes
     class Unit {
-        constructor(nation,id,name){
+        constructor(nation,id,name,number){
+            if (!name) {name = id};
             if (!id) {
                 id = stringGen();
             }
@@ -583,11 +584,14 @@ const TY = (() => {
             this.teamIDs = [];
             this.artillery = false;
             this.type = "";
-            this.num = 0;
+            this.number = number;
             this.inReserve = false;
 
             if (!state.TY.units[id]) {
-                state.TY.units[id] = name;
+                state.TY.units[id] = {
+                    name: name,
+                    number: this.number,
+                };
             }
 
             UnitArray[id] = this;
@@ -947,7 +951,6 @@ log("Special Text: " + specialText)
             this.characterName = charName;
             this.characterID = char.id;
             this.unitID = unitID;
-            this.formationID = formationID;
 
             this.type = type;    
             this.location = location;
@@ -988,7 +991,6 @@ log("Special Text: " + specialText)
             this.hexLabel = hexLabel; //doubled
             this.rotation = token.get("rotation");
             this.special = special;
-            this.rank = rank;
 
             this.weaponArray = weaponArray;
             this.assaultWpns = atWeapons;
@@ -997,7 +999,7 @@ log("Special Text: " + specialText)
             this.shooterIDs = [];
             this.priority = 0;
 
-            this.bailed = this.queryCondition("Bailed Out");
+            this.suppressed = (token.get("tint_color") === Colours.red) ? true:false;
             this.fired = this.queryCondition("Fired");
             this.aaFired = this.queryCondition("AA Fire");
             this.moved = ((this.queryCondition("Tactical") || this.queryCondition("Dash")) === true) ? true:false;
@@ -1008,10 +1010,7 @@ log("Special Text: " + specialText)
             this.unarmouredTransport = uat;
 
             if (!state.TY.teams[this.id]) {
-                state.TY.teams[this.id] = {
-                    unitID: unitID,
-                    formationID: formationID,
-                }
+                state.TY.teams[this.id] = unitID;
             }
 
             TeamArray[tokenID] = this;
@@ -1022,14 +1021,6 @@ log("Special Text: " + specialText)
             let imgSrc,charID;
             let size = 70;
             switch (condition) {
-                case 'Bailed Out':
-                    imgSrc = Nations[this.nation].bailed;
-                    charID = "-Nht9LnFvLCRVCbmcCZd";
-                    break;
-                case 'Pinned':
-                    imgSrc = Nations[this.nation].pinned;
-                    charID = "-Nht9LnFvLCRVCbmcCZd";
-                    break;
                 case 'Dash':
                     imgSrc = "https://s3.amazonaws.com/files.d20.io/images/367732138/K6sIzwifj9tIXcgYPIaw6g/thumb.png?1700012748";
                     charID = "-NhnnimsL_fUE_I44tij";
@@ -1057,10 +1048,6 @@ log("Special Text: " + specialText)
                 case 'GTG':
                     imgSrc = "https://s3.amazonaws.com/files.d20.io/images/364740777/TkNdbvE_My02jE0bkz1KzA/thumb.png?1698193655";
                     charID = "-NhnoOo2ydvrjTOFGMXW";
-                    break;
-                case 'Spot':
-                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/364839305/-UanVemZgRrwTu3fVijGwA/thumb.png?1698268901";
-                    charID = "-NhnoS6WDdovvJrkTeHC";
                     break;
                 case 'Passengers':
                     imgSrc = "https://s3.amazonaws.com/files.d20.io/images/365230932/HxeMNYtOiyWDnoyvoa8FCQ/thumb.png?1698516760";
@@ -1140,70 +1127,49 @@ log("Special Text: " + specialText)
             return result;  
         }
 
-        BailOut() {
+        Suppress() {
             let result = {
                 result: "",
                 tip: "",
             }
-            if (this.bailed === true) {
+            if (this.suppressed === true) {
                 let roll = randomInteger(6);
-                let reroll = CommandReroll(this);
                 result.tip = "<br>Remount Roll: " + roll + " vs. " + this.remount + "+";
-                if (roll < this.remount && reroll !== -1) {
-                    result.tip += "<br>Reroll from Formation Commander: " + reroll;
-                }
-                roll = Math.max(roll,reroll);  
                 if (roll >= this.remount) {
-                    result.result = "bailedAgain"
+                    result.result = "suppressedAgain"
                 } else {
                     result.result = "flees"
                 }
             } else {
-                result.result = "bailed";
+                result.result = "suppressed";
                 this.bail();
             }
             return result;
         }
 
-        bail() {
-            this.addCondition("Bailed Out");
-            this.bailed = true;
+        suppress() {
+            this.token.set("tint_color",Colours.red);
+            this.suppressed = true;
         }
 
         remountTank() {
-            this.removeCondition("Bailed Out");
-            this.bailed = false;
+            if (this.inCommand === true) {
+                this.token.set("tint_color","transparent");
+            } else {
+                this.token.set("tint_color",Colours.black);
+            }
+            this.suppressed = false;
         }
 
         IC(ic) {
             this.inCommand = ic;
             let colour = "transparent";
-            if (ic === false) {
+            if (this.suppressed === true) {
+                colour = Colours.red;
+            } else if (ic === false) {
                 colour = Colours.black;
             }
             this.token.set("tint_color",colour);
-        }
-
-        CheckIC() {
-            let ic = false;
-            if (this.special.includes("HQ") || this.special.includes("Independent") || this.type === "System Unit") {
-                ic = true;
-            } else {
-                let unit = UnitArray[this.unitID];
-                let unitLeader = TeamArray[unit.teamIDs[0]];
-                let index = unit.teamIDs.indexOf(this.id);
-                if (index === 0) {
-                    ic = true;
-                    unit.IC();
-                } else {
-                    let dist = this.hex.distance(unitLeader.hex);
-                    let commandRadius = (unit.size > 7 || this.type === "Aircraft" || this.type === "Helicopter") ? 8:6;
-                    if (dist <= commandRadius) {
-                        ic = true;
-                    } 
-                }
-            }
-            this.IC(ic);
         }
 
         landed() {
@@ -1467,7 +1433,7 @@ log(hit)
 
         flees() {
             UnitArray[this.unitID].remove(this);
-            if (this.bailed === true) {
+            if (this.suppressed === true) {
                 this.wreck();
             } else {
                 this.token.remove();
@@ -1837,7 +1803,6 @@ log(hit)
         //clear arrays
         UnitArray = {};
         TeamArray = {};
-        FormationArray = {};
 
         SmokeArray = {};
         FoxholeArray = [];
@@ -1874,7 +1839,7 @@ log(hit)
             lineArray: [],
             labmode: false,
             darkness: false,
-            vision: 5, //randomize if night to d6+2 and show when start
+            visibility: 70, //change if darkness etc
             turn: 0,
             step: "",
             gametype: "",
@@ -1886,7 +1851,7 @@ log(hit)
             minelets: [[],[]],
             conditions: {},
             teams: {}, //teamIDs -> unit and formation IDs
-            formations: {}, //formationIDs -> name
+            unitNumbers: [0,0], //unit #s for each player
             units: {},//unitIDs -> name
             passengers: {},//keyed on IDs of transports, arrays of passengerIDs
             currentUnitID: "",
@@ -2400,7 +2365,6 @@ log(hit)
     const RebuildArrays = () => {
         UnitArray = {};
         TeamArray = {};
-        FormationArray = {};
         let startTime = Date.now();
         if (!state.TY.teams) {
             log("No Teams in Array")
@@ -2425,27 +2389,17 @@ log(hit)
             }
             let nation = Attribute(character,"nation");
 
-            let teamInfo = state.TY.teams[id];
-            let fid = teamInfo.formationID;
-            let uid = teamInfo.unitID;
+            let unitID = state.TY.teams[id];
 
-            let fName = state.TY.formations[fid];
-            let uName = state.TY.units[uid];
-
-            let formation,unit,team;
-            if (!FormationArray[fid]) {
-                formation = new Formation(nation,fid,fName);
+            let unitName = state.TY.units[unitID].name;
+            let unitNumber =  state.TY.units[unitID].number;
+            let unit,team;
+            if (!UnitArray[unitID]) {
+                unit = new Unit(nation,unitID,unitName,unitNumber);
             } else {
-                formation = FormationArray[fid];
+                unit = UnitArray[unitID];
             }
-            if (!UnitArray[uid]) {
-                unit = new Unit(nation,uid,uName,fid);
-                formation.add(unit);
-            } else {
-                unit = UnitArray[uid];
-            }
-            team = new Team(id,fid,uid);
-
+            team = new Team(id,unitID);
             unit.add(team);
             add++;
         }
@@ -2499,93 +2453,30 @@ log(hit)
             sendChat("","Error, NonCharacter Token");
             return;
         }
+
         let nation = Attribute(refChar,"nation");
 
-        let formationKeys = Object.keys(FormationArray);
-        let supportFlag = false;
-        if (formationKeys.length > 0) {
-            for (let i=0;i<formationKeys.length;i++) {
-                let formation = FormationArray[formationKeys[i]];
-                if (formation.nation !== nation) {continue}
-                if (formation.name === "Support") {
-                    supportFlag = true;
-                    break;
-                }
-            }
-        }
-
-        if (supportFlag === false) {
-            support = new Formation(nation,stringGen(),"Support");
-        }
-
-        let newID = stringGen();
         SetupCard("Unit Creation","",nation);
-        outputCard.body.push("Select Existing Formation or New");
 
-        ButtonInfo("New","!UnitCreation2;" + newID + ";?{Formation Name}");
-        formationKeys = Object.keys(FormationArray); //redone as Support may have been added
-
-        for (let i=0;i<formationKeys.length;i++) {
-            let formation = FormationArray[formationKeys[i]];
-            if (formation.nation !== nation) {continue};
-            if (formation.name === "Barrages") {continue};
-            let action = "!UnitCreation2;" + formation.id;
-            ButtonInfo(formation.name,action);
-        }
-
-        PrintCard();
-
-        unitCreationInfo = {
-            nation: nation,
-            newID: newID,
-            teamIDs: teamIDs,
-            unitName: unitName,
-        }
-    }
-
-    const UnitCreation2 = (msg) => {
-        let Tag = msg.content.split(";");
-        let unitName = unitCreationInfo.unitName;
-        let nation = unitCreationInfo.nation;
         let player = (WarsawPact.includes(nation)) ? 0:1;
-        let teamIDs = unitCreationInfo.teamIDs;
-        let formationID = Tag[1];
-        let formation = FormationArray[formationID];
+        let unitNumber = state.TY.unitNumbers[player];
+        let unit = new Unit(nation,stringGen(),unitName,unitNumber);
+        state.TY.unitNumbers[player]++;
+        let unitMarker = Nations[nation].platoonmarkers[unitNumber];
 
-        if (!formation) {
-            formation = new Formation(nation,formationID,Tag[2]);
-        }
-        let unit = new Unit(nation,stringGen(),unitName,formationID);
-
-        unit.number = formation.unitIDs.length;
-        let unitMarker = Nations[nation].platoonmarkers[unit.number];
-        formation.add(unit);
-
-        teamIDs.sort((a,b) => {
-            let tokenA = findObjs({_type:"graphic", id: a})[0];
-            let tokenB = findObjs({_type:"graphic", id: b})[0];
-            let charA = getObj("character", tokenA.get("represents")); 
-            let charB = getObj("character", tokenB.get("represents")); 
-            if (!charA || !charB) {return 0};
-            let rankA = parseInt(Attribute(charA,"rank"));
-            let rankB = parseInt(Attribute(charB,"rank"));
-            if (rankA > rankB) {return -1};
-            if (rankA < rankB) {return 1};
-            return 0;
-        });
-
-        log(formation)
         log(unit)
-
+        let initialName;
         for (let i=0;i<teamIDs.length;i++) {
-            let team = new Team(teamIDs[i],formationID,unit.id);
+            let team = new Team(teamIDs[i],unit.id);
             if (!team) {continue};
             unit.add(team);
             let aura = "transparent";
+            let name = NameAndRank(team,i);
+
             if (i === 0) {
                 aura = Colours.green
+                initialName = name;
             };
-            let name = NameAndRank(team,i);
             team.name = name;
             let hp = parseInt(team.starthp);
             let r = (team.type === "Infantry") ? 7:0.1;
@@ -2608,25 +2499,31 @@ log(hit)
                 });
             } 
         }
+        if (!unitName) {
+            unit.name = initialName;
+        }
+
+
         if (state.TY.nations[player].includes(nation) === false) {
             state.TY.nations[player].push(nation);
         }
-        sendChat("",unitName + " Added to " + formation.name)
+        sendChat("",unit.name + " Added");
     }
 
 
     const NameAndRank = (team,i) => {
         let name = team.characterName.replace(team.nation + " ","");
         let unit = UnitArray[team.unitID];
-        let unitNumber = unit.num;
+        let unitNumber = unit.number;
         let letter = rowLabels[unitNumber];
         if (team.type.includes("Tank")) {
             name = name.replace(team.nation + " ","");
-            let item = ((unit.number+1) * 100) + i
+            let item = ((unit.number+1) * 100) + (i+1);
             name += " " + item.toString();
         } else if (team.type === "Infantry" || team.type === "Gun") {
-            name += " "+ letter + "/" + i;
+            name += " "+ letter + "/" + (i+1);
         } 
+        /*
         let rank;
         if (team.special.includes("HQ") || team.token.get(SM.HQ) === true) {
             rank = Math.min(i,1);
@@ -2645,6 +2542,7 @@ log(hit)
                 name = Ranks[Nations[team.nation].ranks][rank] + Name(Nations[team.nation].names);
             } 
         }
+        */
         return name;
     }
 
@@ -2698,8 +2596,12 @@ log(hit)
         } else {
             outputCard.body.push("Team is NOT In Command");
         }
-        if (team.bailed === true) {
-            outputCard.body.push("[#ff0000]Team is Bailed Out[/#]");
+        if (team.suppressed === true) {
+            let noun = "Suppressed";
+            if (team.type === "Infantry" || team.type === "Gun") {
+                noun = "Pinned";
+            }
+            outputCard.body.push("[#ff0000]Team is " + noun + "[/#]");
         }
         if (team.order === "") {
             outputCard.body.push("No Order this Turn");
@@ -2718,19 +2620,6 @@ log(hit)
                 outputCard.body.push(passengerTeam.name);
             }
         }
-
-        outputCard.body.push("[hr]");
-        outputCard.body.push("Unit: " + unit.name);
-        outputCard.body.push("# Teams: " + unit.teamIDs.length);
-        if (unit.order === "") {
-            outputCard.body.push("No Order this Turn");
-        } else {
-            outputCard.body.push("Unit Order: " + unit.order);
-        }
-        if (unit.pinned() === true) {
-            outputCard.body.push("[#ff0000]Unit is Pinned[/#]");
-        }
-
         PrintCard();
     }
 
@@ -2748,42 +2637,35 @@ log(hit)
     
         let distanceT1T2 = team1.hex.distance(team2.hex);
         let losReason = "";
-    
-        if (state.TY.darkness === true && team2.queryCondition("Flare") === false && special.includes("NLOS") === false) {
-            let vision = state.TY.vision;
-            if (team1.special.includes("Infra-Red")) {
-                vision = NightVision.IR
+        let visibility = state.TY.visibility;
+        if (state.TY.darkness === true) {visibility = Visibility["Night"]};
+        if (team2.queryCondition("Flare") === true) {
+            visibility = state.TY.visibility;
+        }
+        let conds = ["Infra-Red","Gen1Thermal","Gen2Thermal"];
+        for (let i=0;i<conds;i++) {
+            if (team1.special.includes(conds[i])) {
+                visibility = Math.max(visibility,Visibility[conds[i]]);
             }
-            if (team1.special.includes("Thermal Imaging")) {
-                vision = NightVision.Gen1Thermal;
-            }
-            if (team1.special.includes("2nd Gen Thermal Imaging")) {
-                vision = NightVision.Gen2Thermal;
-            }
-            //check if adjacnt to burning wreck
-            let wreckKeys = Object.keys(WreckArray);
-            for (let w=0;w<wreckKeys.length;w++) {
-                let dist = WreckArray[wreckKeys[w]].distance(team2.hex);
-                if (dist <= 1) {
-                    vision = distanceT1T2 + 3;
-                    break;
-                }
-            }
+        }
+        if (special.includes("NLOS")) {
+            visibility = 1000;
+        }
 
-            if (distanceT1T2 > vision) {
-                let result = {
-                    los: false,
-                    concealed: false,
-                    bulletproof: false,
-                    smoke: false,
-                    facing: facing,
-                    shooterface: shooterFace,
-                    distance: distanceT1T2,
-                    special: special,
-                }
-                losReason = "Distance > Night Vision Range";
-                return result;   
+        if (distanceT1T2 > visibility) {
+            let result = {
+                los: false,
+                concealed: false,
+                bulletproof: false,
+                smoke: false,
+                facing: facing,
+                shooterface: shooterFace,
+                distance: distanceT1T2,
+                special: special,
+                visibility: visibility,
             }
+            losReason = "Distance > Night Vision Range";
+            return result;   
         }
     
         let facing = Facing(id1,id2);
@@ -2820,6 +2702,7 @@ log(hit)
                     shooterface: shooterFace,
                     distance: distanceT1T2,
                     special: special,
+                    visibility: visibility,
                 }
                 return result;    
             } else if (team2.type !== "Aircraft" || team2.type !== "Helicopter") {
@@ -2832,6 +2715,7 @@ log(hit)
                     shooterface: shooterFace,
                     distance: distanceT1T2,
                     special: special,
+                    visibility: visibility,
                 }
                 return result;    
             } else {
@@ -2844,6 +2728,7 @@ log(hit)
                     shooterface: shooterFace,
                     distance: distanceT1T2,
                     special: special,
+                    visibility: visibility,
                 }
                 losReason = "Invalid Target"
                 return result;    
@@ -3060,6 +2945,7 @@ log("Neither is Air")
             shooterface: shooterFace,
             distance: distanceT1T2,
             special: special,
+            visibility: visibility,
         }
         return result;
     }
@@ -3072,13 +2958,15 @@ log("Neither is Air")
         if (!id1 || !id2) {return};
         let team1 = TeamArray[id1];
         let team2 = TeamArray[id2];
-    
+
         SetupCard("LOS","",team1.nation);
         outputCard.body.push(team1.name + " looking at " + team2.name);
     
         let losResult = LOS(id1,id2,"");
         let distance = parseInt(losResult.distance);
-        let metres = distance*50;
+        let visibility = losResult.visibility;
+        outputCard.subtitle = "Visibility: " + visibility + " Hexes"
+        let metres = distance*100;
         if (metres > 1000) {
             metres /= 1000;
             metres = metres.toString() + "km"
@@ -3118,18 +3006,20 @@ log("Neither is Air")
             if (roll === 3 || roll === 4) {timeOfDay = "Daylight"};
             if (roll > 4) {timeOfDay = "Dusk"};
         }
+        let visibility = Tag[3];
         state.TY.gametype = gametype;
         state.TY.timeOfDay = timeOfDay;
         state.TY.darkness = false;
+        state.TY.visibility = parseInt(visibility);
         if (timeOfDay === "Dawn" || timeOfDay === "Night") {
             state.TY.darkness = true;
-            state.TY.vision = randomInteger(6) + 2;
         }
         SetupCard("Setup New Game","","Neutral");
         outputCard.body.push("Game Type: " + gametype);
         outputCard.body.push("Time of Day: " + timeOfDay);
+        outputCard.body.push("Base Visibility: " + visibility + " Hexes");
         if (state.TY.darkness === true) {
-            outputCard.body.push("Visibility is " + state.TY.vision + " hexes");
+            outputCard.body.push("Limited by Darkness to " + Visibility["Night"] + " Hexes");
         }
         PrintCard();
     }
@@ -3218,7 +3108,7 @@ log("Neither is Air")
             targetName = unit.name;
             _.forEach(unit.teamIDs,id => {
                 let tm = TeamArray[id];
-                if (tm.inCommand === true && tm.bailed === false) {
+                if (tm.inCommand === true && tm.suppressed === false) {
                     targetArray.push(tm);
                     if (tm.queryCondition("Spot") === true) {
                         spotted = true;
@@ -3576,7 +3466,7 @@ log("Neither is Air")
                 noun = "Unit";
                 _.forEach(unit.teamIDs,id => {
                     let tm = TeamArray[id];
-                    if (tm.inCommand === true && tm.bailed === false && tm.queryCondition("Spot") === false) {
+                    if (tm.inCommand === true && tm.suppressed === false && tm.queryCondition("Spot") === false) {
                         targetArray.push(tm);
                     }
                 });
@@ -3894,14 +3784,14 @@ log("Same had 2")
                     let unit = UnitArray[keys[i]];
                     let unitLeader = TeamArray[unit.teamIDs[0]];
                     if (!unitLeader) {continue};
-                    if (unitLeader.bailed === true) {
+                    if (unitLeader.suppressed === true) {
                         let text = SwapLeader(unit);
                         if (text !== "") {
                             sendChat("",text);
                         }
                     }
                     if ((hexMap[unitLeader.hexLabel].terrain.includes("Offboard") && unitLeader.type !== "Helicopter" && unit.inReserve === false) || unitLeader.token.get("aura1_color") === Colours.black || unitLeader.token.get("aura1_color") === Colours.lightpurple) {continue};
-                    if (unitLeader.bailed === true) {continue};
+                    if (unitLeader.suppressed === true) {continue};
                     if (unitLeader.token.get("layer") === "walls") {continue};
                     let pos = unitLeader.location;
                     sendPing(pos.x,pos.y, Campaign().get('playerpageid'), null, true); 
@@ -4075,7 +3965,7 @@ log("Same had 2")
                 let ids = unit.teamIDs;
                 for (let j=0;j<ids.length;j++) {
                     let team = TeamArray[ids[j]];
-                    if (team.bailed === true) {
+                    if (team.suppressed === true) {
                         CheckArray.push(team);
                     }
                 }
@@ -4132,7 +4022,7 @@ log("Same had 2")
                 for (let j=0;j<ids.length;j++) {
                     let team = TeamArray[ids[j]];
                     if (team.type === "Tank") {
-                        if (team.bailed === true) {
+                        if (team.suppressed === true) {
                             continue;
                         }
                     }
@@ -4499,7 +4389,7 @@ log("Same had 2")
                         let teamIDs = DeepCopy(unit.teamIDs)
                         _.forEach(teamIDs,teamID => {
                             let team = TeamArray[teamID];
-                            if (team.bailed === true) {
+                            if (team.suppressed === true) {
                                 team.kill();
                             }
                         });
@@ -4644,7 +4534,7 @@ log("Mistaken: " + mistaken)
             if (st.spotAttempts > 0) {
                 excluded = " Spotted for Artillery";
             }
-            if (st.type === "Tank" && st.bailed === true) {
+            if (st.type === "Tank" && st.suppressed === true) {
                 excluded = " is Bailed Out";
             }
             if (excluded === undefined) {
@@ -5129,7 +5019,7 @@ log(weapons)
         let allFired = true;
         for (let i=0;i<shooterUnit.teamIDs.length;i++) {
             let team = TeamArray[shooterUnit.teamIDs[i]];
-            if (team.fired === false && team.aaFired === false && team.bailed === false) {
+            if (team.fired === false && team.aaFired === false && team.suppressed === false) {
                 allFired = false;
                 break;
             }
@@ -5263,7 +5153,7 @@ log("In Mistaken")
             team.priority = team.rank;
             if (team.token.get(SM.HQ) === true) {team.priority = 3};
             if (team.type === "Tank") {
-                if (team.bailed === true) {
+                if (team.suppressed === true) {
                     team.priority = -3;
                 } else {
                     for (let j=0;j<team.hitArray.length;j++) {
@@ -5285,7 +5175,7 @@ log("In Mistaken")
                 if (team.hitArray.length === 0) {continue};
                 team.priority = team.rank;
                 if (team.token.get(SM.HQ) === true) {team.priority = 3};
-                if (team.bailed === true && team.type === "Tank") {team.priority = -3};
+                if (team.suppressed === true && team.type === "Tank") {team.priority = -3};
                 array.push(team);
             }
         }
@@ -5433,7 +5323,7 @@ log(artUnits)
             let unit = artUnits[i];
             for (let j=0;j<unit.teamIDs.length;j++) {
                 let team = TeamArray[unit.teamIDs[j]];
-                if (team.special.includes("Artillery") === false || team.fired === true || team.aaFired === true || team.bailed === true) {continue};
+                if (team.special.includes("Artillery") === false || team.fired === true || team.aaFired === true || team.suppressed === true) {continue};
                 if (team.type !== "Aircraft" && team.type !== "Helicopter") {
                     if (hexMap[team.hexLabel].terrain.includes("Building") || team.moved === true) {
                         continue; //moved or in building
@@ -6181,7 +6071,7 @@ log(marker);
         let closestDist = Infinity;
         for (let i=1;i<unit.teamIDs.length;i++) {
             let team2 = TeamArray[unit.teamIDs[i]];
-            if (team2.inCommand === false || team2.characterID !== team1.characterID || team2.bailed === true) {continue};
+            if (team2.inCommand === false || team2.characterID !== team1.characterID || team2.suppressed === true) {continue};
             let dist = oldLeader.hex.distance(team2.hex);
             if (dist < closestDist) {
                 newLeader = team2;
@@ -6285,7 +6175,7 @@ log(results)
                     if ((bailedOut + casualties) >= 2) {
                         outputCard.body.push("The Unit must Fall Back");
                     }
-                    if (unit.teamIDs.length === 1 && unitLeader.bailed === true) {
+                    if (unit.teamIDs.length === 1 && unitLeader.suppressed === true) {
                         outputCard.body.push("The Unit must Fall Back");
                     }
                 }
@@ -6310,8 +6200,8 @@ log(results)
             "deflect": 0,
             "minor": 0,
             "destroyed": 0,
-            "bailed": 0,
-            "bailedAgain": 0,
+            "suppressed": 0,
+            "suppressedAgain": 0,
             "flees": 0,
             "saved": 0,
             "cover": 0,
@@ -6340,10 +6230,10 @@ log(results)
                     saveResult.push(SaveResultsMult.destroyed);
                 } else if (outputArray.flees > 0) {
                     saveResult.push(SaveResultsMult.flees);
-                } else if (outputArray.bailedAgain > 0) {
-                    saveResult.push(SaveResultsMult.bailedAgain);
-                } else if (outputArray.bailed > 0) {
-                    saveResult.push(SaveResultsMult.bailed);
+                } else if (outputArray.suppressedAgain > 0) {
+                    saveResult.push(SaveResultsMult.suppressedAgain);
+                } else if (outputArray.suppressed > 0) {
+                    saveResult.push(SaveResultsMult.suppressed);
                 } else if (outputArray.minor > 0) {
                     saveResult.push(SaveResultsMult.minor);
                 } else if (outputArray.deflect > 0) {
@@ -6555,7 +6445,7 @@ log("Charge Dist: " + chargeDist)
         
                 let needed = attTeam.assault;
                 let attacks = parseInt(attTeam.token.get("bar1_value")) || 1;
-                if (attTeam.type === "Unarmoured Tank" || attTeam.bailed === true) {attacks = 0};
+                if (attTeam.type === "Unarmoured Tank" || attTeam.suppressed === true) {attacks = 0};
 
                 // attTeam.assaultWpns
                 let weapon = attTeam.weaponArray[0];
@@ -6623,8 +6513,8 @@ log("Charge Dist: " + chargeDist)
         _.forEach(AssaultIDs[defendingPlayer],id2 => {
                 let team2 = TeamArray[id2];
                 if (team2) {
-                        if (team2.bailed === true) {bailedTeamIDs.push(id2)};
-                        if (team2.type !== "Unarmoured Tank" && team2.bailed === false) {
+                        if (team2.suppressed === true) {bailedTeamIDs.push(id2)};
+                        if (team2.type !== "Unarmoured Tank" && team2.suppressed === false) {
                                 for (let i=0;i<AssaultIDs[attackingPlayer].length;i++) {
                                         let id1 = AssaultIDs[attackingPlayer][i];
                                         let team1 = TeamArray[id1];
@@ -6951,7 +6841,7 @@ log("Charge Dist: " + chargeDist)
 
                 let oldHexLabel = team.hexLabel;
 
-                let moveBack = team.bailed;
+                let moveBack = team.suppressed;
                 if ((team.type === "Tank" || team.type === "Unarmoured Tank") && hexMap[newHexLabel].dash === 3) {
                     moveBack = true;
                 }
@@ -6981,7 +6871,9 @@ log("Charge Dist: " + chargeDist)
                     hexMap[oldHexLabel].teamIDs.splice(index,1);
                 }
                 hexMap[newHexLabel].teamIDs.push(tok.id);
-                team.CheckIC();
+                if (unit) {
+                    unit.IC();
+                }
                 //let theta = oldHex.angle(newHex);
                 //tok.set("rotation",theta);
                 FlipGraphic(tok.get("rotation"),tok,team);
@@ -7066,12 +6958,8 @@ log("Charge Dist: " + chargeDist)
                 log(TeamArray);
                 log("Unit Array");
                 log(UnitArray);
-                log("Formation Array");
-                log(FormationArray);
                 log("Ranged In Array");
                 log(RangedInArray)
-                log("CC Team IDs");
-                log(CCTeamIDs);
                 break;
             case '!TokenInfo':
                 TokenInfo(msg);
@@ -7084,9 +6972,6 @@ log("Charge Dist: " + chargeDist)
                 break;
             case '!UnitCreation':
                 UnitCreation(msg);
-                break;
-            case '!UnitCreation2':
-                UnitCreation2(msg);
                 break;
             case '!TestLOS':
                 TestLOS(msg);
