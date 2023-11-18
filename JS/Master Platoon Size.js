@@ -172,17 +172,17 @@ const TY = (() => {
     const MapTokenInfo = {
         "woods": {name: "Woods",height: 2,bp: false,type: 2,group: "Woods",dash: 2},
         "ruins": {name: "Ruins",height: 1,bp: true,type: 1,group: "Rough",dash: 2},
-        "wreck": {name: "Wreck",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
+        //"wreck": {name: "Wreck",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
         "building 1": {name: "Buildings - Height 1",height: 1,bp: true,type: 3,group: "Building",dash: 2},
         "building 2": {name: "Buildings - Height 2",height: 2,bp: true,type: 3,group: "Building",dash: 2},
         "building 3": {name: "Buildings - Height 3",height: 3,bp: true,type: 3,group: "Building",dash: 2},
         "rubble": {name: "Rubble",height: 0,bp: true,type: 1,group: "Rough",dash: 2},
-        "anti-tank ditch": {name: "Anti-Tank Ditch",height: 0,bp: true,type: 0,group: "Trench",dash: 3},
-        "wall": {name: "Wall",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
+        //"anti-tank ditch": {name: "Anti-Tank Ditch",height: 0,bp: true,type: 0,group: "Trench",dash: 3},
+        //"wall": {name: "Wall",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
         "hedge": {name: "Hedge",height: 0,bp: false,type: 1,group: "Obstacle",dash: 2},
-        "bocage": {name: "Bocage",height: 0,bp: true,type: 2,group: "Obstacle",dash: 2},
-        "dragon's teeth": {name: "Dragon's Teeth",height: 0,bp: true,type: 1,group: "Obstacle",dash: 3},
-        "road block": {name: "Road Block",height: 0,bp: true,type: 1,group: "Obstacle",dash: 3},
+        //"bocage": {name: "Bocage",height: 0,bp: true,type: 2,group: "Obstacle",dash: 2},
+        //"dragon's teeth": {name: "Dragon's Teeth",height: 0,bp: true,type: 1,group: "Obstacle",dash: 3},
+        //"road block": {name: "Road Block",height: 0,bp: true,type: 1,group: "Obstacle",dash: 3},
         "crater": {name: "Craters",height: 0,bp: true,type: 0,group: "Rough",dash: 2},        
         "crops": {name: "Crops",height: 0,bp: false,type: 1,group: "Crops",dash: 2},
         "foxholes": {name: "Foxholes",height: 0,bp: false,type: 0,group: "Foxholes",dash: 2}, //bp tracked in LOS, and in hexMap
@@ -4499,8 +4499,8 @@ log("Same had 2")
                 let round = parseInt(Tag[Tag.length-1]) + 1;
                 let roll = randomInteger(6);
                 let counterAttackingUnitIDs = [];
-                let countercounterAttackingTeamIDs = [];
-                let breakingOffUnits = 0;
+                let counterAttackingTeamIDs = [];
+                let breakingOffUnitIDs = [];
                 _.forEach(defUnitIDs,unitID => {
                     let unit = UnitArray[unitID];
                     let defendingPlayer = unit.player;
@@ -4515,22 +4515,32 @@ log("Same had 2")
                     roll = Math.max(roll,reroll);
                     if (roll < needed) {
                         outputCard.body.push("Unit must break off");
-                        breakingOffUnits++;
+                        breakingOffUnitIDs.push(unit.id);
                     } else {
                         outputCard.body.push("Unit may Counterattack");
                         unit.order = "Assault";
                         _.forEach(unit.teamIDs,id => {
                             let team = TeamArray[id];
-                            countercounterAttackingTeamIDs.push(team.id);
+                            counterAttackingTeamIDs.push(team.id);
                             team.addCondition("Assault");
                             team.order = "Assault";
                         })
                         counterAttackingUnitIDs.push(unitID);
                     }
                 });
-                if (breakingOffUnits > 0) {
+                if (breakingOffUnitIDs.length > 0) {
                     outputCard.body.push('Breaking Off Teams must move at Tactical speed the shortest distance to be further than 3 hexes away from all Assaulting Teams');
                     outputCard.body.push("Any Teams not able to do so surrender and are destroyed");
+                    _.forEach(breakingOffUnitIDs,unitID => {
+                        let unit = UnitArray[unitID];
+                        let teamIDs = DeepCopy(unit.teamIDs)
+                        _.forEach(teamIDs,teamID => {
+                            let team = TeamArray[teamID];
+                            if (team.bailed === true) {
+                                team.kill();
+                            }
+                        });
+                    });
                 }
                 if (counterAttackingUnitIDs.length === 0) {
                     outputCard.body.push("The Assault is Over");
@@ -4539,7 +4549,7 @@ log("Same had 2")
                     outputCard.body.push("Counterattacking Teams not in contact may charge (if possible)");
                     outputCard.body.push("Once Set, click Button");
                     //revise AssaultIDs, button will start CCTwo with defending player now the attacker
-                    AssaultIDs[defendingPlayer] = countercounterAttackingTeamIDs;
+                    AssaultIDs[defendingPlayer] = counterAttackingTeamIDs;
                     ButtonInfo("Start Next Round of Close Combat","!CloseCombatTwo;" + defendingPlayer +";" + round);
                 }
                 PrintCard();
@@ -6643,9 +6653,11 @@ log("Charge Dist: " + chargeDist)
 
         let finalDefIDs = [];
         let defUnitIDs = [];
+        let bailedIDs = [];
         _.forEach(AssaultIDs[defendingPlayer],id2 => {
                 let team2 = TeamArray[id2];
                 if (team2) {
+                        if (team2.bailed === true) {bailedTeamIDs.push(id2)};
                         if (team2.type !== "Unarmoured Tank" && team2.bailed === false) {
                                 for (let i=0;i<AssaultIDs[attackingPlayer].length;i++) {
                                         let id1 = AssaultIDs[attackingPlayer][i];
@@ -6672,6 +6684,10 @@ log("Charge Dist: " + chargeDist)
                 outputCard.body.push("Any Teams not able to do so (due to Bailed or Movement) surrender and are destroyed");
                 outputCard.body.push('The Winning Teams may Consolidate 2 hexes, this Move may not bring them into contact with an enemy Team.')  
                 AssaultIDs = [[],[]];
+                _.forEach(bailedIDs,id => {
+                    let team = TeamArray[id];
+                    team.kill();
+                })
         } else {
                 SetupCard("Counterattack","",state.TY.nations[defendingPlayer]);
                 outputCard.body.push("The Defenders may now choose to Counterattack or may Break Off");
@@ -6721,19 +6737,7 @@ log("Charge Dist: " + chargeDist)
             }
         }
     }
-    
-    const ResetAuras = (player) => {
-        let unitKeys = Object.keys(UnitArray);
-        for (let i=0;i<unitKeys.length;i++) {
-            let unit = UnitArray[unitKeys[i]];
-            if (unit.player !== player || unit.type === "System Unit") {continue};
-            let unitLeader = TeamArray[unit.teamIDs[0]];
-            if (unitLeader) {
-                let colour = (unit.pinned() === false) ? Colours.green:Colours.yellow;
-                unitLeader.token.set("aura1_color",colour);
-            }
-        }
-    }
+
 
     const Mount = (msg) => {
         let Tag = msg.content.split(";");
