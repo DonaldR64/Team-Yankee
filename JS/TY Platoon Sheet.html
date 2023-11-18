@@ -197,8 +197,10 @@
                         <option value="Artillery">Artillery</option>
                         <option value="Rockets">Rockets</option>
                         <option value="Autocannon">Autocannon</option>
-                        <option value="Handheld AT">Handheld AT</option>    
-                        <option value="Vehicle Missile">Vehicle Missile</option>                    
+                        <option value="Handheld AT">Handheld AT</option>
+                        <option value="Infantry Missile">Infantry Missile</option>        
+                        <option value="Vehicle Missile">Vehicle Missile</option>  
+                        <option value="SAM">SAM</option>  
                     </select>
                 </td>
             </tr>
@@ -253,7 +255,9 @@
                         <option value="Rockets">Rockets</option>
                         <option value="Autocannon">Autocannon</option>
                         <option value="Handheld AT">Handheld AT</option>    
-                        <option value="Vehicle Missile">Vehicle Missile</option>                    
+                        <option value="Infantry Missile">Infantry Missile</option>        
+                        <option value="Vehicle Missile">Vehicle Missile</option>  
+                        <option value="SAM">SAM</option>                    
                     </select>
                 <td>
             </tr>
@@ -307,8 +311,10 @@
                         <option value="Artillery">Artillery</option>
                         <option value="Rockets">Rockets</option>
                         <option value="Autocannon">Autocannon</option>
-                        <option value="Handheld AT">Handheld AT</option>    
-                        <option value="Vehicle Missile">Vehicle Missile</option>                               
+                        <option value="Handheld AT">Handheld AT</option>                        
+                        <option value="Infantry Missile">Infantry Missile</option>        
+                        <option value="Vehicle Missile">Vehicle Missile</option>      
+                        <option value="SAM">SAM</option>                           
                     </select>
                 <td>
             </tr>
@@ -362,8 +368,67 @@
                         <option value="Artillery">Artillery</option>
                         <option value="Rockets">Rockets</option>
                         <option value="Autocannon">Autocannon</option>
-                        <option value="Handheld AT">Handheld AT</option>    
-                        <option value="Vehicle Missile">Vehicle Missile</option>                                       
+                        <option value="Handheld AT">Handheld AT</option>
+                        <option value="Infantry Missile">Infantry Missile</option>            
+                        <option value="Vehicle Missile">Vehicle Missile</option>     
+                        <option value="SAM">SAM</option>                                    
+                    </select>
+                <td>
+            </tr>
+            <tr>
+                <td><input type="text" name="attr_weapon5name"></td>
+                <td><input type="text" name="attr_weapon5range"></td>
+                <td>
+                    <select name="attr_weapon5halted">
+                        <option value=""selected="selected">(nil)</option>   
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="Artillery">Artillery</option>
+                        <option value="Salvo">Salvo</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="attr_weapon5moving">
+                        <option value=""selected="selected">(nil)</option>   
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="Artillery">Artillery</option>
+                        <option value="Salvo">Salvo</option>
+                    </select>
+                </td>
+                <td><input type="number" name="attr_weapon5at"></td>
+                <td><input type="text" name="attr_weapon5fp"></td>
+                <td><input type="text" name="attr_weapon5notes"></td>
+                <td>
+                    <select name="attr_weapon5type">
+                        <option selected="selected" value="Small Arms">Small Arms</option>
+                        <option value="Vehicle MG">Vehicle MG</option>
+                        <option value="AA MG">AA MG</option>
+                        <option value="Flamethrower">Flamethrower</option>              
+                        <option value="Gun">Main Gun</option>
+                        <option value="Artillery">Artillery</option>
+                        <option value="Rockets">Rockets</option>
+                        <option value="Autocannon">Autocannon</option>
+                        <option value="Handheld AT">Handheld AT</option>
+                        <option value="Infantry Missile">Infantry Missile</option>            
+                        <option value="Vehicle Missile">Vehicle Missile</option>     
+                        <option value="SAM">SAM</option>                                    
                     </select>
                 <td>
             </tr>
@@ -517,6 +582,13 @@
                 <h4><span name="attr_weapon4at"></span></h4>
                 <h4><span name="attr_weapon4fp"></span></h4>
                 <h4><span name="attr_weapon4notes"></span></h4>    
+                <h4><span name="attr_weapon5name"></span></h4>
+                <h4><span name="attr_weapon5range"></span></h4>
+                <h4><span name="attr_weapon5halted"></span></h4>
+                <h4><span name="attr_weapon5moving"></span></h4>
+                <h4><span name="attr_weapon5at"></span></h4>
+                <h4><span name="attr_weapon5fp"></span></h4>
+                <h4><span name="attr_weapon5notes"></span></h4>   
             </div>         
           </section>
         </main>
