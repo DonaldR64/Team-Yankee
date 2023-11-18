@@ -5,17 +5,17 @@
 	"notes": ["For any OP Must Field an Artillery Unit"],
 	"sections": [
 		{"name": "Core Battalion Formations", "formations": [
-			{"id": 501, "name": "Merkava 1 Tank Company","pts": 0,"upgrades": [10,11,41,50,51]},
-			{"id": 502, "name": "Merkava 2 Tank Company","pts": 0,"upgrades": [20,21,41,50,51]},
-            {"id": 503, "name": "Magach 6 Tank Company","pts": 0,"upgrades": [30,31,41,50,51]},
-            {"id": 504, "name": "M113 Mech Infantry Company","pts": 0,"upgrades": [40,41,50,51,11,21,31,60,61]}
+			{"id": 501, "name": "Merkava 1 Tank Company","pts": 54,"units": "1 HQ Platoon, 2x Merkava 1 Platoons","upgrades": [11,41,50,51]},
+			{"id": 502, "name": "Merkava 2 Tank Company","pts": 63,"units": "1 HQ Platoon, 2x Merkava 2 Platoons","upgrades": [21,41,50,51]},
+            {"id": 503, "name": "Magach 6 Tank Company","pts": 33,"units": "1 HQ Platoon, 2x Magach 6 Platoons","upgrades": [31,41,50,51]},
+            {"id": 504, "name": "M113 Mech Infantry Company","pts": 22,"units": "2x Mech. Infantry Platoons","upgrades": [41,11,21,31,50,51,60,61]}
 		]},
 
         {"name": "Reserve Support", "formations": [
-            {"id": 506, "name": "Merkava 1 Tank Reserve Platoon","pts": 0,"upgrades": [11]},
-            {"id": 507, "name": "Merkava 2 Tank Reserve Platoon","pts": 0,"upgrades": [21]},
-            {"id": 508, "name": "Magach 6 Tank Reserve Platoon","pts": 0,"upgrades": [31]},
-            {"id": 509, "name": "M113 Mech Infantry Reserve Platoon","pts": 0,"upgrades": [41]}
+            {"id": 506, "name": "Merkava 1 Tank Reserve Platoon","units": "1x Merkava 1 Platoon","pts": 18},
+            {"id": 507, "name": "Merkava 2 Tank Reserve Platoon","units": "1x Merkava 2 Platoon","pts": 21},
+            {"id": 508, "name": "Magach 6 Tank Reserve Platoon","units": "1x Magach 6 Platoon","pts": 11},
+            {"id": 509, "name": "M113 Mech Infantry Reserve Platoon","units": "1x Mech Infantry Platoon","pts": 11}
         ]},
 
 	    {"name": "Brigade Support","formations":[
@@ -23,11 +23,11 @@
 	    	{"id": 511, "name": "M113 OP","pts": 1, "units": "1x M113 OP"},
 	    	{"id": 512, "name": "Artillery Battery","pts": 0,"upgrades": [110,111,101]},
             {"id": 514, "name": "Pereh Anti-tank Platoon","units": "3x Pereh","pts": 7},            
-            {"id": 515, "name": "Jeep (TOW) Platoon","units": "4x Jeep TOW","pts": 6},
-            {"id": 516, "name": "M163 VADS AA Platoon","units": "4x M163 VADS","pts": 7},
-            {"id": 517, "name": "ZSU-23-4 Shilka AA Platoon","units": "4x ZSU-23-4 Shilka","pts": 6},
-            {"id": 518, "name": "M48 Chaparral SAM Platoon","units": "4x M48 Chaparral","pts": 9},
-            {"id": 519, "name": "Redeye SAM Platoon","units": "2x Redeye Squads","pts": 4},
+            {"id": 515, "name": "Jeep (TOW) Platoon","pts": 6},
+            {"id": 516, "name": "M163 VADS AA Platoon","pts": 7},
+            {"id": 517, "name": "ZSU-23-4 Shilka AA Platoon","pts": 6},
+            {"id": 518, "name": "M48 Chaparral SAM Platoon","pts": 9},
+            {"id": 519, "name": "Redeye SAM Platoon","pts": 4},
             {"id": 520, "name": "AH-1 Viper Attack Helicopter Platoon","pts": 0,"upgrades": [150,151]}, 
             {"id": 521, "name": "Skyhawk Fighter Flight","pts": 0,"upgrades": [145,146,147,148]}
 
@@ -37,38 +37,30 @@
 
 	"upgrades": [
 
-      	{"id": 10, "name": "HQ Platoon: 2x Merkava 1s", "pts": 12},
-      	{"id": 11, "name": "Merkava 1 Platoon: 3x Merkava 1s","pts": 18},
-    
-      	{"id": 20, "name": "HQ Platoon: 2x Merkava 2s", "pts": 14},
-      	{"id": 21, "name": "Merkava 2 Platoon: 3x Merkava 2s", "pts": 21},
-
-      	{"id": 30, "name": "HQ Platoon: 2x Magach 6s", "pts": 7},
-      	{"id": 31, "name": "Magach 6 Platoon: 3x Magach 6s", "pts": 11},
+      	{"id": 11, "name": "Merkava 1 Platoon","pts": 18},
+      	{"id": 21, "name": "Merkava 2 Platoon", "pts": 21},
+      	{"id": 31, "name": "Magach 6 Platoon", "pts": 11},
  
-        {"id": 40, "name": "Company HQ - 1 Team", "pts": 1},
-        {"id": 41, "name": "Mech. Infantry Platoon: 1 Platoon HQ Team, 3 Rifle Squads, 1 Dragon Team, 1 52mm Mortar Team, 1 M113 Transport Platoon (4 M113s)", "pts": 11},
+        {"id": 41, "name": "Mech. Infantry Platoon", "pts": 11},
 
-		{"id": 50, "name": "Jeep Recce Platoon: 3x Recce Jeeps", "pts": 2},
-		{"id": 51, "name": "M113 Recce Platoon: 4x Recce M113", "pts": 3},
+		{"id": 50, "name": "Jeep Recce Platoon", "pts": 2},
+		{"id": 51, "name": "M113 Recce Platoon", "pts": 3},
 
-        {"id": 60, "name": "M125 Mortar Platoon: 3x M125 81mm Mortars", "pts": 2},
+        {"id": 60, "name": "M125 Mortar Platoon", "pts": 2},
+        {"id": 61, "name": "M150 TOW Platoon", "pts": 3},
 
-        {"id": 61, "name": "M150 TOW Platoon: 2x M150 TOW", "pts": 3},
+        {"id": 101, "name": "M106 Mortar Battery", "pts": 4},
 
-
-        {"id": 101, "name": "M106 Mortar Battery: 4x M106 (120mm)", "pts": 4},
-
-        {"id": 110, "name": "M109 Battery: 1 Team of 3x M109 155mm", "pts": 7},
-        {"id": 111, "name": "M109 Battery: 2 Teams of 3x M109 155mm", "pts": 14},
+        {"id": 110, "name": "M109 Battery: 1x M109 155mm Platoon", "pts": 7},
+        {"id": 111, "name": "M109 Battery: 2x M109 155mm Platoons", "pts": 14},
 
         {"id": 145, "name": "1 Team of 2x Skyhawk", "pts": 3},
         {"id": 146, "name": "2 Teams of 2x Skyhawk", "pts": 6},
         {"id": 147, "name": "1 Team of 2x Skyhawk w/Napalm", "pts": 5},
         {"id": 148, "name": "2 Teams of 2x Skyhawk w/Napalm", "pts": 10},
 
-        {"id": 150, "name": "1 Team of 2x AH-1 Viper", "pts": 8},
-        {"id": 151, "name": "2 Teams of 2x AH-1 Viper", "pts": 16}
+        {"id": 150, "name": "1x AH-1 Viper Attack Helicopter Platoon", "pts": 8},
+        {"id": 151, "name": "2x AH-1 Viper Attack Helicopter Platoons", "pts": 16}
 
 
 	],
@@ -99,20 +91,12 @@
 
 
    "upgradeConstraints": [      
-   	    {"max": 1, "min": 1, "from": [10], "appliesTo": [501]},
-   	    {"max": 3, "min": 2, "from": [11], "appliesTo": [501]},
+   	    {"max": 1, "min": 0, "from": [11], "appliesTo": [501]},
+   	    {"max": 1, "min": 0, "from": [21], "appliesTo": [502]},
+   	    {"max": 1, "min": 0, "from": [31], "appliesTo": [503]},
+		{"max": 1, "min": 0, "from": [41], "appliesTo": [501,502,503,504]},
+   	    {"max": 1, "min": 0, "from": [50,51], "appliesTo": [501,502,503,504]},
 
-		{"max": 1, "min": 1, "from": [20], "appliesTo": [502]},
-   	    {"max": 3, "min": 2, "from": [21], "appliesTo": [502]},
-
-		{"max": 1, "min": 1, "from": [30], "appliesTo": [503]},
-   	    {"max": 3, "min": 2, "from": [31], "appliesTo": [503]},
-
-		{"max": 1, "min": 0, "from": [41], "appliesTo": [501,502,503]},
-   	    {"max": 1, "min": 0, "from": [50,51], "appliesTo": [501,502,503]},
-
-		{"max": 1, "min": 1, "from": [40], "appliesTo": [504]},
-   	    {"max": 3, "min": 2, "from": [41], "appliesTo": [504]},
 		{"max": 1, "min": 0, "from": [11,21,31], "appliesTo": [504]},
 		{"max": 1, "min": 0, "from": [60], "appliesTo": [504]},
         {"max": 1, "min": 0, "from": [61], "appliesTo": [504]},
