@@ -1331,6 +1331,7 @@ log(hit)
                     result: "smoked",
                     tip: hitNum + ": Smoke Round",
                 }
+                DirectSmoke(this);
                 return save;
             }
 
@@ -6178,7 +6179,7 @@ log(marker);
         SmokeArray = newSmoke;
     }
 
-    const DirectSmoke = (team,unitID) => {
+    const DirectSmoke = (team) => {
         //place smoke on team
         let location = team.location;
         let rotation = randomInteger(12) * 30;
@@ -6203,7 +6204,7 @@ log(marker);
         let sInfo = {
             hexLabel: team.hexLabel,
             id: newToken.id, //id of the Smoke token, can be used to remove later
-            type: unitID,
+            type: team.unitID,
         }
         SmokeArray.push(sInfo);
     }
