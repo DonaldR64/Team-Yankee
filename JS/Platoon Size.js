@@ -46,8 +46,8 @@ const TY = (() => {
         Bad: 15,
         Night: 8,
         "Infra-Red": 20,
-        Gen1Thermal: 20,
-        Gen2Thermal: 40,
+        "Thermal Imaging": 20,
+        "2nd Gen Thermal Imaging": 40,
     }
 
 
@@ -590,7 +590,7 @@ const TY = (() => {
             if (!state.TY.units[id]) {
                 state.TY.units[id] = {
                     name: name,
-                    number: this.number,
+                    number: number,
                 };
             }
 
@@ -2642,17 +2642,25 @@ log(hit)
         if (team2.queryCondition("Flare") === true) {
             visibility = state.TY.visibility;
         }
-        let conds = ["Infra-Red","Gen1Thermal","Gen2Thermal"];
-        for (let i=0;i<conds;i++) {
+        let conds = ["Infra-Red","Thermal Imaging","2nd Gen Thermal Imaging"];
+        for (let i=0;i<conds.length;i++) {
             if (team1.special.includes(conds[i])) {
-                visibility = Math.max(visibility,Visibility[conds[i]]);
+                if (state.TY.visibility === 15 && conds[i] === "Infra-Red") {
+                    visibility = 15;
+                } else {
+                    visibility = Math.max(visibility,Visibility[conds[i]]);
+                }
             }
         }
         if (special.includes("NLOS")) {
             visibility = 1000;
         }
 
+        let facing = Facing(id1,id2);
+        let shooterFace = Facing(id2,id1);
+
         if (distanceT1T2 > visibility) {
+            losReason = "Distance > Visibility";
             let result = {
                 los: false,
                 concealed: false,
@@ -2663,13 +2671,11 @@ log(hit)
                 distance: distanceT1T2,
                 special: special,
                 visibility: visibility,
+                losReason: losReason,
             }
-            losReason = "Distance > Night Vision Range";
             return result;   
         }
-    
-        let facing = Facing(id1,id2);
-        let shooterFace = Facing(id2,id1);
+
         let team1Height = teamHeight(team1);
         let team2Height = teamHeight(team2);
         let teamLevel = Math.min(team1Height,team2Height);
@@ -2703,6 +2709,7 @@ log(hit)
                     distance: distanceT1T2,
                     special: special,
                     visibility: visibility,
+                    losReason: "",
                 }
                 return result;    
             } else if (team2.type !== "Aircraft" || team2.type !== "Helicopter") {
@@ -2716,9 +2723,11 @@ log(hit)
                     distance: distanceT1T2,
                     special: special,
                     visibility: visibility,
+                    losReason: "",
                 }
                 return result;    
             } else {
+                losReason = "Invalid Target"
                 let result = {
                     los: false,
                     concealed: true,
@@ -2729,8 +2738,8 @@ log(hit)
                     distance: distanceT1T2,
                     special: special,
                     visibility: visibility,
+                    losReason: losReason,
                 }
-                losReason = "Invalid Target"
                 return result;    
             }
         }
@@ -3007,6 +3016,12 @@ log("Neither is Air")
             if (roll > 4) {timeOfDay = "Dusk"};
         }
         let visibility = Tag[3];
+        if (visibility === "Random") {
+            let roll = randomInteger(6);
+            if (roll === 1) {visibility = 15};
+            if (roll === 2,3) {visibility = 30};
+            if (roll > 3) {visibility = 70};
+        }
         state.TY.gametype = gametype;
         state.TY.timeOfDay = timeOfDay;
         state.TY.darkness = false;
@@ -3020,6 +3035,7 @@ log("Neither is Air")
         outputCard.body.push("Base Visibility: " + visibility + " Hexes");
         if (state.TY.darkness === true) {
             outputCard.body.push("Limited by Darkness to " + Visibility["Night"] + " Hexes");
+            outputCard.body.push("without Equipment or Weapons Flare")
         }
         PrintCard();
     }
@@ -3031,7 +3047,7 @@ log("Neither is Air")
         ButtonInfo("Place in Reserve","!PlaceInReserve");
 
         //ButtonInfo("Kill Selected Team","!!KillTeam;@{selected|token_id}");
-        ButtonInfo("Setup New Game","!SetupGame;?{Game Type|Meeting Engagement|Attack/Defend};?{Time of Day|Daylight|Dawn|Dusk|Night|Random}");
+        ButtonInfo("Setup New Game","!SetupGame;?{Game Type|Meeting Engagement|Attack/Defend};?{Time of Day|Daylight|Dawn|Dusk|Night|Random};?{Visibility|Good,70|Moderate,30|Bad,15|Random}");
         //ButtonInfo("Test LOS","!TestLOS;@{selected|token_id};@{target|token_id}");
         //ButtonInfo("Unit Creation","!UnitCreation;?{Unit Name};?{Formation Name};?{Support|No|Yes};");
         //ButtonInfo("Team Unit Info","!TeamInfo");
@@ -3747,12 +3763,11 @@ log("Same had 2")
         if (turn === 0) {
             for (let p=0;p<2;p++) {
                 let num = 100 + parseInt(p);
-                let form = new Formation(state.TY.nations[p][0],num,"Barrages");
-                let unit = new Unit(state.TY.nations[p][0],num,"Barrages",num);
+                let unit = new Unit(state.TY.nations[p][0],num,"Barrages",-1);
             }
             if (state.TY.gametype === "") {
                 SetupCard("Setup Game","","Neutral");
-                ButtonInfo("Setup New Game","!SetupGame;?{Game Type|Meeting Engagement|Attack/Defend};?{Time of Day|Daylight|Dawn|Dusk|Night|Random}");
+                ButtonInfo("Setup New Game","!SetupGame;?{Game Type|Meeting Engagement|Attack/Defend};?{Time of Day|Daylight|Dawn|Dusk|Night|Random};?{Visibility|Good,70|Moderate,30|Bad,15|Random}");
                 PrintCard();
                 return;
             }
@@ -3865,7 +3880,7 @@ log("Same had 2")
                 pageInfo.page.set("dynamic_lighting_enabled",false);
             }
 
-            StartStep("ResLeaders");
+            StartStep("Morale");
         }
         if (currentStep === "Artillery and Air") {
             SetupCard("Artillery and Air","Turn: " + state.TY.turn,"Neutral");
@@ -3915,149 +3930,27 @@ log("Same had 2")
     }
 
     const StartStep = (pass) => {
-        if (pass === "ResLeaders") {
+        if (pass === "Morale") {
             CheckArray = [];
             for (let p=0;p<2;p++) {
-                //check if a formation HQ for the player is dead
-                let formationIDs = deadHQs[p];
-                for (let i=0;i<formationIDs.length;i++) {
-                    let formation = FormationArray[formationIDs[i]];
-                    if (formation) {
-                        let eligibleUnitIDs = formation.unitIDs;
-                        let team;
-                        let possibleTeams = [];
-                        for (let i=0;i<eligibleUnitIDs.length;i++) {
-                            let unit = UnitArray[eligibleUnitIDs[i]];
-                            let unitLeader = TeamArray[unit.teamIDs[0]];
-                            if (unitLeader.special.includes("Passengers")) {continue};
-                            if ((unit.teamIDs.length > (lastStandCount[unit.type] + 1)) || unit.teamIDs.length === 1) {
-                                team = unitLeader;
-                                break;
-                            } else {
-                                possibleTeams.push(unitLeader);
-                            }
-                        }
-                        if (team === undefined && possibleTeams.length > 0) {
-                            team = possibleTeams[0];
-                        }
-                        if (team !== undefined) {
+                _.forEach(UnitArray,unit => {
+                    _.forEach(unit.teamIDs,id => {
+                        let team = TeamArray[id];
+                        if (team.suppressed === true && team.player === p) {
                             CheckArray.push(team);
                         }
-                    }
-                }
-            }
-
-            if (CheckArray.length > 0) {
-                SetupCard("Field Promotions","","Neutral");
-                ButtonInfo("Start","!FieldPromotions");
-                PrintCard();            
-            } else {
-                StartStep("Remount");
-            }
-        }
-        if (pass === "Remount") {
-            deadHQs = [[],[]];
-            CheckArray = [];
-            let keys = Object.keys(UnitArray); 
-            for (let i=0;i<keys.length;i++) {
-                let unit = UnitArray[keys[i]];
-                if (unit.type !== "Tank") {continue};
-                let ids = unit.teamIDs;
-                for (let j=0;j<ids.length;j++) {
-                    let team = TeamArray[ids[j]];
-                    if (team.suppressed === true) {
-                        CheckArray.push(team);
-                    }
-                }
-            }
-            if (CheckArray.length > 0) {
-                SetupCard("Remount Checks","","Neutral");
-                ButtonInfo("Start Remount Checks","!RemountChecks");
-                PrintCard();            
-            } else {
-                StartStep("Rally");
-            }
-        }
-        if (pass === "Rally") {
-            CheckArray = [];
-            let keys = Object.keys(UnitArray);
-            for (let i=0;i<keys.length;i++) {
-                let unit = UnitArray[keys[i]];
-                if ((unit.type !== "Infantry" && unit.type !== "Unarmoured Tank" && unit.type !== "Gun")) {continue};
-                let unitLeader = TeamArray[unit.teamIDs[0]];
-                if (!unitLeader) {
-                    log("No Unit Leader for this unit: " + unit.name);
-                    log("# of units: " + unit.teamIDs.length);
-                    return;
-                }
-                unit.Size();
-                unitLeader.token.set("bar3_value",0);
-                if (unit.pinned() === true) {
-                    CheckArray.push(unit);
-                };
+                    });
+                });
             };
             if (CheckArray.length > 0) {
-                SetupCard("Rally Checks","","Neutral");
-                ButtonInfo("Start Rally Checks","!RallyChecks");
-                PrintCard();            
-            } else {
-                StartStep("Unit Morale");
-            }
-        }
-        if (pass === "Unit Morale") {
-            CheckArray = [];
-            let keys = Object.keys(UnitArray);
-            for (let i=0;i<keys.length;i++) {
-                let unit = UnitArray[keys[i]];
-                if (unit.name === "Barrages") {continue};
-                let unitLeader = TeamArray[unit.teamIDs[0]];
-                if (!unitLeader) {
-                    log("Error in Unit Morale Unit Leader")
-                    log(unit)
-                    continue;
-                }
-                if ( unitLeader.special.includes("HQ") || unitLeader.token.get(SM.HQ) === true || unitLeader.special.includes("Independent")) {continue};
-                let count = 0;
-                let ids = unit.teamIDs;
-                for (let j=0;j<ids.length;j++) {
-                    let team = TeamArray[ids[j]];
-                    if (team.type === "Tank") {
-                        if (team.suppressed === true) {
-                            continue;
-                        }
-                    }
-                    if (team.inCommand === true) {
-                        count++;
-                    }   
-                }
-                if (count < lastStandCount[unit.type]) {
-                    CheckArray.push(unit);
-                }
-            }
-            if (CheckArray.length > 0) {
-                SetupCard("Unit Morale Checks","","Neutral");
+                SetupCard("Morale Checks","","Neutral");
                 ButtonInfo("Start Morale Checks","!MoraleChecks");
                 PrintCard();            
             } else {
-                StartStep("Formation Morale");
+                StartStep("Final");
             }
         }
-        if (pass === "Formation Morale") {      
-            let keys = Object.keys(FormationArray);
-            for (let i=0;i<keys.length;i++) {
-                let formation = FormationArray[keys[i]];
-                if (formation.name === "Support" || formation.name === "Barrages") {continue};
-                let unitNumbers = formation.unitIDs.length;
-                if (unitNumbers < 2) {
-                    SetupCard(formation.name,"Morale",formation.nation);
-                    outputCard.body.push("The Formation as a whole breaks and flees the field!");
-                    outputCard.body.push("Check Victory Conditions");
-                    //destroy units/teams
-                    PrintCard();
-                }
-            }
-            StartStep("Final");
-        }
+    
         if (pass === "Final") {
             SetupCard("Turn: " + state.TY.turn,"Starting Step","Neutral");
             ClearSmoke("Smokescreens");
@@ -4077,7 +3970,6 @@ log("Same had 2")
             _.forEach(UnitArray,unit => {
                 unit.resetflags();
             });
-
             state.TY.currentUnitID = "";
         }
     }
@@ -4115,65 +4007,21 @@ log("Same had 2")
         }
     }
 
-    const FieldPromotions = () => {
-        let team = CheckArray.shift();
-        if (team) {
-            let location = team.location;
-            sendPing(location.x,location.y, Campaign().get('playerpageid'), null, true); 
-            SetupCard(team.name,"Promote",team.nation);
-            outputCard.body.push("Roll Against: 3+");
-            ButtonInfo("Roll","!RollD6;Promote;" + team.id);
-            PrintCard();
-        } else {
-            StartStep("Remount");
-        }
-    }
 
-    const RemountChecks = () => {
+    const MoraleChecks = () => {
         let team = CheckArray.shift();
         if (team) {
             let location = team.location;
             sendPing(location.x,location.y, Campaign().get('playerpageid'), null, true); 
-            SetupCard(team.name,"Remount",team.nation);
-            outputCard.body.push("Roll Against: " + team.remount);
-            ButtonInfo("Roll","!RollD6;Remount;" + team.id + ";" + team.remount);
+            SetupCard(team.name,"Morale",team.nation);
+            outputCard.body.push("Roll Against: " + team.rally);
+            ButtonInfo("Roll","!RollD6;Rally;" + team.id + ";" + team.rally);
             PrintCard();
         } else {
-            StartStep("Rally");
+            StartStep("Final");
         }
     }
     
-    const RallyChecks = () => {
-        let unit = CheckArray.shift();
-        if (unit) {
-            SetupCard(unit.name,"Rally",unit.nation);
-            let unitLeader = TeamArray[unit.teamIDs[0]];
-            let location = unitLeader.location;
-            let rally = unitLeader.rally;    
-            sendPing(location.x,location.y, Campaign().get('playerpageid'), null, true); 
-            outputCard.body.push("Roll Against: " + rally);
-            ButtonInfo("Roll","!RollD6;Rally;" + unit.id + ";" + rally);
-            PrintCard();
-        } else {
-            StartStep("Unit Morale");
-         }
-    }
-    
-    const MoraleChecks = () => {
-        let unit = CheckArray.shift();
-        if (unit) {
-            SetupCard(unit.name,"Unit Morale",unit.nation);
-            let unitLeader = TeamArray[unit.teamIDs[0]];
-            let location = unitLeader.location;
-            let morale = unitLeader.morale;
-            sendPing(location.x,location.y, Campaign().get('playerpageid'), null, true); 
-            outputCard.body.push("Roll Against: " + morale);
-            ButtonInfo("Roll","!RollD6;UnitMorale;" + unit.id + ";" + morale);
-            PrintCard();
-        } else {
-            StartStep("Formation Morale");
-        }
-    }
     
     const BreakOff = (msg) => {
         let defendingPlayer = msg.content.split(";")[1];
@@ -4212,7 +4060,7 @@ log("Same had 2")
             sendChat("player|" + playerID,res);
         } else {
             let type = Tag[1];
-            if (type === "Remount") {
+            if (type === "Rally") {
                 let id = Tag[2];
                 let needed = parseInt(Tag[3]);
                 let neededText = needed.toString() + "+";
@@ -4240,107 +4088,6 @@ log("Same had 2")
                     part1 = "Next Team";
                 } 
                 ButtonInfo(part1,"!RemountChecks");
-                PrintCard();
-            } else if (type === "Rally") {
-                let unitID = Tag[2];
-                let needed = parseInt(Tag[3]);
-                let unit = UnitArray[unitID];
-                let roll = randomInteger(6);
-                let unitLeader = TeamArray[unit.teamIDs[0]];
-                SetupCard(unit.name,"Needing: " + needed + "+",unit.nation);
-                outputCard.body.push("Unit Leader: " + DisplayDice(roll,unit.nation,24));
-                let reroll = CommandReroll(unitLeader);
-                if (roll < needed && reroll > -1) {
-                    outputCard.body.push("Commander Reroll: " + DisplayDice(reroll,unit.nation,24));
-                }
-                if (roll >= needed || reroll >= needed) {
-                    outputCard.body.push("Success!");
-                    unit.unpin();
-                } else {
-                    outputCard.body.push("Failure! Unit remains Pinned");
-                }
-                let part1 = "Done";
-                if (CheckArray.length > 0) {
-                    part1 = "Next Unit";
-                } 
-                ButtonInfo(part1,"!RallyChecks");
-                PrintCard();
-            } else if (type === "UnitMorale") {
-                let unitID = Tag[2];
-                let needed = parseInt(Tag[3]);
-                let unit = UnitArray[unitID];
-                let roll = randomInteger(6);
-                let unitLeader = TeamArray[unit.teamIDs[0]];
-                if (!unitLeader) {
-                    log("ERROR with Unit Leader of unit: " + unit.name)
-                    return;
-                }
-                SetupCard(unit.name,"Needing: " + needed + "+",unit.nation);
-                outputCard.body.push("Unit Leader: " + DisplayDice(roll,unit.nation,24));
-                let reroll = CommandReroll(unitLeader);
-                if (roll < needed && reroll > -1) {
-                    outputCard.body.push("Commander Reroll: " + DisplayDice(reroll,unit.nation,24));
-                }
-                if (roll >= needed || reroll >= needed) {
-                    outputCard.body.push("Success!");
-                    outputCard.body.push("Unit continues to fight.");
-                } else {
-                    outputCard.body.push("Failure! Unit Flees the Field!");
-                    outputCard.body.push("(Any associated Transports Should be Removed)");
-/*
-                    FormationArray[unit.formationID].remove(unit);
-                    for (let i=0;i<unit.teamIDs;i++) {
-                        let id = unit.teamIDs[i];
-                        TeamArray[id].Kill();
-                    }
-*/
-
-                }
-                let part1 = "Done";
-                if (CheckArray.length > 0) {
-                    part1 = "Next Unit";
-                } 
-                ButtonInfo(part1,"!MoraleChecks");
-                PrintCard();
-            } else if (type === "Promote") {
-                let id = Tag[2];
-                let team = TeamArray[id]
-                let roll = randomInteger(6);
-                SetupCard(team.name,"Needing: 3+",team.nation);
-                outputCard.body.push("Roll: " + DisplayDice(roll,team.nation,24));
-                if (roll < 3) {
-                    outputCard.body.push("Failure!");
-                    outputCard.body.push("The Formation now lacks an HQ for the remainder of the Battle");
-                } else {
-                    outputCard.body.push("Success!");
-                    outputCard.body.push(team.name + " assumes Command");
-                    outputCard.body.push("He leaves his current Unit to form an HQ unit");
-                    outputCard.body.push("Promoted Leaders cannot Spot");
-                    let originalUnit = UnitArray[team.unitID];
-                    originalUnit.remove(team);
-                    let newUnit = new Unit(team.nation,stringGen(),"Promoted HQ",team.formationID);
-                    newUnit.add(team);
-                    let r = 0.1;
-                    if (team.type === "Infantry") {r = 0.25};
-                    let name = PromotedName(team);
-                    team.token.set({
-                        name: name,
-                        tint_color: "transparent",
-                        aura1_color: Colours.green,
-                        aura1_radius: r,
-                        showname: true,
-                        statusmarkers: "",
-                    })                    
-                    team.name = name;
-                    newUnit.hqUnit = true;
-                    newUnit.size = 1;
-                    team.token.set(SM.HQ,true);
-                }
-                let part1 = "Done";
-                if (CheckArray.length > 0) {
-                    part1 = "Next Formation";
-                }
-                ButtonInfo(part1,"!FieldPromotions");
                 PrintCard();
             } else if (type === "Counterattack") {
                 let defUnitIDs = [];
@@ -6080,21 +5827,15 @@ log(marker);
         }
         if (newLeader !== undefined) {
             let aura1 = oldLeader.token.get("aura1_color");
-            let name1 = oldLeader.name;
-            let name2 = newLeader.name;
             newLeader.token.set({
-                name: name1,
                 aura1_color: aura1,
             });
             oldLeader.token.set({
-                name: name2,
                 aura1_color: "transparent",
             });
-            oldLeader.name = name2;
-            newLeader.name = name1;
             let old_index = unit.teamIDs.indexOf(newLeader.id);
             unit.teamIDs.splice(0, 0, unit.teamIDs.splice(old_index, 1)[0]);
-            text = name1 + " takes command of " + name2;
+            text = newLeader.name + " takes command of the Unit";
         }
         return text;
     }
@@ -6996,15 +6737,6 @@ log("Charge Dist: " + chargeDist)
                 break;
             case '!AdvanceStep':
                 AdvanceStep();
-                break;
-            case '!RemountChecks':
-                RemountChecks();
-                break;
-            case '!RallyChecks':
-                RallyChecks();
-                break;
-            case '!FieldPromotions':
-                FieldPromotions();
                 break;
             case '!MoraleChecks':
                 MoraleChecks();
