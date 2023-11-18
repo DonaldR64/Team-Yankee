@@ -15,6 +15,8 @@ const TY = (() => {
     let CheckArray = []; //used by Remount, Rally and Morale checks
     let RangedInArray = {};
     let WreckArray = {};//used for night vision
+    let delayedOut = [];
+
 
     let unitCreationInfo = {}; //used during unit creation 
     let unitIDs4Saves = {}; //used during shooting routines
@@ -126,6 +128,7 @@ const TY = (() => {
         "saved": "Hit Saved",
         "cover": "Hit Saved by Cover",
         "smoked": "Target Smoked",
+        "injury": "[#0000ff]Hit kills some of the Squad[/#]",
     }
 
     const SaveResultsMult = {
@@ -137,6 +140,7 @@ const TY = (() => {
         "flees": "[#ff0000]Hits Destroy Tank as the Crew Flees![/#]",
         "saved": "All Hits Saved",
         "cover": "All Hits Saved (Cover)",
+        "injury": "[#0000ff]Hits kills some of the Squad[/#]",
     }
 
     let outputCard = {title: "",subtitle: "",nation: "",body: [],buttons: []};
@@ -1457,10 +1461,21 @@ log(hit)
                     if (fpRoll < weapon.fp) {
                         save.result = "cover";
                     } else {
-                        if (save.tip.charAt(0) != "💀") {
-                            save.tip = "💀" + save.tip
+                        let hp = parseInt(this.token.get("bar1_value")) || 1;
+                        let charZero = save.tip.charAt(0);
+                        if (hp > 1) {
+                            hp--;
+                            this.token.set("bar1_value",hp);
+                            save.result = "injury";
+                            save.tip = "🩸" + save.tip;
+                        } else {
+                            if (charZero === "🩸") {
+                                save.tip.charAt(0) = "💀"
+                            } else if (charZero !== "💀" || charZero !== "🩸") {
+                                save.tip = "💀" + save.tip
+                            }
+                            save.result = "destroyed";
                         }
-                        save.result = "destroyed";
                     }
                 } else {
                     if (save.tip.charAt(0) != "💀") {
@@ -1502,6 +1517,29 @@ log(hit)
             if (this.type === "Tank" || this.type === "Helicopter") {
                 this.wreck();
                 PlaySound("Explosion")
+                if (this.queryCondition("Passengers") === true) {
+                    let passengers = state.TY.passengers[this.id];
+                    if (passengers) {
+                        for (let i=0;i<passengers.length;i++) {
+                            let passengerTeam = TeamArray[passengers[i]];
+                            UnitArray[passengerTeam.unitID].pin();
+                            passengerTeam.token.set("layer","objects");
+                            toFront(passengerTeam.token);
+                            let needed = passengerTeam.armourF;
+                            if (state.TY.step === "Assault") {
+                                needed = 7;
+                            }
+                            let roll = randomInteger(6);
+                            if (roll < needed) {
+                                outputCard.bottom.push(passengerTeam.name + " is killed as well");
+                                passengerTeam.kill();
+                            } else {
+                                outputCard.bottom.push(passengerTeam.name + " survives");
+                            }
+                        }
+                        this.removeCondition("Passengers");
+                    }
+                }
             } else {
                 this.token.set({
                     layer: "map",
@@ -1692,6 +1730,7 @@ log(hit)
         outputCard.body = [];
         outputCard.buttons = [];
         outputCard.inline = [];
+        outputCard.bottom = [];
     }
 
     const DisplayDice = (roll,tablename,size) => {
@@ -2091,6 +2130,24 @@ log(hit)
                 out += `"> <div style='text-align: centre; display:block;'>`;
                 out += line + `</div></span></div></div>`;                
             }
+            output += out;
+        }
+
+        for (let i=0;i<outputCard.bottom.length;i++) {
+            let out = "";
+            let line = outputCard.bottom[i];
+            if (!line || line === "") {continue};
+            line = line.replace(/\[hr(.*?)\]/gi, '<hr style="width:95%; align:centre; margin:0px 0px 5px 5px; border-top:2px solid $1;">');
+            line = line.replace(/\[\#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})\](.*?)\[\/[\#]\]/g, "<span style='color: #$1;'>$2</span>"); // [#xxx] or [#xxxx]...[/#] for color codes. xxx is a 3-digit hex code
+            line = line.replace(/\[[Uu]\](.*?)\[\/[Uu]\]/g, "<u>$1</u>"); // [U]...[/u] for underline
+            line = line.replace(/\[[Bb]\](.*?)\[\/[Bb]\]/g, "<b>$1</b>"); // [B]...[/B] for bolding
+            line = line.replace(/\[[Ii]\](.*?)\[\/[Ii]\]/g, "<i>$1</i>"); // [I]...[/I] for italics
+            let lineBack = (i % 2 === 0) ? "#D3D3D3" : "#EEEEEE";
+            out += `<div style="display: table-row; background: ` + lineBack + `;; `;
+            out += `"><div style="display: table-cell; padding: 0px 0px; font-family: Arial; font-style: normal; font-weight: normal; font-size: 14px; `;
+            out += `"><span style="line-height: normal; color: #000000; `;
+            out += `"> <div style='text-align: centre; display:block;'>`;
+            out += line + `</div></span></div></div>`;  
             output += out;
         }
 
@@ -3529,7 +3586,7 @@ log("Neither is Air")
                     }
                 } else {
                     let shellType = "Regular";
-                    if (type === "Gun" && smoke === true) {
+                    if (weaponType === "Gun" && smoke === true) {
                         shellType = "?{Fire Smoke|No,Regular|Yes,Smoke}";
                     }
                     abilityName = weaponNum + ": " + names;
@@ -3941,6 +3998,7 @@ log("Same had 2")
                     }
                     if ((hexMap[unitLeader.hexLabel].terrain.includes("Offboard") && unitLeader.type !== "Helicopter" && unit.inReserve === false) || unitLeader.token.get("aura1_color") === Colours.black || unitLeader.token.get("aura1_color") === Colours.lightpurple) {continue};
                     if (unitLeader.bailed === true) {continue};
+                    if (unitLeader.token.get("layer") === "walls") {continue};
                     let pos = unitLeader.location;
                     sendPing(pos.x,pos.y, Campaign().get('playerpageid'), null, true); 
                     SetupCard(unit.nation,"",unit.nation);
@@ -6195,7 +6253,6 @@ log(marker);
             pageid: Campaign().get("playerpageid"),
             imgsrc: img,
             layer: "map",
-            gmnotes: currentPlayer,
         });
         toFront(newToken);
         //add to hexMap
@@ -6330,7 +6387,6 @@ log(results)
                 outputCard.body.push("Entire Unit Killed");
             }
 
-            unit.linkedUnitID = "";
             PrintCard();
         }
         unitIDs4Saves = {};
@@ -6354,6 +6410,7 @@ log(results)
             "saved": 0,
             "cover": 0,
             "smoked": 0,
+            "injury": 0,
         }
         let save; //as single hit's save can then carry onto output part
     
@@ -6392,6 +6449,8 @@ log(results)
             } else if (team.type === "Infantry" || team.type === "Unarmoured Tank" || team.type === "Gun") {
                 if (outputArray.destroyed > 0) {
                     saveResult.push(SaveResultsMult.destroyed);
+                } else if (outputArray.injury > 0) {
+                    saveResult.push(SaveResultsMult.injury);
                 } else if (outputArray.cover > 0) {
                     saveResult.push(SaveResultsMult.cover);
                 } else if (outputArray.saved > 0) {
@@ -6411,7 +6470,7 @@ log(results)
             }
         }
     
-        if (outputArray.destroyed > 0) {
+        if (outputArray.destroyed > 0 || outputArray.flees > 0) {
             team.kill();
         }
     
@@ -6745,12 +6804,13 @@ log("Charge Dist: " + chargeDist)
         let passengerID = Tag[1];
         let transportID = Tag[2];
         let passengerTeam = TeamArray[passengerID];
+        let pSize = parseInt(passengerTeam.token.get("bar1_value")) || 1;
         let transportTeam = TeamArray[transportID];
         SetupCard(passengerTeam.name,"Mount",passengerTeam.nation);
         let errorMsg;
         let distance = passengerTeam.hex.distance(transportTeam.hex);
-        if (state.TY.step !== "Movement") {
-            errorMsg = "Teams can only Mount in the Movement Phase";
+        if (state.TY.step !== "Move and Fire" && state.TY.turn > 0) {
+            errorMsg = "Teams can only Mount in the Move and Fire Step";
         }
         if (transportTeam.maxPass === 0) {
             errorMsg = "Not a Transport or Tank";
@@ -6762,16 +6822,28 @@ log("Charge Dist: " + chargeDist)
             state.TY.passengers[transportID] = [];
         }
         let passengers = state.TY.passengers[transportID];
-        let room = parseInt(transportTeam.maxPass) - parseInt(passengers.length);
-        if (room < 1) {
-            errorMsg = "No More Room";
+        let taken = 0;
+
+        for (let p=0;p<passengers.length;p++) {
+            let pTeam = TeamArray[passengers[p]];
+            let pTeamSize = parseInt(pTeam.token.get("bar1_value")) || 1;
+            taken += pTeamSize;
         }
+        let room = parseInt(transportTeam.maxPass) - taken;
+        if (room < pSize) {
+            errorMsg = "Not enough Room for this Team or Squad";
+        }
+        room -= pSize;
         if (errorMsg !== undefined) {
             outputCard.body.push(errorMsg);
             PrintCard();
             return;
         }
         passengers.push(passengerID);
+        passengerTeam.location = transportTeam.location;
+        passengerTeam.hexLabel = transportTeam.hexLabel;
+        passengerTeam.hex = transportTeam.hex;
+
         if (passengers.length === 1) {
             //after first, dont need to add icon
             transportTeam.addCondition("Passengers");
@@ -6781,7 +6853,11 @@ log("Charge Dist: " + chargeDist)
         passengerTeam.token.set("layer","walls");
 
         outputCard.body.push(passengerTeam.name + " Loaded");
-        outputCard.body.push(transportTeam + " has " + (room-1) + " Transport Left");
+        if (room > 0) {
+            outputCard.body.push("Transport has " + room + " Transport Left");
+        } else {
+            outputCard.body.push("Transport is full.");
+        }
         PrintCard();
     }
 
@@ -6790,8 +6866,8 @@ log("Charge Dist: " + chargeDist)
         let transportTeam = TeamArray[id];
         let passengers;
         SetupCard(transportTeam.name,"Dismount",transportTeam.nation);
-        if (state.TY.step !== "Movement") {
-            outputCard.body.push("Can only Dismount in the Movement Step");
+        if (state.TY.step !== "Move and Fire" && state.TY.turn > 0) {
+            outputCard.body.push("Can only Dismount in the Move and Fire Step");
             PrintCard();
             return;
         }
@@ -6802,7 +6878,7 @@ log("Charge Dist: " + chargeDist)
             for (let i=0;i<passengers.length;i++) {
                 let passengerTeam = TeamArray[passengers[i]];
                 passengerTeam.token.set("layer","objects");
-                toFront(passengerTeam);
+                toFront(passengerTeam.token);
             }
             transportTeam.removeCondition("Passengers");
             state.TY.passengers[id] = [];
