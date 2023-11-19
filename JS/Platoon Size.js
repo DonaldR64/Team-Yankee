@@ -951,7 +951,7 @@ log("Special Text: " + specialText)
             this.unitID = unitID;
 
             this.type = type;    
-            this.main = attributeArray.main;
+            this.main = (attributeArray.main === "true") ? true:false;
             this.location = location;
             this.prevHexLabel = hexLabel;
             this.prevHex = hex;
