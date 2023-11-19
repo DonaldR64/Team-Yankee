@@ -762,32 +762,16 @@
                 cross = "AUTO";
             }
 
-            let w1R = parseInt(values.weapon1range);
-            let w2R = parseInt(values.weapon2range);
-            let w3R = parseInt(values.weapon3range);
-            let w4R = parseInt(values.weapon4range);
-            let w5R = parseInt(values.weapon5range);
-            let w1rangetext = "";
-            let w2rangetext = "";
-            let w3rangetext = "";
-            let w4rangetext = "";
-            let w5rangetext = "";
-
-            if (isNaN(w1R) === false) {
-                w1rangetext = Math.floor(w1R/2) + "/" + w1R + "/" + Math.floor(w1R*1.5) || "";
+            let w1R = values.weapon1range;
+            if (!w1R) {
+                w1rangetext = "";
+            } else if (w1R === "CC") {
+                w1rangetext = "CC";
+            } else {
+                w1R = parseInt(w1R);
+                w1rangetext = Math.floor(w1R/2) + "/" + w1R + "/" + Math.floor(w1R*1.5);
             }
-            if (isNaN(w2R)) {
-                w2rangetext = Math.floor(w2R/2) + "/" + w2R + "/" + Math.floor(w2R*1.5) || "";
-            }
-            if (isNaN(w3R)) {
-                w3rangetext = Math.floor(w3R/2) + "/" + w3R + "/" + Math.floor(w3R*1.5) || "";
-            }
-            if (isNaN(w4R)) {
-                w4rangetext = Math.floor(w4R/2) + "/" + w4R + "/" + Math.floor(w4R*1.5) || "";
-            }
-            if (isNaN(w5R)) {
-                w5rangetext = Math.floor(w5R/2) + "/" + w5R + "/" + Math.floor(w5R*1.5) || "";
-            }
+            
 
             setAttrs({
                 "nationimage": nationImage,
@@ -806,10 +790,7 @@
                 "airmove": am,
                 "main": main,
                 "weapon1text": w1rangetext,
-                "weapon2text": w2rangetext,
-                "weapon3text": w3rangetext,
-                "weapon4text": w4rangetext,
-                "weapon5text": w5rangetext,
+                
             })
         });    
     });  
