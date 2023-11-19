@@ -143,7 +143,6 @@ const TY = (() => {
     let outputCard = {title: "",subtitle: "",nation: "",body: [],buttons: []};
     const WarsawPact = ["Soviet","Poland","Syria"];
     const NATO = ["US Army","US Marine Corps","British","West Germany","Canada","Israel"];
-    const lastStandCount = {"Infantry": 3,"Gun": 2,"Tank": 2,"Unarmoured Tank": 2,"Aircraft": 1,};
 
     const Ranks = {
                 "German": ["Major ","Hauptmann ","Oberleutnant ","Feldwebel "],
@@ -151,6 +150,9 @@ const TY = (() => {
                 "Soviet": ["Podpolkovnik ","Majór ","Kapitán ","Leytnant ","Serzhant "],
                 "Arabic": ["Muquddam ","Ra'id ","Naqib ","Mulazim ","Raqib ",]
     };
+
+
+
 
     //Types: Flat = 0, Short = 1, Tall = 2, Building = 3
     //Dash: Road = 0,Country = 1,Terrain = 2, Tank Obstacle = 3, Impassable = 4
@@ -213,7 +215,7 @@ const TY = (() => {
             "pinnedCharID": "-NhltPoS8_P4_rslcUsA",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/319032004/qf3aHgIiFnJ0aYoPOFR-TA/thumb.png?1671325647",
             "objectiveimage": "https://s3.amazonaws.com/files.d20.io/images/365313516/Bpy0UrmmYYph7t5xLL0o9A/thumb.png?1698546715",
-            "platoonmarkers": ["letters_and_numbers0099::4815235","letters_and_numbers0100::4815236","letters_and_numbers0101::4815237","letters_and_numbers0102::4815238","letters_and_numbers0103::4815239","letters_and_numbers0104::4815240","letters_and_numbers0105::4815241","letters_and_numbers0106::4815242","letters_and_numbers0107::4815243","letters_and_numbers0108::4815244","letters_and_numbers0109::4815245","letters_and_numbers0110::4815246","letters_and_numbers0111::4815247","letters_and_numbers0112::4815248","letters_and_numbers0113::4815249","letters_and_numbers0114::4815250","letters_and_numbers0115::4815251","letters_and_numbers0116::4815252","letters_and_numbers0117::4815253","letters_and_numbers0118::4815254","letters_and_numbers0119::4815255","letters_and_numbers0120::4815256","letters_and_numbers0121::4815257","letters_and_numbers0122::4815258","letters_and_numbers0123::4815259","letters_and_numbers0124::4815260"],
+            "unitmarkers": ["letters_and_numbers0099::4815235","letters_and_numbers0100::4815236","letters_and_numbers0101::4815237","letters_and_numbers0102::4815238","letters_and_numbers0103::4815239","letters_and_numbers0104::4815240","letters_and_numbers0105::4815241","letters_and_numbers0106::4815242","letters_and_numbers0107::4815243","letters_and_numbers0108::4815244","letters_and_numbers0109::4815245","letters_and_numbers0110::4815246","letters_and_numbers0111::4815247","letters_and_numbers0112::4815248","letters_and_numbers0113::4815249","letters_and_numbers0114::4815250","letters_and_numbers0115::4815251","letters_and_numbers0116::4815252","letters_and_numbers0117::4815253","letters_and_numbers0118::4815254","letters_and_numbers0119::4815255","letters_and_numbers0120::4815256","letters_and_numbers0121::4815257","letters_and_numbers0122::4815258","letters_and_numbers0123::4815259","letters_and_numbers0124::4815260"],
         },
         "West Germany": {
             "image": "https://s3.amazonaws.com/files.d20.io/images/329415788/ypEgv2eFi-BKX3YK6q_uOQ/thumb.png?1677173028",
@@ -231,7 +233,7 @@ const TY = (() => {
             "pinnedCharID": "",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/319029852/xSAh0T5hTSCOSHrRZKBrtA/thumb.png?1671324745",
             "objectiveimage": "",
-            "platoonmarkers": ["letters_and_numbers0197::4815333","letters_and_numbers0198::4815334","letters_and_numbers0199::4815335","letters_and_numbers0200::4815336","letters_and_numbers0201::4815337","letters_and_numbers0202::4815338","letters_and_numbers0203::4815339","letters_and_numbers0204::4815340","letters_and_numbers0205::4815341","letters_and_numbers0206::4815342","letters_and_numbers0207::4815343","letters_and_numbers0208::4815344","letters_and_numbers0209::4815345","letters_and_numbers0210::4815346","letters_and_numbers0211::4815347","letters_and_numbers0212::4815348","letters_and_numbers0213::4815349","letters_and_numbers0214::4815350","letters_and_numbers0215::4815351","letters_and_numbers0216::4815352","letters_and_numbers0217::4815353","letters_and_numbers0218::4815354","letters_and_numbers0219::4815355","letters_and_numbers0220::4815356","letters_and_numbers0221::4815357","letters_and_numbers0222::4815358"],
+            "unitmarkers": ["letters_and_numbers0197::4815333","letters_and_numbers0198::4815334","letters_and_numbers0199::4815335","letters_and_numbers0200::4815336","letters_and_numbers0201::4815337","letters_and_numbers0202::4815338","letters_and_numbers0203::4815339","letters_and_numbers0204::4815340","letters_and_numbers0205::4815341","letters_and_numbers0206::4815342","letters_and_numbers0207::4815343","letters_and_numbers0208::4815344","letters_and_numbers0209::4815345","letters_and_numbers0210::4815346","letters_and_numbers0211::4815347","letters_and_numbers0212::4815348","letters_and_numbers0213::4815349","letters_and_numbers0214::4815350","letters_and_numbers0215::4815351","letters_and_numbers0216::4815352","letters_and_numbers0217::4815353","letters_and_numbers0218::4815354","letters_and_numbers0219::4815355","letters_and_numbers0220::4815356","letters_and_numbers0221::4815357","letters_and_numbers0222::4815358"],
         },
         "British": {
             "image": "https://s3.amazonaws.com/files.d20.io/images/330506939/YtTgDTM3q7p8m0fJ4-E13A/thumb.png?1677713592",
@@ -249,7 +251,7 @@ const TY = (() => {
             "pinnedCharID": "-NhtBzw_bXWrJORCxWZK",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/327891446/xsAVVJ0Ft-xZW92JUtZBdw/thumb.png?1676321000",
             "objectiveimage": "https://s3.amazonaws.com/files.d20.io/images/365313551/2_miHmMrIheFFKq-5m3Iyw/thumb.png?1698546731",
-            "platoonmarkers": ["letters_and_numbers0148::4815284","letters_and_numbers0149::4815285","letters_and_numbers0150::4815286","letters_and_numbers0151::4815287","letters_and_numbers0152::4815288","letters_and_numbers0153::4815289","letters_and_numbers0154::4815290","letters_and_numbers0155::4815291","letters_and_numbers0156::4815292","letters_and_numbers0157::4815293","letters_and_numbers0158::4815294","letters_and_numbers0159::4815295","letters_and_numbers0160::4815296","letters_and_numbers0161::4815297","letters_and_numbers0162::4815298","letters_and_numbers0163::4815299","letters_and_numbers0164::4815300","letters_and_numbers0165::4815301","letters_and_numbers0166::4815302","letters_and_numbers0167::4815303","letters_and_numbers0168::4815304","letters_and_numbers0169::4815305","letters_and_numbers0170::4815306","letters_and_numbers0171::4815307","letters_and_numbers0172::4815308","letters_and_numbers0173::4815309"],
+            "unitmarkers": ["letters_and_numbers0148::4815284","letters_and_numbers0149::4815285","letters_and_numbers0150::4815286","letters_and_numbers0151::4815287","letters_and_numbers0152::4815288","letters_and_numbers0153::4815289","letters_and_numbers0154::4815290","letters_and_numbers0155::4815291","letters_and_numbers0156::4815292","letters_and_numbers0157::4815293","letters_and_numbers0158::4815294","letters_and_numbers0159::4815295","letters_and_numbers0160::4815296","letters_and_numbers0161::4815297","letters_and_numbers0162::4815298","letters_and_numbers0163::4815299","letters_and_numbers0164::4815300","letters_and_numbers0165::4815301","letters_and_numbers0166::4815302","letters_and_numbers0167::4815303","letters_and_numbers0168::4815304","letters_and_numbers0169::4815305","letters_and_numbers0170::4815306","letters_and_numbers0171::4815307","letters_and_numbers0172::4815308","letters_and_numbers0173::4815309"],
         },
         "US Army": {
             "image": "https://s3.amazonaws.com/files.d20.io/images/327595663/Nwyhbv22KB4_xvwYEbL3PQ/thumb.png?1676165491",
@@ -267,7 +269,7 @@ const TY = (() => {
             "pinnedCharID": "-NhtC--h2t90ayjtfXPx",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/327891469/QfaYQvRbVs7tA_3jGFwQ9Q/thumb.png?1676321007",
             "objectiveimage": "https://s3.amazonaws.com/files.d20.io/images/365313723/o7CvHeJhHOVJ9h2tUECKfQ/thumb.png?1698546825",
-            "platoonmarkers": ["letters_and_numbers0050::4815186","letters_and_numbers0051::4815187","letters_and_numbers0052::4815188","letters_and_numbers0053::4815189","letters_and_numbers0054::4815190","letters_and_numbers0055::4815191","letters_and_numbers0056::4815192","letters_and_numbers0057::4815193","letters_and_numbers0058::4815194","letters_and_numbers0059::4815195","letters_and_numbers0060::4815196","letters_and_numbers0061::4815197","letters_and_numbers0062::4815198","letters_and_numbers0063::4815199","letters_and_numbers0064::4815200","letters_and_numbers0065::4815201","letters_and_numbers0066::4815202","letters_and_numbers0067::4815203","letters_and_numbers0068::4815204","letters_and_numbers0069::4815205","letters_and_numbers0070::4815206","letters_and_numbers0071::4815207","letters_and_numbers0072::4815208","letters_and_numbers0073::4815209","letters_and_numbers0074::4815210","letters_and_numbers0075::4815211"],
+            "unitmarkers": ["letters_and_numbers0050::4815186","letters_and_numbers0051::4815187","letters_and_numbers0052::4815188","letters_and_numbers0053::4815189","letters_and_numbers0054::4815190","letters_and_numbers0055::4815191","letters_and_numbers0056::4815192","letters_and_numbers0057::4815193","letters_and_numbers0058::4815194","letters_and_numbers0059::4815195","letters_and_numbers0060::4815196","letters_and_numbers0061::4815197","letters_and_numbers0062::4815198","letters_and_numbers0063::4815199","letters_and_numbers0064::4815200","letters_and_numbers0065::4815201","letters_and_numbers0066::4815202","letters_and_numbers0067::4815203","letters_and_numbers0068::4815204","letters_and_numbers0069::4815205","letters_and_numbers0070::4815206","letters_and_numbers0071::4815207","letters_and_numbers0072::4815208","letters_and_numbers0073::4815209","letters_and_numbers0074::4815210","letters_and_numbers0075::4815211"],
         },
         "US Marine Corps": {
             "image": "https://s3.amazonaws.com/files.d20.io/images/327769203/uM2mlqoLnxDD_ptnBdNXfg/thumb.png?1676240966",
@@ -280,7 +282,7 @@ const TY = (() => {
             "ranks": "Western",
             "names": "USA",
             "rangedIn": "https://s3.amazonaws.com/files.d20.io/images/328835177/sjCggEYtL2PfE32fyQV4zw/thumb.png?1676837406",
-            "platoonmarkers": ["","letters_and_numbers0148::4815284","letters_and_numbers0149::4815285","letters_and_numbers0150::4815286","letters_and_numbers0151::4815287","letters_and_numbers0152::4815288","letters_and_numbers0153::4815289","letters_and_numbers0154::4815290","letters_and_numbers0155::4815291","letters_and_numbers0156::4815292","letters_and_numbers0157::4815293","letters_and_numbers0158::4815294","letters_and_numbers0159::4815295","letters_and_numbers0160::4815296","letters_and_numbers0161::4815297","letters_and_numbers0162::4815298","letters_and_numbers0163::4815299","letters_and_numbers0164::4815300","letters_and_numbers0165::4815301","letters_and_numbers0166::4815302","letters_and_numbers0167::4815303","letters_and_numbers0168::4815304","letters_and_numbers0169::4815305","letters_and_numbers0170::4815306","letters_and_numbers0171::4815307","letters_and_numbers0172::4815308","letters_and_numbers0173::4815309"],
+            "unitmarkers": ["","letters_and_numbers0148::4815284","letters_and_numbers0149::4815285","letters_and_numbers0150::4815286","letters_and_numbers0151::4815287","letters_and_numbers0152::4815288","letters_and_numbers0153::4815289","letters_and_numbers0154::4815290","letters_and_numbers0155::4815291","letters_and_numbers0156::4815292","letters_and_numbers0157::4815293","letters_and_numbers0158::4815294","letters_and_numbers0159::4815295","letters_and_numbers0160::4815296","letters_and_numbers0161::4815297","letters_and_numbers0162::4815298","letters_and_numbers0163::4815299","letters_and_numbers0164::4815300","letters_and_numbers0165::4815301","letters_and_numbers0166::4815302","letters_and_numbers0167::4815303","letters_and_numbers0168::4815304","letters_and_numbers0169::4815305","letters_and_numbers0170::4815306","letters_and_numbers0171::4815307","letters_and_numbers0172::4815308","letters_and_numbers0173::4815309"],
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/327891469/QfaYQvRbVs7tA_3jGFwQ9Q/thumb.png?1676321007",
         },
 
@@ -303,7 +305,7 @@ const TY = (() => {
             "borderColour": "#FF0000",
             "borderStyle": "5px ridge",
             "rangedIn": "https://s3.amazonaws.com/files.d20.io/images/307909232/aEbkdXCShELgc4zcz89srg/thumb.png?1665016513",
-            "platoonmarkers": ["","letters_and_numbers0099::4815235","letters_and_numbers0100::4815236","letters_and_numbers0101::4815237","letters_and_numbers0102::4815238","letters_and_numbers0103::4815239","letters_and_numbers0104::4815240","letters_and_numbers0105::4815241","letters_and_numbers0106::4815242","letters_and_numbers0107::4815243","letters_and_numbers0108::4815244","letters_and_numbers0109::4815245","letters_and_numbers0110::4815246","letters_and_numbers0111::4815247","letters_and_numbers0112::4815248","letters_and_numbers0113::4815249","letters_and_numbers0114::4815250","letters_and_numbers0115::4815251","letters_and_numbers0116::4815252","letters_and_numbers0117::4815253","letters_and_numbers0118::4815254","letters_and_numbers0119::4815255","letters_and_numbers0120::4815256","letters_and_numbers0121::4815257","letters_and_numbers0122::4815258","letters_and_numbers0123::4815259","letters_and_numbers0124::4815260"],
+            "unitmarkers": ["","letters_and_numbers0099::4815235","letters_and_numbers0100::4815236","letters_and_numbers0101::4815237","letters_and_numbers0102::4815238","letters_and_numbers0103::4815239","letters_and_numbers0104::4815240","letters_and_numbers0105::4815241","letters_and_numbers0106::4815242","letters_and_numbers0107::4815243","letters_and_numbers0108::4815244","letters_and_numbers0109::4815245","letters_and_numbers0110::4815246","letters_and_numbers0111::4815247","letters_and_numbers0112::4815248","letters_and_numbers0113::4815249","letters_and_numbers0114::4815250","letters_and_numbers0115::4815251","letters_and_numbers0116::4815252","letters_and_numbers0117::4815253","letters_and_numbers0118::4815254","letters_and_numbers0119::4815255","letters_and_numbers0120::4815256","letters_and_numbers0121::4815257","letters_and_numbers0122::4815258","letters_and_numbers0123::4815259","letters_and_numbers0124::4815260"],
         },
         "NATO": {
             "image": "https://s3.amazonaws.com/files.d20.io/images/341399549/70dmI15RviYyvp1MxHkf4A/thumb.webp?1683859627",
@@ -314,7 +316,7 @@ const TY = (() => {
             "borderColour": "#BC2D2F",
             "borderStyle": "5px groove",
             "rangedIn": "https://s3.amazonaws.com/files.d20.io/images/328837544/KrWC027rT0Lw_ghCuu_5DQ/thumb.png?1676838067",
-            "platoonmarkers": ["","letters_and_numbers0148::4815284","letters_and_numbers0149::4815285","letters_and_numbers0150::4815286","letters_and_numbers0151::4815287","letters_and_numbers0152::4815288","letters_and_numbers0153::4815289","letters_and_numbers0154::4815290","letters_and_numbers0155::4815291","letters_and_numbers0156::4815292","letters_and_numbers0157::4815293","letters_and_numbers0158::4815294","letters_and_numbers0159::4815295","letters_and_numbers0160::4815296","letters_and_numbers0161::4815297","letters_and_numbers0162::4815298","letters_and_numbers0163::4815299","letters_and_numbers0164::4815300","letters_and_numbers0165::4815301","letters_and_numbers0166::4815302","letters_and_numbers0167::4815303","letters_and_numbers0168::4815304","letters_and_numbers0169::4815305","letters_and_numbers0170::4815306","letters_and_numbers0171::4815307","letters_and_numbers0172::4815308","letters_and_numbers0173::4815309"],
+            "unitmarkers": ["","letters_and_numbers0148::4815284","letters_and_numbers0149::4815285","letters_and_numbers0150::4815286","letters_and_numbers0151::4815287","letters_and_numbers0152::4815288","letters_and_numbers0153::4815289","letters_and_numbers0154::4815290","letters_and_numbers0155::4815291","letters_and_numbers0156::4815292","letters_and_numbers0157::4815293","letters_and_numbers0158::4815294","letters_and_numbers0159::4815295","letters_and_numbers0160::4815296","letters_and_numbers0161::4815297","letters_and_numbers0162::4815298","letters_and_numbers0163::4815299","letters_and_numbers0164::4815300","letters_and_numbers0165::4815301","letters_and_numbers0166::4815302","letters_and_numbers0167::4815303","letters_and_numbers0168::4815304","letters_and_numbers0169::4815305","letters_and_numbers0170::4815306","letters_and_numbers0171::4815307","letters_and_numbers0172::4815308","letters_and_numbers0173::4815309"],
         },
         "Canada": {
             "image": "https://s3.amazonaws.com/files.d20.io/images/341315251/n0tyjwJROMhYYaJhteCF_Q/thumb.png?1683817346",
@@ -353,7 +355,7 @@ const TY = (() => {
             "suppressed": "https://s3.amazonaws.com/files.d20.io/images/365910072/lx9C4uLHSh7XnCrzdJWPHg/thumb.png?1698940336",
             "pinnedCharID": "",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/327891446/xsAVVJ0Ft-xZW92JUtZBdw/thumb.png?1676321000",
-            "platoonmarkers": ["letters_and_numbers0148::4815284","letters_and_numbers0149::4815285","letters_and_numbers0150::4815286","letters_and_numbers0151::4815287","letters_and_numbers0152::4815288","letters_and_numbers0153::4815289","letters_and_numbers0154::4815290","letters_and_numbers0155::4815291","letters_and_numbers0156::4815292","letters_and_numbers0157::4815293","letters_and_numbers0158::4815294","letters_and_numbers0159::4815295","letters_and_numbers0160::4815296","letters_and_numbers0161::4815297","letters_and_numbers0162::4815298","letters_and_numbers0163::4815299","letters_and_numbers0164::4815300","letters_and_numbers0165::4815301","letters_and_numbers0166::4815302","letters_and_numbers0167::4815303","letters_and_numbers0168::4815304","letters_and_numbers0169::4815305","letters_and_numbers0170::4815306","letters_and_numbers0171::4815307","letters_and_numbers0172::4815308","letters_and_numbers0173::4815309"],
+            "unitmarkers": ["letters_and_numbers0148::4815284","letters_and_numbers0149::4815285","letters_and_numbers0150::4815286","letters_and_numbers0151::4815287","letters_and_numbers0152::4815288","letters_and_numbers0153::4815289","letters_and_numbers0154::4815290","letters_and_numbers0155::4815291","letters_and_numbers0156::4815292","letters_and_numbers0157::4815293","letters_and_numbers0158::4815294","letters_and_numbers0159::4815295","letters_and_numbers0160::4815296","letters_and_numbers0161::4815297","letters_and_numbers0162::4815298","letters_and_numbers0163::4815299","letters_and_numbers0164::4815300","letters_and_numbers0165::4815301","letters_and_numbers0166::4815302","letters_and_numbers0167::4815303","letters_and_numbers0168::4815304","letters_and_numbers0169::4815305","letters_and_numbers0170::4815306","letters_and_numbers0171::4815307","letters_and_numbers0172::4815308","letters_and_numbers0173::4815309"],
         },
         "Syria": {
             "image": "https://s3.amazonaws.com/files.d20.io/images/366073450/MaE7Hz3ruNZ-2LrDfZQicA/thumb.png?1699036295",
@@ -370,7 +372,7 @@ const TY = (() => {
             "suppressed": "https://s3.amazonaws.com/files.d20.io/images/365910087/WnjytMMCK-NJROZviRF6YA/thumb.png?1698940344",
             "pinnedCharID": "",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/319032004/qf3aHgIiFnJ0aYoPOFR-TA/thumb.png?1671325647",
-            "platoonmarkers": ["letters_and_numbers0197::4815333","letters_and_numbers0198::4815334","letters_and_numbers0199::4815335","letters_and_numbers0200::4815336","letters_and_numbers0201::4815337","letters_and_numbers0202::4815338","letters_and_numbers0203::4815339","letters_and_numbers0204::4815340","letters_and_numbers0205::4815341","letters_and_numbers0206::4815342","letters_and_numbers0207::4815343","letters_and_numbers0208::4815344","letters_and_numbers0209::4815345","letters_and_numbers0210::4815346","letters_and_numbers0211::4815347","letters_and_numbers0212::4815348","letters_and_numbers0213::4815349","letters_and_numbers0214::4815350","letters_and_numbers0215::4815351","letters_and_numbers0216::4815352","letters_and_numbers0217::4815353","letters_and_numbers0218::4815354","letters_and_numbers0219::4815355","letters_and_numbers0220::4815356","letters_and_numbers0221::4815357","letters_and_numbers0222::4815358"],
+            "unitmarkers": ["letters_and_numbers0197::4815333","letters_and_numbers0198::4815334","letters_and_numbers0199::4815335","letters_and_numbers0200::4815336","letters_and_numbers0201::4815337","letters_and_numbers0202::4815338","letters_and_numbers0203::4815339","letters_and_numbers0204::4815340","letters_and_numbers0205::4815341","letters_and_numbers0206::4815342","letters_and_numbers0207::4815343","letters_and_numbers0208::4815344","letters_and_numbers0209::4815345","letters_and_numbers0210::4815346","letters_and_numbers0211::4815347","letters_and_numbers0212::4815348","letters_and_numbers0213::4815349","letters_and_numbers0214::4815350","letters_and_numbers0215::4815351","letters_and_numbers0216::4815352","letters_and_numbers0217::4815353","letters_and_numbers0218::4815354","letters_and_numbers0219::4815355","letters_and_numbers0220::4815356","letters_and_numbers0221::4815357","letters_and_numbers0222::4815358"],
         },
 
 
@@ -582,8 +584,6 @@ const TY = (() => {
             this.nation = nation;
             this.player = (WarsawPact.includes(nation)) ? 0:1;
             this.teamIDs = [];
-            this.artillery = false;
-            this.type = "";
             this.number = number;
             this.inReserve = false;
 
@@ -601,12 +601,6 @@ const TY = (() => {
             if (this.teamIDs.includes(team.id) === false) {
                 this.teamIDs.push(team.id);
                 team.unitID = this.id;
-                if (team.artillery === true) {
-                    this.artillery = true;
-                }
-                if (team.special.includes("Passengers") === false) {
-                    this.type = team.type;
-                } 
             }
         }
 
@@ -624,21 +618,19 @@ const TY = (() => {
                 delete state.TY.units[this.id];
                 delete UnitArray[this.id];
             } else if (index === 0) {
-                let auraC = team.token.get("aura1_color");
+                //let auraC = team.token.get("aura1_color");
                 let newLeader = this.teamIDs[0];
-                if (!auraC || auraC === "transparent") {
-                    auraC = (this.order === "") ? Colours.green:Colours.black;
-                };
+                let newName = NameAndRank(newLeader,0,"Promote");
                 newLeader.token.set({
-                    aura1_color: auraC,
+                    name: newName,
                     tint_color: "transparent",
                 })
                 newLeader.inCommand = true;
+                newLeader.name = newName;
             } 
         }
 
         resetflags() {
-log(this.name + " in resetflags()")
             let newTeamIDs = [];
             let conditions = ["Dash","Tactical","Hold","Assault","Fired","AAFire"];
 
@@ -657,35 +649,35 @@ log(this.name + " in resetflags()")
             this.order = "";
             this.specialorder = "";
 
-            if (this.teamIDs.length > 1) {
+            if (this.player === 0) {
                 let unitLeader = TeamArray[this.teamIDs[0]];
-                if (unitLeader) {
-                    unitLeader.token.set("bar3_value",0);
-                    if (unitLeader.suppressed === true) {
-                        SwapLeader(this);
-                    }
+                if (unitLeader.suppressed === true) {
+                    SwapLeader(this);
                 }
-                for (let i=0;i<this.teamIDs.length;i++) {
-                    let team = TeamArray[this.teamIDs[i]];
-                    if (state.TY.conditions[team.id]) {
-                        for (let c=0;c<conditions.length;c++) {
-                            if (state.TY.conditions[team.id][conditions[c]]) {
-                                team.removeCondition(conditions[c]);
-                            }
+            } 
+
+            _.forEach(this.teamIDs,id => {
+                let team = TeamArray[id];
+                if (state.TY.conditions[id]) {
+                    for (let c=0;c<conditions.length;c++) {
+                        if (state.TY.conditions[id][conditions[c]]) {
+                            team.removeCondition(conditions[c]);
                         }
                     }
-                    team.spotAttempts = 0;
-                    team.prevHexLabel = team.hexLabel;
-                    team.prevHex = team.hex;
-                    team.order = "";
-                    team.specialorder = "";
-                    team.hitArray = [];
-                    team.eta = [];
-                    team.moved = false;
-                    team.maxTact = false;
-                    team.fired = false;
-                    team.aaFired = false;
-                    if (i===0) {
+                }
+                team.spotAttempts = 0;
+                team.prevHexLabel = team.hexLabel;
+                team.prevHex = team.hex;
+                team.order = "";
+                team.specialorder = "";
+                team.hitArray = [];
+                team.eta = [];
+                team.moved = false;
+                team.maxTact = false;
+                team.fired = false;
+                team.aaFired = false;
+                if (this.player === 0) {
+                    if (id === this.teamIDs[0]) {
                         team.token.set("aura1_color",Colours.green);
                     } else {
                         if (team.inCommand === true) {
@@ -694,8 +686,10 @@ log(this.name + " in resetflags()")
                             team.token.set("aura1_color",Colours.lightblue)
                         }
                     }
+                } else if (this.player === 1) {
+                    team.token.set("aura1_color",Colours.green);
                 }
-            } 
+            });
         }
 
         IC() {
@@ -703,38 +697,42 @@ log(this.name + " in resetflags()")
             let unitLeader = TeamArray[this.teamIDs[0]];
             unitLeader.IC(true);
             if (this.teamIDs.length === 1) {return};
-            let array = this.teamIDs.map(id => {
-                let team2 = TeamArray[id];
-                let dist = team2.hex.distance(unitLeader.hex);
-                let info = {
-                    id: id,
-                    dist: dist,
-                }
-                return info;
-            })
-            array.sort((a,b) => {
-                return a.dist - b.dist;
-            });
-            for (let i=1;i<array.length;i++) {
-                let a1 = array[i-1];
-                let a2 = array[i];
-                let team1 = TeamArray[a1.id];
-                let team2 = TeamArray[a2.id];
-                let d12 = a2.dist - a1.dist;
-                if (team1.inCommand === true && d12 < 3) {
-                    team2.IC(true);
-                } else {
-                    team2.IC(false);
+            if (unitLeader.player === 1) {
+                _.forEach(this.teamIDs,id => {
+                    TeamArray[id].IC(true);
+                })
+            } else {
+                let array = this.teamIDs.map(id => {
+                    let team2 = TeamArray[id];
+                    let dist = team2.hex.distance(unitLeader.hex);
+                    let info = {
+                        id: id,
+                        dist: dist,
+                    }
+                    return info;
+                })
+                array.sort((a,b) => {
+                    return a.dist - b.dist;
+                });
+                for (let i=1;i<array.length;i++) {
+                    let a1 = array[i-1];
+                    let a2 = array[i];
+                    let team1 = TeamArray[a1.id];
+                    let team2 = TeamArray[a2.id];
+                    let d12 = a2.dist - a1.dist;
+                    if (team1.inCommand === true && d12 < 3) {
+                        team2.IC(true);
+                    } else {
+                        team2.IC(false);
+                    }
                 }
             }
         }
-
-
-
     }
 
     class Team {
         constructor(tokenID,unitID) {
+            if (!unitID) {unitID = "Placeholder"};
             let token = findObjs({_type:"graphic", id: tokenID})[0];
             if (!token) {sendChat("","No Token?"); return}
             let char = getObj("character", token.get("represents")); 
@@ -953,6 +951,7 @@ log("Special Text: " + specialText)
             this.unitID = unitID;
 
             this.type = type;    
+            this.main = attributeArray.main;
             this.location = location;
             this.prevHexLabel = hexLabel;
             this.prevHex = hex;
@@ -1142,7 +1141,7 @@ log("Special Text: " + specialText)
                 }
             } else {
                 result.result = "suppressed";
-                this.bail();
+                this.suppress();
             }
             return result;
         }
@@ -1152,7 +1151,7 @@ log("Special Text: " + specialText)
             this.suppressed = true;
         }
 
-        remountTank() {
+        rally() {
             if (this.inCommand === true) {
                 this.token.set("tint_color","transparent");
             } else {
@@ -2460,58 +2459,108 @@ log(hit)
 
         let player = (WarsawPact.includes(nation)) ? 0:1;
         let unitNumber = state.TY.unitNumbers[player];
-        let unit = new Unit(nation,stringGen(),unitName,unitNumber);
         state.TY.unitNumbers[player]++;
-        let unitMarker = Nations[nation].platoonmarkers[unitNumber];
+        let unitMarker = Nations[nation].unitmarkers[unitNumber];
 
-        log(unit)
-        let initialName;
-        for (let i=0;i<teamIDs.length;i++) {
-            let team = new Team(teamIDs[i],unit.id);
-            if (!team) {continue};
-            unit.add(team);
-            let aura = "transparent";
-            let name = NameAndRank(team,i);
+        //NATO - Unit is the Company, each token a Platoon and commandable
+        //WARPACT - Unit is the Company, but only lead token in Co is Commandable, larger unit is formation, not tracked in game
 
-            if (i === 0) {
-                aura = Colours.green
-                initialName = name;
-            };
-            team.name = name;
-            let hp = parseInt(team.starthp);
-            let r = (team.type === "Infantry") ? 7:0.1;
-            team.token.set({
-                name: name,
-                tint_color: "transparent",
-                aura1_color: aura,
-                aura1_radius: r,
-                showplayers_aura1: true,
-                showname: true,
-                statusmarkers: unitMarker,
-            })
-            if ((team.type === "Infantry" || team.type === "Unarmoured Tank") && hp > 1) {
+        if (player === 1) {
+            let unit = new Unit(nation,stringGen(),unitName,unitNumber);
+            for (let i=0;i<teamIDs.length;i++) {
+                let team = new Team(teamIDs[i],unit.id);
+                if (!team) {continue};
+                unit.add(team);
+                let name = NameAndRank(team,i);    
+                team.name = name;
+                let hp = parseInt(team.starthp);
+                let r = (team.type === "Infantry") ? 20:0.1;
                 team.token.set({
-                    bar1_value: hp,
-                    bar1_max: hp,
-                    compact_bar: "standard",
-                    showplayers_bar1: true,
-                    playersedit_bar1: true,
+                    name: name,
+                    tint_color: "transparent",
+                    aura1_color: Colours.green,
+                    aura1_radius: r,
+                    showplayers_aura1: true,
+                    showname: true,
+                    statusmarkers: unitMarker,
                 });
-            } 
+                if (team.type === "Infantry" && hp > 1) {
+                    team.token.set({
+                        bar1_value: hp,
+                        bar1_max: hp,
+                        compact_bar: "standard",
+                        showplayers_bar1: true,
+                        playersedit_bar1: true,
+                    });
+                } 
+            }
+        } else if (player === 0) {
+            //organize tokens into units
+            //HQ for battalion HQ, then main (tank or infantry) organized into co of 3, then non in singles
+            let idArray = [];
+            let company = 1;
+            for (let i=0;i<teamIDs.length;i++) {
+                let id = teamIDs[i];
+                let token = findObjs({_type:"graphic", id: id})[0];
+                let char = getObj("character", token.get("represents")); 
+                if (!char) {sendChat("","No Character?"); return}
+                idArray.push(id);
+                if (Attribute(char,"main") === true && idArray < 4) {
+                    continue;
+                }
+                if (Attribute(char,"special").includes("HQ")) {
+                    unitName = unitName + " HQ";
+                } else if (Attribute(char,"main") === true) {
+                    unitName = unitName + " Co " + company;
+                    company++;
+                } else {
+                    unitName = char.get("name").replace(Attribute(char,"nation") + " ","");
+                }
+                let unit = new Unit(nation,stringGen(),unitName,unitNumber);
+                for (let j=0;j<idArray.length;j++) {
+                    let team = new Team(idArray[j],unit.id);
+                    unit.add(team);
+                    let hp = parseInt(team.starthp);
+                    let r = (team.type === "Infantry") ? 20:0.1;
+                    let aura,name;
+                    if (j===0 && idArray.length > 1) {
+                        aura = Colours.green;
+                        name = NameAndRank(team,j,"Promote");
+                    } else {
+                        name = NameAndRank(team,j);
+                        aura = "transparent";    
+                    }
+                    team.name = name;
+                    team.token.set({
+                        name: name,
+                        tint_color: "transparent",
+                        aura1_color: aura,
+                        aura1_radius: r,
+                        showplayers_aura1: true,
+                        showname: true,
+                        statusmarkers: unitMarker,
+                    });
+                    if (team.type === "Infantry" && hp > 1) {
+                        team.token.set({
+                            bar1_value: hp,
+                            bar1_max: hp,
+                            compact_bar: "standard",
+                            showplayers_bar1: true,
+                            playersedit_bar1: true,
+                        });
+                    } 
+                }
+            }
         }
-        if (!unitName) {
-            unit.name = initialName;
-        }
-
 
         if (state.TY.nations[player].includes(nation) === false) {
             state.TY.nations[player].push(nation);
         }
-        sendChat("",unit.name + " Added");
+        sendChat("","Unit(s) Added");
     }
 
 
-    const NameAndRank = (team,i) => {
+    const NameAndRank = (team,i,note) => {
         let name = team.characterName.replace(team.nation + " ","");
         let unit = UnitArray[team.unitID];
         let unitNumber = unit.number;
@@ -2523,26 +2572,12 @@ log(hit)
         } else if (team.type === "Infantry" || team.type === "Gun") {
             name += " "+ letter + "/" + (i+1);
         } 
-        /*
-        let rank;
-        if (team.special.includes("HQ") || team.token.get(SM.HQ) === true) {
-            rank = Math.min(i,1);
-            unit.hqUnit = true;
-            name = Ranks[Nations[team.nation].ranks][rank] + Name(Nations[team.nation].names);
-        } else {
-            if (team.type === "Aircraft" || team.special.includes("Independent")) {
-                rank = 2;
-                unit.aircraft = true;
-                if (WarsawPact.includes(team.nation)) {rank=3};
-                name = Ranks[Nations[team.nation].ranks][rank] + Name(Nations[team.nation].names);
-            }  else if (i === 0) {
-                rank = 2;
-                if (WarsawPact.includes(team.nation) && unit.artillery === true) {rank=3};
-                if (team.special.includes("Passengers")) {rank++}
-                name = Ranks[Nations[team.nation].ranks][rank] + Name(Nations[team.nation].names);
-            } 
+        if (team.special.includes("HQ")) {
+            name = Ranks[Nations[team.nation].ranks][1] + Name(Nations[team.nation].names);
         }
-        */
+        if (note === "Promoted") {
+            name = Ranks[Nations[team.nation].ranks][2] + Name(Nations[team.nation].names);
+        }       
         return name;
     }
 
@@ -5654,7 +5689,7 @@ log(weapon)
         let markers = team.token.get("statusmarkers").split(",");
 log("Markers")       
 log(markers)
-        let marker = returnCommonElements(markers,Nations[nation].platoonmarkers);
+        let marker = returnCommonElements(markers,Nations[nation].unitmarkers);
 log("Platoon Marker")
 log(marker);
         marker = "status_" + marker;
