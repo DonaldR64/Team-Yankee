@@ -542,44 +542,43 @@
             <h3>Weapons</h3>
             <div class="weaponinfo">
                 <div class="box1"><span>Weapon</span></div>
-                <div class="box2"><span>Ranges</span></div>
+                <div class="box2"><span>Range</span></div>
                 <div class="box3"><span>ROF</span></div>
                 <div class="box4"><span>Antitank</span></div>
                 <div class="box5"><span>Firepower</span></div>
                 <div class="box6"><span>Notes</span></div>
                 <div class="box7"><span>Halted</span></div>
                 <div class="box8"><span>Moving</span></div>
-                <div class="box9"><span>Short/Eff/Long</span></div>
                 <h4><span name="attr_weapon1name"></span></h4>
-                <h4><span name="attr_weapon1text"></span></h4>
+                <h4><span name="attr_weapon1range"></span></h4>
                 <h4><span name="attr_weapon1halted"></span></h4>
                 <h4><span name="attr_weapon1moving"></span></h4>
                 <h4><span name="attr_weapon1at"></span></h4>
                 <h4><span name="attr_weapon1fp"></span></h4>
                 <h4><span name="attr_weapon1notes"></span></h4>
                 <h4><span name="attr_weapon2name"></span></h4>
-                <h4><span name="attr_weapon2text"></span></h4>
+                <h4><span name="attr_weapon2range"></span></h4>
                 <h4><span name="attr_weapon2halted"></span></h4>
                 <h4><span name="attr_weapon2moving"></span></h4>
                 <h4><span name="attr_weapon2at"></span></h4>
                 <h4><span name="attr_weapon2fp"></span></h4>
                 <h4><span name="attr_weapon2notes"></span></h4>
                 <h4><span name="attr_weapon3name"></span></h4>
-                <h4><span name="attr_weapon3text"></span></h4>
+                <h4><span name="attr_weapon3range"></span></h4>
                 <h4><span name="attr_weapon3halted"></span></h4>
                 <h4><span name="attr_weapon3moving"></span></h4>
                 <h4><span name="attr_weapon3at"></span></h4>
                 <h4><span name="attr_weapon3fp"></span></h4>
                 <h4><span name="attr_weapon3notes"></span></h4>
                 <h4><span name="attr_weapon4name"></span></h4>
-                <h4><span name="attr_weapon4text"></span></h4>
+                <h4><span name="attr_weapon4range"></span></h4>
                 <h4><span name="attr_weapon4halted"></span></h4>
                 <h4><span name="attr_weapon4moving"></span></h4>
                 <h4><span name="attr_weapon4at"></span></h4>
                 <h4><span name="attr_weapon4fp"></span></h4>
                 <h4><span name="attr_weapon4notes"></span></h4>    
                 <h4><span name="attr_weapon5name"></span></h4>
-                <h4><span name="attr_weapon5text"></span></h4>
+                <h4><span name="attr_weapon5range"></span></h4>
                 <h4><span name="attr_weapon5halted"></span></h4>
                 <h4><span name="attr_weapon5moving"></span></h4>
                 <h4><span name="attr_weapon5at"></span></h4>
@@ -665,7 +664,7 @@
     });
 
     on("change:attrs sheet:opened", function() { 
-        getAttrs(["type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","weapon1notes","weapon2notes","airmove","mainteam","weapon1range","weapon2range","weapon3range","weapon4range","weapon5range"], function(values) {
+        getAttrs(["type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","weapon1notes","weapon2notes","airmove","mainteam"], function(values) {
             let nationImage;
             let nation = values.nation;
 
@@ -762,62 +761,6 @@
                 cross = "AUTO";
             }
 
-            let w1R = values.weapon1range;
-            if (!w1R) {
-                w1rangetext = "";
-            } else if (w1R === "CC") {
-                w1rangetext = "CC";
-            } else if (w1R.includes("-")) {
-                w1rangetext = w1R;
-            } else {    
-                w1R = parseInt(w1R);
-                w1rangetext = Math.floor(w1R/2) + "/" + w1R + "/" + Math.floor(w1R*1.5);
-            }
-            let w2R = values.weapon2range;
-            if (!w2R) {
-                w2rangetext = "";
-            } else if (w2R === "CC") {
-                w2rangetext = "CC";
-            } else if (w2R.includes("-")) {
-                w1rangetext = w2R;
-            } else {
-                w2R = parseInt(w2R);
-                w2rangetext = Math.floor(w2R/2) + "/" + w2R + "/" + Math.floor(w2R*1.5);
-            }
-            let w3R = values.weapon3range;
-            if (!w3R) {
-                w3rangetext = "";
-            } else if (w3R === "CC") {
-                w3rangetext = "CC";
-            } else if (w3R.includes("-")) {
-                w1rangetext = w3R;
-            } else {
-                w3R = parseInt(w3R);
-                w3rangetext = Math.floor(w3R/2) + "/" + w3R + "/" + Math.floor(w3R*1.5);
-            }
-            let w4R = values.weapon4range;
-            if (!w4R) {
-                w4rangetext = "";
-            } else if (w4R === "CC") {
-                w4rangetext = "CC";
-            } else if (w4R.includes("-")) {
-                w1rangetext = w4R;
-            } else {
-                w4R = parseInt(w4R);
-                w4rangetext = Math.floor(w4R/2) + "/" + w4R + "/" + Math.floor(w4R*1.5);
-            }
-            let w5R = values.weapon5range;
-            if (!w5R) {
-                w5rangetext = "";
-            } else if (w5R === "CC") {
-                w5rangetext = "CC";
-            } else if (w5R.includes("-")) {
-                w1rangetext = w5R;
-            } else {
-                w5R = parseInt(w5R);
-                w5rangetext = Math.floor(w5R/2) + "/" + w5R + "/" + Math.floor(w5R*1.5);
-            }
-
             setAttrs({
                 "nationimage": nationImage,
                 "aplus": aplus,
@@ -834,11 +777,6 @@
                 "cross": cross,
                 "airmove": am,
                 "main": main,
-                "weapon1text": w1rangetext,
-                "weapon2text": w2rangetext,
-                "weapon3text": w3rangetext,
-                "weapon4text": w4rangetext,
-                "weapon5text": w5rangetext,
             })
         });    
     });  
