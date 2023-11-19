@@ -767,7 +767,9 @@
                 w1rangetext = "";
             } else if (w1R === "CC") {
                 w1rangetext = "CC";
-            } else {
+            } else if (w1R.includes("-")) {
+                w1rangetext = w1R;
+            } else {    
                 w1R = parseInt(w1R);
                 w1rangetext = Math.floor(w1R/2) + "/" + w1R + "/" + Math.floor(w1R*1.5);
             }
@@ -776,6 +778,8 @@
                 w2rangetext = "";
             } else if (w2R === "CC") {
                 w2rangetext = "CC";
+            } else if (w2R.includes("-")) {
+                w1rangetext = w2R;
             } else {
                 w2R = parseInt(w2R);
                 w2rangetext = Math.floor(w2R/2) + "/" + w2R + "/" + Math.floor(w2R*1.5);
@@ -785,6 +789,8 @@
                 w3rangetext = "";
             } else if (w3R === "CC") {
                 w3rangetext = "CC";
+            } else if (w3R.includes("-")) {
+                w1rangetext = w3R;
             } else {
                 w3R = parseInt(w3R);
                 w3rangetext = Math.floor(w3R/2) + "/" + w3R + "/" + Math.floor(w3R*1.5);
@@ -794,6 +800,8 @@
                 w4rangetext = "";
             } else if (w4R === "CC") {
                 w4rangetext = "CC";
+            } else if (w4R.includes("-")) {
+                w1rangetext = w4R;
             } else {
                 w4R = parseInt(w4R);
                 w4rangetext = Math.floor(w4R/2) + "/" + w4R + "/" + Math.floor(w4R*1.5);
@@ -803,6 +811,8 @@
                 w5rangetext = "";
             } else if (w5R === "CC") {
                 w5rangetext = "CC";
+            } else if (w5R.includes("-")) {
+                w1rangetext = w5R;
             } else {
                 w5R = parseInt(w5R);
                 w5rangetext = Math.floor(w5R/2) + "/" + w5R + "/" + Math.floor(w5R*1.5);
