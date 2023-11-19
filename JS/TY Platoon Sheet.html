@@ -547,8 +547,9 @@
                 <div class="box4"><span>Antitank</span></div>
                 <div class="box5"><span>Firepower</span></div>
                 <div class="box6"><span>Notes</span></div>
-                <div class="box"><span>Halted</span></div>
-                <div class="box"><span>Moving</span></div>
+                <div class="box7"><span>Halted</span></div>
+                <div class="box7"><span>Moving</span></div>
+                <div class="box8"><span>S/Eff/L</span></div>
                 <h4><span name="attr_weapon1name"></span></h4>
                 <h4><span name="attr_weapon1text"></span></h4>
                 <h4><span name="attr_weapon1halted"></span></h4>
@@ -767,14 +768,11 @@
             let w4R = parseInt(values.weapon4range);
             let w5R = parseInt(values.weapon5range);
 
-            let w1rangetext = Math.floor(w1R/2) + "/" + w1R + "/" + Math.floor(w1R*1.5);
-            let w2rangetext = Math.floor(w2R/2) + "/" + w2R + "/" + Math.floor(w2R*1.5);
-            let w3rangetext = Math.floor(w3R/2) + "/" + w3R + "/" + Math.floor(w3R*1.5);
-            let w4rangetext = Math.floor(w4R/2) + "/" + w4R + "/" + Math.floor(w4R*1.5);
-            let w5rangetext = Math.floor(w5R/2) + "/" + w5R + "/" + Math.floor(w5R*1.5);
-
-
-
+            let w1rangetext = Math.floor(w1R/2) + "/" + w1R + "/" + Math.floor(w1R*1.5) || "";
+            let w2rangetext = Math.floor(w2R/2) + "/" + w2R + "/" + Math.floor(w2R*1.5) || "";
+            let w3rangetext = Math.floor(w3R/2) + "/" + w3R + "/" + Math.floor(w3R*1.5) || "";
+            let w4rangetext = Math.floor(w4R/2) + "/" + w4R + "/" + Math.floor(w4R*1.5) || "";
+            let w5rangetext = Math.floor(w5R/2) + "/" + w5R + "/" + Math.floor(w5R*1.5) || "";
 
 
             setAttrs({
