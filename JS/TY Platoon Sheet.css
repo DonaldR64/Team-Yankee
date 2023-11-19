@@ -341,11 +341,16 @@ input[type="hidden"][name="attr_nation"]:is([value="Canada"]) ~ .header :is(h1,h
   align-items: center;
 }
 .box7 {
-  grid-column: 3/5;
+  grid-column: 3;
   grid-row: 2;
   align-items: center;
 }
 .box8 {
+  grid-column: 4;
+  grid-row: 2;
+  align-items: center;
+}
+.box9 {
   grid-column: 2;
   grid-row: 2;
   align-items: center;
