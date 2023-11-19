@@ -432,7 +432,13 @@
     <div class="row">
             <h3>Special</h3>
             <input type="text" name="attr_special">
+            <br>
+            <input type="checkbox" id="main" name="attr_mainteam" value="1">
+            <label for="main">Platoon Team</label>
     </div>
+
+
+
 </div>
 
 
@@ -658,7 +664,7 @@
     });
 
     on("change:attrs sheet:opened", function() { 
-        getAttrs(["type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","weapon1notes","weapon2notes","airmove"], function(values) {
+        getAttrs(["type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","weapon1notes","weapon2notes","airmove","mainteam"], function(values) {
             let nationImage;
             let nation = values.nation;
 
@@ -723,9 +729,7 @@
                 nationImage = "https://s3.amazonaws.com/files.d20.io/images/366073450/MaE7Hz3ruNZ-2LrDfZQicA/thumb.png?1699036295";       
             }
 
-
-
-
+            let main = (values.mainteam === "1") ? true:false;
 
             let tact = parseInt(values.tactical);
             let ter = parseInt(values.terrain);
@@ -772,6 +776,7 @@
                 "road": road,
                 "cross": cross,
                 "airmove": am,
+                "main": main,
             })
         });    
     });  
