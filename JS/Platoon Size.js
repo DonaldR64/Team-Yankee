@@ -151,8 +151,7 @@ const TY = (() => {
                 "Arabic": ["Muquddam ","Ra'id ","Naqib ","Mulazim ","Raqib ",]
     };
 
-
-
+    const companyMarkers = ["Red-01::2006626","Red-02::2006628","Red-03::2006629","Red-04::2006631","Red-05::2006633"];
 
     //Types: Flat = 0, Short = 1, Tall = 2, Building = 3
     //Dash: Road = 0,Country = 1,Terrain = 2, Tank Obstacle = 3, Impassable = 4
@@ -586,6 +585,7 @@ const TY = (() => {
             this.teamIDs = [];
             this.number = number;
             this.inReserve = false;
+            this.company = -1;
 
             if (!state.TY.units[id]) {
                 state.TY.units[id] = {
@@ -750,6 +750,9 @@ const TY = (() => {
             let hexLabel = hex.label();
             let infoArray = [];
 
+            let main = (attributeArray.main === "true" || attributeArray.main === true) ? true:false;
+log(charName)
+log(main)
             let starthp = (type === "Infantry") ? 3:1;
 
             //create array of weapon info
@@ -951,7 +954,7 @@ log("Special Text: " + specialText)
             this.unitID = unitID;
 
             this.type = type;    
-            this.main = (attributeArray.main === "true") ? true:false;
+            this.main = main;
             this.location = location;
             this.prevHexLabel = hexLabel;
             this.prevHex = hex;
@@ -2497,39 +2500,40 @@ log(hit)
         } else if (player === 0) {
             //organize tokens into units
             //HQ for battalion HQ, then main (tank or infantry) organized into co of 3, then non in singles
+            let batName = unitName;
             let idArray = [];
-            let company = 1;
+            let company = 0;
             for (let i=0;i<teamIDs.length;i++) {
                 let id = teamIDs[i];
                 let token = findObjs({_type:"graphic", id: id})[0];
                 let char = getObj("character", token.get("represents")); 
                 if (!char) {sendChat("","No Character?"); return}
                 idArray.push(id);
-                if (Attribute(char,"main") === true && idArray < 4) {
+                let main = Attribute(char,"main");
+                let charName = char.get("name");
+                if (main === true && idArray.length < 3) {
                     continue;
                 }
+                let cm = "";
                 if (Attribute(char,"special").includes("HQ")) {
-                    unitName = unitName + " HQ";
-                } else if (Attribute(char,"main") === true) {
-                    unitName = unitName + " Co " + company;
+                    unitName = batName + " HQ";
+                } else if (main === true) {
+                    unitName = batName + " Co " + (company+1);
+                    cm = companyMarkers[company];
                     company++;
                 } else {
                     unitName = char.get("name").replace(Attribute(char,"nation") + " ","");
+                    company++;
                 }
                 let unit = new Unit(nation,stringGen(),unitName,unitNumber);
                 for (let j=0;j<idArray.length;j++) {
                     let team = new Team(idArray[j],unit.id);
                     unit.add(team);
+                    unit.company = Math.max(company-1,0);
                     let hp = parseInt(team.starthp);
                     let r = (team.type === "Infantry") ? 20:0.1;
-                    let aura,name;
-                    if (j===0 && idArray.length > 1) {
-                        aura = Colours.green;
-                        name = NameAndRank(team,j,"Promote");
-                    } else {
-                        name = NameAndRank(team,j);
-                        aura = "transparent";    
-                    }
+                    let aura = (team.special.includes("HQ") || j === 0) ? Colours.green:"transparent";
+                    let name = (team.special.includes("HQ") || (j === 0 && team.main === true)) ? NameAndRank(team,j,"Promoted"):NameAndRank(team,j);
                     team.name = name;
                     team.token.set({
                         name: name,
@@ -2540,6 +2544,9 @@ log(hit)
                         showname: true,
                         statusmarkers: unitMarker,
                     });
+                    if (cm !== "") {
+                        team.token.set("status_" + cm,true);
+                    }
                     if (team.type === "Infantry" && hp > 1) {
                         team.token.set({
                             bar1_value: hp,
@@ -2550,9 +2557,9 @@ log(hit)
                         });
                     } 
                 }
+                idArray = [];
             }
         }
-
         if (state.TY.nations[player].includes(nation) === false) {
             state.TY.nations[player].push(nation);
         }
@@ -2563,21 +2570,24 @@ log(hit)
     const NameAndRank = (team,i,note) => {
         let name = team.characterName.replace(team.nation + " ","");
         let unit = UnitArray[team.unitID];
-        let unitNumber = unit.number;
-        let letter = rowLabels[unitNumber];
+        let un = unit.number;
+        if (unit.player === 0) {
+            un = unit.company;
+        }
+        let letter = rowLabels[un];
         if (team.type.includes("Tank")) {
             name = name.replace(team.nation + " ","");
-            let item = ((unit.number+1) * 100) + (i+1);
+            let item = ((un+1) * 100) + (i+1);
             name += " " + item.toString();
         } else if (team.type === "Infantry" || team.type === "Gun") {
             name += " "+ letter + "/" + (i+1);
         } 
-        if (team.special.includes("HQ")) {
-            name = Ranks[Nations[team.nation].ranks][1] + Name(Nations[team.nation].names);
-        }
         if (note === "Promoted") {
             name = Ranks[Nations[team.nation].ranks][2] + Name(Nations[team.nation].names);
-        }       
+        }      
+        if (team.special.includes("HQ")) {
+            name = Ranks[Nations[team.nation].ranks][1] + Name(Nations[team.nation].names);
+        }    
         return name;
     }
 
