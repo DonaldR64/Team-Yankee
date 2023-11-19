@@ -762,18 +762,30 @@
                 cross = "AUTO";
             }
 
-            let w1R = parseInt(values.weapon1range);
-            let w2R = parseInt(values.weapon2range);
-            let w3R = parseInt(values.weapon3range);
-            let w4R = parseInt(values.weapon4range);
-            let w5R = parseInt(values.weapon5range);
+            let w1R,w2R,w3R,w4R,w5R;
+            let w1rangetext,w2rangetext,w3rangetext,w4rangetext,w5rangetext;
 
-            let w1rangetext = Math.floor(w1R/2) + "/" + w1R + "/" + Math.floor(w1R*1.5) || "";
-            let w2rangetext = Math.floor(w2R/2) + "/" + w2R + "/" + Math.floor(w2R*1.5) || "";
-            let w3rangetext = Math.floor(w3R/2) + "/" + w3R + "/" + Math.floor(w3R*1.5) || "";
-            let w4rangetext = Math.floor(w4R/2) + "/" + w4R + "/" + Math.floor(w4R*1.5) || "";
-            let w5rangetext = Math.floor(w5R/2) + "/" + w5R + "/" + Math.floor(w5R*1.5) || "";
 
+            if (values.weapon1range) {
+                w1R =  parseInt(values.weapon1range) || 0;
+                w1rangetext = Math.floor(w1R/2) + "/" + w1R + "/" + Math.floor(w1R*1.5) || "";
+            }
+            if (values.weapon1range) {
+                w2R =  parseInt(values.weapon2range) || 0;
+                w2rangetext = Math.floor(w2R/2) + "/" + w2R + "/" + Math.floor(w2R*1.5) || "";
+            }
+            if (values.weapon1range) {
+                w3R =  parseInt(values.weapon3range) || 0;
+                w3rangetext = Math.floor(w3R/2) + "/" + w3R + "/" + Math.floor(w3R*1.5) || "";
+            }
+            if (values.weapon1range) {
+                w4R =  parseInt(values.weapon4range) || 0;
+                w4rangetext = Math.floor(w4R/2) + "/" + w4R + "/" + Math.floor(w4R*1.5) || "";
+            }
+            if (values.weapon1range) {
+                w5R =  parseInt(values.weapon5range) || 0;
+                w5rangetext = Math.floor(w5R/2) + "/" + w5R + "/" + Math.floor(w5R*1.5) || "";
+            }
 
             setAttrs({
                 "nationimage": nationImage,
