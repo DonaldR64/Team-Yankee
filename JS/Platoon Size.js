@@ -4116,23 +4116,19 @@ log("Same had 2")
                 }
                 let unit = UnitArray[team.unitID];
                 let roll = randomInteger(6);
-                let reroll = CommandReroll(team);
                 SetupCard(team.name,"Needing: " + neededText,team.nation);
                 outputCard.body.push("Team: " + DisplayDice(roll,team.nation,24));
-                if (roll < needed && reroll > -1) {
-                    outputCard.body.push("Commander Reroll: " + DisplayDice(reroll,team.nation,24));
-                }
-                if (roll >= needed || reroll >= needed) {
+                if (roll >= needed) {
                     outputCard.body.push("Success!");
-                    team.remountTank();
+                    team.rally();
                 } else {
-                    outputCard.body.push("Failure! Team remains Bailed Out");
+                    outputCard.body.push("Failure! Team remains Suppressed");
                 }
                 let part1 = "Done";
                 if (CheckArray.length > 0) {
                     part1 = "Next Team";
                 } 
-                ButtonInfo(part1,"!RemountChecks");
+                ButtonInfo(part1,"!MoraleChecks");
                 PrintCard();
             } else if (type === "Counterattack") {
                 let defUnitIDs = [];
