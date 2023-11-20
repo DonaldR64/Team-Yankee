@@ -51,9 +51,9 @@
                 <option value="" selected disabled hidden>Choose here</option>
                 <option value="0">Base</option>
                 <option value="1">Specialist Team</option>
-                <option value="2">Platoon Leader</option>
+                <option value="2">Platoon/Company HQ</option>
                 <option value="3">Independent</option>
-                <option value="4">HQ</option>
+                <option value="4">Formation HQ</option>
             </select>   
         </div>
         <div class="col">
@@ -76,7 +76,7 @@
                 <option value="2">2+</option>
             </select>
             <br>
-            <label for="attr_remount">Rally/Remount:</label>
+            <label for="attr_remount">Rally:</label>
             <select name="attr_remount">
                 <option value="" selected disabled hidden>Choose here</option>
                 <option value="4">4+</option>
@@ -151,245 +151,319 @@
 
     <div class="row">
         <h3>Weapons</h3>
-
-    <div class="weapons">
-        <table>
-          <thead>
-            <tr>
-              <th>Weapon</th>
-              <th>Range</th>
-              <th>ROF Halted</th>
-              <th>ROF Moving</th>
-              <th>Antitank</th>
-              <th>Firepower</th>
-              <th>Notes</th>
-              <th>Type</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-                <td><input type="text" name="attr_weapon1name"></td>
-                <td><input type="text" name="attr_weapon1range"></td>
-                <td>
-                    <select name="attr_weapon1halted">
-                        <option value=""selected="selected">(nil)</option>   
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                        <option value="Artillery">Artillery</option>
-                        <option value="Salvo">Salvo</option>
-                    </select>
-                </td>
-                <td>
-                    <select name="attr_weapon1moving">
-                        <option value=""selected="selected">(nil)</option>   
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                        <option value="Artillery">Artillery</option>
-                        <option value="Salvo">Salvo</option>
-                    </select>
-                </td>
-                <td><input type="number" name="attr_weapon1at"></td>
-                <td><input type="text" name="attr_weapon1fp"></td>
-                <td><input type="text" name="attr_weapon1notes"></td>
-                <td>
-                    <select name="attr_weapon1type">
-                        <option selected="selected" value="Small Arms">Small Arms</option>
-                        <option value="Vehicle MG">Vehicle MG</option>
-                        <option value="AA MG">AA MG</option>
-                        <option value="Flamethrower">Flamethrower</option>              
-                        <option value="Gun">Main Gun</option>
-                        <option value="Artillery">Artillery</option>
-                        <option value="Rockets">Rockets</option>
-                        <option value="Autocannon">Autocannon</option>
-                        <option value="Handheld AT">Handheld AT</option>    
-                        <option value="Vehicle Missile">Vehicle Missile</option>                    
-                    </select>
-                </td>
-            </tr>
-             <tr>
-                <td><input type="text" name="attr_weapon2name"></td>
-                <td><input type="text" name="attr_weapon2range"></td>
-                <td>
-                    <select name="attr_weapon2halted">
-                        <option value=""selected="selected">(nil)</option>   
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                        <option value="Artillery">Artillery</option>
-                        <option value="Salvo">Salvo</option>
-                    </select>
-                </td>
-                <td>
-                    <select name="attr_weapon2moving">
-                        <option value=""selected="selected">(nil)</option>   
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                        <option value="Artillery">Artillery</option>
-                        <option value="Salvo">Salvo</option>
-                    </select>
-                </td>
-                <td><input type="number" name="attr_weapon2at"></td>
-                <td><input type="text" name="attr_weapon2fp"></td>
-                <td><input type="text" name="attr_weapon2notes"></td>
-                <td>
-                    <select name="attr_weapon2type">
-                        <option selected="selected" value="Small Arms">Small Arms</option>
-                        <option value="Vehicle MG">Vehicle MG</option>
-                        <option value="AA MG">AA MG</option>
-                        <option value="Flamethrower">Flamethrower</option>              
-                        <option value="Gun">Main Gun</option>
-                        <option value="Artillery">Artillery</option>
-                        <option value="Rockets">Rockets</option>
-                        <option value="Autocannon">Autocannon</option>
-                        <option value="Handheld AT">Handheld AT</option>    
-                        <option value="Vehicle Missile">Vehicle Missile</option>                    
-                    </select>
-                <td>
-            </tr>
-            <tr>
-                <td><input type="text" name="attr_weapon3name"></td>
-                <td><input type="text" name="attr_weapon3range"></td>
-                <td>
-                    <select name="attr_weapon3halted">
-                        <option value=""selected="selected">(nil)</option>   
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                        <option value="Artillery">Artillery</option>
-                        <option value="Salvo">Salvo</option>
-                    </select>
-                </td>
-                <td>
-                    <select name="attr_weapon3moving">
-                        <option value=""selected="selected">(nil)</option>   
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                        <option value="Artillery">Artillery</option>
-                        <option value="Salvo">Salvo</option>
-                    </select>
-                </td>
-                <td><input type="number" name="attr_weapon3at"></td>
-                <td><input type="text" name="attr_weapon3fp"></td>
-                <td><input type="text" name="attr_weapon3notes"></td>
-                <td>
-                    <select name="attr_weapon3type">
-                        <option selected="selected" value="Small Arms">Small Arms</option>
-                        <option value="Vehicle MG">Vehicle MG</option>
-                        <option value="AA MG">AA MG</option>
-                        <option value="Flamethrower">Flamethrower</option>              
-                        <option value="Gun">Main Gun</option>
-                        <option value="Artillery">Artillery</option>
-                        <option value="Rockets">Rockets</option>
-                        <option value="Autocannon">Autocannon</option>
-                        <option value="Handheld AT">Handheld AT</option>    
-                        <option value="Vehicle Missile">Vehicle Missile</option>                               
-                    </select>
-                <td>
-            </tr>
-            <tr>
-                <td><input type="text" name="attr_weapon4name"></td>
-                <td><input type="text" name="attr_weapon4range"></td>
-                <td>
-                    <select name="attr_weapon4halted">
-                        <option value=""selected="selected">(nil)</option>   
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                        <option value="Artillery">Artillery</option>
-                        <option value="Salvo">Salvo</option>
-                    </select>
-                </td>
-                <td>
-                    <select name="attr_weapon4moving">
-                        <option value=""selected="selected">(nil)</option>   
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                        <option value="Artillery">Artillery</option>
-                        <option value="Salvo">Salvo</option>
-                    </select>
-                </td>
-                <td><input type="number" name="attr_weapon4at"></td>
-                <td><input type="text" name="attr_weapon4fp"></td>
-                <td><input type="text" name="attr_weapon4notes"></td>
-                <td>
-                    <select name="attr_weapon4type">
-                        <option selected="selected" value="Small Arms">Small Arms</option>
-                        <option value="Vehicle MG">Vehicle MG</option>
-                        <option value="AA MG">AA MG</option>
-                        <option value="Flamethrower">Flamethrower</option>              
-                        <option value="Gun">Main Gun</option>
-                        <option value="Artillery">Artillery</option>
-                        <option value="Rockets">Rockets</option>
-                        <option value="Autocannon">Autocannon</option>
-                        <option value="Handheld AT">Handheld AT</option>    
-                        <option value="Vehicle Missile">Vehicle Missile</option>                                       
-                    </select>
-                <td>
-            </tr>
-          </tbody>
-        </table>    
-     </div>    
+        <div class="weapons">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Group</th>
+                  <th>Range</th>
+                  <th>ROF Halted</th>
+                  <th>ROF Moving</th>
+                  <th>Antitank</th>
+                  <th>Firepower</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                    <td><input type="text" name="attr_weapon1name"></td>
+                    <td>
+                        <select name="attr_weapon1type">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="Small Arms">Small Arms</option>
+                            <option value="Heavy Weapon">Heavy Weapon</option>
+                            <option value="Vehicle MG">Vehicle MG</option>
+                            <option value="AA MG">AA MG</option>
+                            <option value="Flamethrower">Flamethrower</option>              
+                            <option value="Gun">Main Gun</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Rockets">Rockets</option>
+                            <option value="Autocannon">Autocannon</option>
+                            <option value="LAW/MAW">LAW/MAW</option>
+                            <option value="Infantry Missile">Infantry Missile</option>        
+                            <option value="Vehicle Missile">Vehicle Missile</option>  
+                            <option value="SAM">SAM</option>  
+                        </select>
+                    </td>
+                    <td><input type="text" name="attr_weapon1range"></td>
+                    <td>
+                        <select name="attr_weapon1halted">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Salvo">Salvo</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="attr_weapon1moving">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Salvo">Salvo</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="attr_weapon1at"></td>
+                    <td><input type="text" name="attr_weapon1fp"></td>
+                    <td><input type="text" name="attr_weapon1notes"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" name="attr_weapon2name"></td>
+                    <td>
+                        <select name="attr_weapon2type">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="Small Arms">Small Arms</option>
+                            <option value="Heavy Weapon">Heavy Weapon</option>
+                            <option value="Vehicle MG">Vehicle MG</option>
+                            <option value="AA MG">AA MG</option>
+                            <option value="Flamethrower">Flamethrower</option>              
+                            <option value="Gun">Main Gun</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Rockets">Rockets</option>
+                            <option value="Autocannon">Autocannon</option>
+                            <option value="LAW/MAW">LAW/MAW</option>
+                            <option value="Infantry Missile">Infantry Missile</option>        
+                            <option value="Vehicle Missile">Vehicle Missile</option>  
+                            <option value="SAM">SAM</option>                    
+                        </select>
+                    </td>
+                    <td><input type="text" name="attr_weapon2range"></td>
+                    <td>
+                        <select name="attr_weapon2halted">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Salvo">Salvo</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="attr_weapon2moving">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Salvo">Salvo</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="attr_weapon2at"></td>
+                    <td><input type="text" name="attr_weapon2fp"></td>
+                    <td><input type="text" name="attr_weapon2notes"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" name="attr_weapon3name"></td>
+                    <td>
+                        <select name="attr_weapon3type">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="Small Arms">Small Arms</option>
+                            <option value="Heavy Weapon">Heavy Weapon</option>
+                            <option value="Vehicle MG">Vehicle MG</option>
+                            <option value="AA MG">AA MG</option>
+                            <option value="Flamethrower">Flamethrower</option>              
+                            <option value="Gun">Main Gun</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Rockets">Rockets</option>
+                            <option value="Autocannon">Autocannon</option>
+                            <option value="LAW/MAW">LAW/MAW</option>
+                            <option value="Infantry Missile">Infantry Missile</option>        
+                            <option value="Vehicle Missile">Vehicle Missile</option>      
+                            <option value="SAM">SAM</option>                           
+                        </select>
+                    </td>
+                    <td><input type="text" name="attr_weapon3range"></td>
+                    <td>
+                        <select name="attr_weapon3halted">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Salvo">Salvo</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="attr_weapon3moving">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Salvo">Salvo</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="attr_weapon3at"></td>
+                    <td><input type="text" name="attr_weapon3fp"></td>
+                    <td><input type="text" name="attr_weapon3notes"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" name="attr_weapon4name"></td>
+                    <td>
+                        <select name="attr_weapon4type">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="Small Arms">Small Arms</option>
+                            <option value="Heavy Weapon">Heavy Weapon</option>
+                            <option value="Vehicle MG">Vehicle MG</option>
+                            <option value="AA MG">AA MG</option>
+                            <option value="Flamethrower">Flamethrower</option>              
+                            <option value="Gun">Main Gun</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Rockets">Rockets</option>
+                            <option value="Autocannon">Autocannon</option>
+                            <option value="LAW/MAW">LAW/MAW</option>
+                            <option value="Infantry Missile">Infantry Missile</option>            
+                            <option value="Vehicle Missile">Vehicle Missile</option>     
+                            <option value="SAM">SAM</option>                                    
+                        </select>
+                    </td>
+                    <td><input type="text" name="attr_weapon4range"></td>
+                    <td>
+                        <select name="attr_weapon4halted">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Salvo">Salvo</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="attr_weapon4moving">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Salvo">Salvo</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="attr_weapon4at"></td>
+                    <td><input type="text" name="attr_weapon4fp"></td>
+                    <td><input type="text" name="attr_weapon4notes"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" name="attr_weapon5name"></td>
+                    <td>
+                        <select name="attr_weapon5type">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="Small Arms">Small Arms</option>
+                            <option value="Heavy Weapon">Heavy Weapon</option>
+                            <option value="Vehicle MG">Vehicle MG</option>
+                            <option value="AA MG">AA MG</option>
+                            <option value="Flamethrower">Flamethrower</option>              
+                            <option value="Gun">Main Gun</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Rockets">Rockets</option>
+                            <option value="Autocannon">Autocannon</option>
+                            <option value="LAW/MAW">LAW/MAW</option>
+                            <option value="Infantry Missile">Infantry Missile</option>            
+                            <option value="Vehicle Missile">Vehicle Missile</option>     
+                            <option value="SAM">SAM</option>                                    
+                        </select>
+                    </td>
+                    <td><input type="text" name="attr_weapon5range"></td>
+                    <td>
+                        <select name="attr_weapon5halted">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Salvo">Salvo</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="attr_weapon5moving">
+                            <option value=""selected="selected">(nil)</option>   
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="Artillery">Artillery</option>
+                            <option value="Salvo">Salvo</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="attr_weapon5at"></td>
+                    <td><input type="text" name="attr_weapon5fp"></td>
+                    <td><input type="text" name="attr_weapon5notes"></td>
+                </tr>
+              </tbody>
+            </table>    
+         </div>    
 
     </div>    
 
@@ -427,7 +501,7 @@
             <div class="info">
               <h2>Courage: <span name="attr_courage"></span>+</h2>
               <h3>Morale: <span name="attr_morale"></span>+</h3>
-              <h3><span name="attr_rallyname"></span><span name="attr_remount"></span><span name="attr_rplus"></span></h3>      
+              <h3>Rally: <span name="attr_remount"></span><span name="attr_rplus"></span></h3>      
             </div>  
           </section>
 
@@ -487,7 +561,6 @@
             <div class="info">
               <h2>Skill: <span name="attr_skill"></span>+</h2>
               <h3><span name="attr_assaultname"></span><span name="attr_assault"></span><span name="attr_aplus"></span></h3>
-              <h3><span name="attr_assault2name"></span><span name="attr_assault2"></span><span name="attr_aplus2"></span></h3>
               <h3><span name="attr_counterattackname"></span><span name="attr_counterattack"></span><span name="attr_cplus"></span></h3>
             </div>  
           </section>
@@ -504,14 +577,16 @@
             <h3>Weapons</h3>
             <div class="weaponinfo">
                 <div class="box1"><span>Weapon</span></div>
-                <div class="box2"><span>Range</span></div>
-                <div class="box3"><span>ROF</span></div>
-                <div class="box4"><span>Antitank</span></div>
-                <div class="box5"><span>Firepower</span></div>
-                <div class="box6"><span>Notes</span></div>
-                <div class="box"><span>Halted</span></div>
-                <div class="box"><span>Moving</span></div>
+                <div class="box2"><span>Type</span></div>
+                <div class="box3"><span>Range</span></div>
+                <div class="box4"><span>ROF</span></div>
+                <div class="box5"><span>Antitank</span></div>
+                <div class="box6"><span>Firepower</span></div>
+                <div class="box7"><span>Notes</span></div>
+                <div class="box8"><span>Halted</span></div>
+                <div class="box9"><span>Moving</span></div>
                 <h4><span name="attr_weapon1name"></span></h4>
+                <h4><span name="attr_weapon1type"></span></h4>
                 <h4><span name="attr_weapon1range"></span></h4>
                 <h4><span name="attr_weapon1halted"></span></h4>
                 <h4><span name="attr_weapon1moving"></span></h4>
@@ -519,6 +594,7 @@
                 <h4><span name="attr_weapon1fp"></span></h4>
                 <h4><span name="attr_weapon1notes"></span></h4>
                 <h4><span name="attr_weapon2name"></span></h4>
+                <h4><span name="attr_weapon2type"></span></h4>
                 <h4><span name="attr_weapon2range"></span></h4>
                 <h4><span name="attr_weapon2halted"></span></h4>
                 <h4><span name="attr_weapon2moving"></span></h4>
@@ -526,6 +602,7 @@
                 <h4><span name="attr_weapon2fp"></span></h4>
                 <h4><span name="attr_weapon2notes"></span></h4>
                 <h4><span name="attr_weapon3name"></span></h4>
+                <h4><span name="attr_weapon3type"></span></h4>
                 <h4><span name="attr_weapon3range"></span></h4>
                 <h4><span name="attr_weapon3halted"></span></h4>
                 <h4><span name="attr_weapon3moving"></span></h4>
@@ -533,12 +610,21 @@
                 <h4><span name="attr_weapon3fp"></span></h4>
                 <h4><span name="attr_weapon3notes"></span></h4>
                 <h4><span name="attr_weapon4name"></span></h4>
+                <h4><span name="attr_weapon4type"></span></h4>
                 <h4><span name="attr_weapon4range"></span></h4>
                 <h4><span name="attr_weapon4halted"></span></h4>
                 <h4><span name="attr_weapon4moving"></span></h4>
                 <h4><span name="attr_weapon4at"></span></h4>
                 <h4><span name="attr_weapon4fp"></span></h4>
                 <h4><span name="attr_weapon4notes"></span></h4>    
+                <h4><span name="attr_weapon5name"></span></h4>
+                <h4><span name="attr_weapon5type"></span></h4>
+                <h4><span name="attr_weapon5range"></span></h4>
+                <h4><span name="attr_weapon5halted"></span></h4>
+                <h4><span name="attr_weapon5moving"></span></h4>
+                <h4><span name="attr_weapon5at"></span></h4>
+                <h4><span name="attr_weapon5fp"></span></h4>
+                <h4><span name="attr_weapon5notes"></span></h4>   
             </div>         
           </section>
         </main>
@@ -635,7 +721,6 @@
 
 
             let type = values.type;
-            let ralName = "Remount: ";
             let aplus = "+";
             let rplus = "+";
             let cplus = "+";
@@ -644,7 +729,6 @@
             let counterattack = "Counterattack: ";
             let sn = values.startnumber;
             if (type === "Infantry") {
-                ralName = "Rally: ";
                 info = "Teams: " + sn;
             }
             if (type === "Aircraft" || type === "Helicopter") {
@@ -721,11 +805,11 @@
                 move = "Aircraft";
             } 
             if (type === "Infantry") {
-                tact = '4';
-                tactDisplay = '4';
-                ter = '4';
-                count = '6';
-                road = '6';
+                tact = '6';
+                tactDisplay = '6';
+                ter = '6;
+                count = '8';
+                road = '8';
                 cross = "AUTO";
             }
 
