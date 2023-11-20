@@ -148,7 +148,7 @@ const TY = (() => {
                 "German": ["Major ","Hauptmann ","Oberleutnant ","Feldwebel "],
                 "Western": ["Major ","Captain ","Lieutenant ","Sergeant "],
                 "Soviet": ["Podpolkovnik ","Majór ","Kapitán ","Leytnant ","Serzhant "],
-                "Arabic": ["Muquddam ","Ra'id ","Naqib ","Mulazim ","Raqib ",]
+                "Arabic": ["Aqeed ","Ra'id ","Naqeeb ","Mulazim ","Raqib ",]
     };
 
     const companyMarkers = ["Red-01::2006626","Red-02::2006628","Red-03::2006629","Red-04::2006631","Red-05::2006633"];
