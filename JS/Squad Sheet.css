@@ -64,6 +64,7 @@ main {
                       "common  common motive  skill"
                       "common  common armour   armour"
                       "move    move    move  move"
+                      "weapon  weapon  weapon weapon"
                       "weapon  weapon  weapon weapon";
 }
 
@@ -280,14 +281,6 @@ input[type="hidden"][name="attr_nation"]:is([value="Canada"]) ~ .header :is(h1,h
     text-align: center;
 }
 
-.titles{
-  grid-area: titles;
-  display: grid;
-  grid-gap: 2px;
-  grid-template-columns: 1fr 1fr;
-  text-align: center;
-}
-
 .info{
   grid-area: info;
   display: grid;
@@ -301,7 +294,7 @@ input[type="hidden"][name="attr_nation"]:is([value="Canada"]) ~ .header :is(h1,h
   display: grid;
   grid-gap: 2px;
   grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr 3fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
   background-color: white;
   text-align: center;
   align-items: center;
@@ -478,4 +471,182 @@ input[type="hidden"][name="attr_nation"]:is([value="Canada"]) ~ .spbody {
   padding: 5px;
   text-align: left;
   margin-bottom: 1em;
+}
+
+
+
+/* Weapon 1 */
+input[type="hidden"][value="Off"].weapon1-status ~ .weapon1{
+    display: none;
+}
+
+.weapon1 {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr 3fr;
+    grid-template-rows: 1;
+    background-color: white;
+    text-align: center;
+    align-items: center;
+    padding: 3px;
+}
+
+/* Weapon 2 */
+input[type="hidden"][value="Off"].weapon2-status ~ .weapon2{
+    display: none;
+}
+ 
+.weapon2 {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr 3fr;
+    grid-template-rows: 1;
+    background-color: white;
+    text-align: center;
+    align-items: center;
+    padding: 3px;
+}
+
+/* Weapon 3 */
+input[type="hidden"][value="Off"].weapon3-status ~ .weapon3{
+    display: none;
+}
+input[type="hidden"][value="Equipped"].weapon3-status ~ .weapon3{
+    display: grid;
+}
+  
+.weapon3 {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr 3fr;
+    grid-template-rows: 1;
+    text-align: center;
+    align-items: center;
+    padding: 3px;
+}
+
+/* Weapon 4 */
+input[type="hidden"][value="Off"].weapon4-status ~ .weapon4{
+    display: none;
+}
+input[type="hidden"][value="Equipped"].weapon4-status ~ .weapon4{
+    display: grid;
+}
+  
+.weapon4 {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr 3fr;
+    grid-template-rows: 1;
+    text-align: center;
+    align-items: center;
+    padding: 3px;
+}
+
+/* Weapon 5 */
+input[type="hidden"][value="Off"].weapon5-status ~ .weapon5{
+    display: none;
+}
+input[type="hidden"][value="Equipped"].weapon5-status ~ .weapon5{
+    display: grid;
+}
+  
+.weapon5 {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr 3fr;
+    grid-template-rows: 1;
+    text-align: center;
+    align-items: center;
+    padding: 3px;
+}
+
+/* Weapon 6 */
+input[type="hidden"][value="Off"].weapon6-status ~ .weapon6{
+    display: none;
+}
+input[type="hidden"][value="Equipped"].weapon6-status ~ .weapon6{
+    display: grid;
+}
+  
+.weapon6 {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr 3fr;
+    grid-template-rows: 1;
+    text-align: center;
+    align-items: center;
+    padding: 3px;
+}
+
+/* Weapon 7 */
+input[type="hidden"][value="Off"].weapon7-status ~ .weapon7{
+    display: none;
+}
+input[type="hidden"][value="Equipped"].weapon7-status ~ .weapon7{
+    display: grid;
+}
+  
+.weapon7 {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr 3fr;
+    grid-template-rows: 1;
+    text-align: center;
+    align-items: center;
+    padding: 3px;
+}
+
+/* Weapon 8 */
+input[type="hidden"][value="Off"].weapon8-status ~ .weapon8{
+    display: none;
+}
+input[type="hidden"][value="Equipped"].weapon8-status ~ .weapon8{
+    display: grid;
+}
+  
+.weapon8 {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr 3fr;
+    grid-template-rows: 1;
+    text-align: center;
+    align-items: center;
+    padding: 3px;
+}
+
+/* Weapon 9 */
+input[type="hidden"][value="Off"].weapon9-status ~ .weapon9{
+    display: none;
+}
+input[type="hidden"][value="Equipped"].weapon9-status ~ .weapon9{
+    display: grid;
+}
+  
+.weapon9 {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr 3fr;
+    grid-template-rows: 1;
+    text-align: center;
+    align-items: center;
+    padding: 3px;
+}
+
+/* Weapon 10 */
+input[type="hidden"][value="Off"].weapon10-status ~ .weapon10{
+    display: none;
+}
+input[type="hidden"][value="Equipped"].weapon10-status ~ .weapon10{
+    display: grid;
+}
+  
+.weapon10 {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr 3fr;
+    grid-template-rows: 1;
+    text-align: center;
+    align-items: center;
+    padding: 3px;
 }
