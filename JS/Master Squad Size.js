@@ -8,17 +8,14 @@ const TY = (() => {
 
     let TerrainArray = {};
     let TeamArray = {}; //Individual Squads, Tanks etc
-    let UnitArray = {}; //Units of Teams eg. Platoon
-    let FormationArray = {}; //to track formations
+    let UnitArray = {}; //Command Units
+    let FormationArray = {}; //Used for Morale Purposes
     let SmokeArray = [];
     let FoxholeArray = [];
     let CheckArray = []; //used by Remount, Rally and Morale checks
     let RangedInArray = {};
-    let WreckArray = {};//used for night vision
-    let delayedOut = [];
 
 
-    let unitCreationInfo = {}; //used during unit creation 
     let unitIDs4Saves = {}; //used during shooting routines
     let AssaultIDs = [[],[]]; //array of teams (IDs) in a CC, updated when charge/move
     let deadHQs = [[],[]]; //formationIDs of any formations that lost leaders in prev. turn, by player
@@ -42,16 +39,18 @@ const TY = (() => {
     }
 
     const SM = {
-        "defensive": "status_green",
-        "surprised": "status_yellow",
         "HQ": "status_black-flag",
         "oneshot": "status_oneshot::5503748",
     };
 
-    const NightVision = {
-        IR: 20,
-        Gen1Thermal: 20,
-        Gen2Thermal: 40,
+    const Visibility = {
+        Good: 70,
+        Moderate: 30,
+        Bad: 15,
+        Night: 8,
+        "Infra-Red": 20,
+        "Thermal Imaging": 20,
+        "2nd Gen Thermal Imaging": 40,
     }
 
     let specialInfo = {
@@ -122,25 +121,25 @@ const TY = (() => {
         "deflect": "Hit deflected by Armour",
         "minor": "Hit caused Minor damage only",
         "destroyed": "[#ff0000]Hit Destroys the Team[/#]",
-        "bailed": "[#0000ff]Hit caused Moderate Damage to Vehicle, Crew Suppressed[/#]",
-        "bailedAgain": "[#0000ff]Hit caused Moderate Damage to Vehicle, Crew Remains Suppressed[/#]",
-        "flees": "[#ff0000]Hit Destroys Tank as the Crew Flees![/#]",
+        "suppressed": "[#0000ff]Hit caused Moderate Damage to Vehicle, Crew Suppressed[/#]",
+        "suppressedAgain": "[#0000ff]Hit caused Moderate Damage to Vehicle, Crew Remains Suppressed[/#]",
+        "flees": "[#ff0000]Hit causes Crew to Flee, Vehicle Destroyed![/#]",
         "saved": "Hit Saved",
         "cover": "Hit Saved by Cover",
         "smoked": "Target Smoked",
-        "injury": "[#0000ff]Hit kills some of the Squad[/#]",
+        "injury": "[#0000ff]Hit kills some of the Men[/#]",
     }
 
     const SaveResultsMult = {
         "deflect": "All Hits deflected by Armour",
         "minor": "Hits cause Minor damage only",
         "destroyed": "[#ff0000]Hits Destroy the Team[/#]",
-        "bailed": "[#0000ff]Hits cause Moderate Damage to Vehicle, Crew Suppressed[/#]",
-        "bailedAgain": "[#0000ff]Hits cause Moderate Damage to Vehicle, Crew Remains Suppressed[/#]",
-        "flees": "[#ff0000]Hits Destroy Tank as the Crew Flees![/#]",
+        "suppressed": "[#0000ff]Hits cause Moderate Damage to Vehicle, Crew Suppressed[/#]",
+        "suppressedAgain": "[#0000ff]Hits cause Moderate Damage to Vehicle, Crew Remain Suppressed[/#]",
+        "flees": "[#ff0000]Hit causes Crew to Flee, Vehicle Destroyed![/#]",
         "saved": "All Hits Saved",
         "cover": "All Hits Saved (Cover)",
-        "injury": "[#0000ff]Hits kills some of the Squad[/#]",
+        "injury": "[#0000ff]Hits kills some of the Men[/#]",
     }
 
     let outputCard = {title: "",subtitle: "",nation: "",body: [],buttons: []};
@@ -152,8 +151,10 @@ const TY = (() => {
                 "German": ["Major ","Hauptmann ","Oberleutnant ","Feldwebel "],
                 "Western": ["Major ","Captain ","Lieutenant ","Sergeant "],
                 "Soviet": ["Podpolkovnik ","Majór ","Kapitán ","Leytnant ","Serzhant "],
-                "Arabic": ["Muquddam ","Ra'id ","Naqib ","Mulazim ","Raqib ",]
+                "Arabic": ["Aqeed ","Ra'id ","Naqeeb ","Mulazim ","Raqib ",]
     };
+
+    const squadMarkers = ["Red-01::2006626","Red-02::2006628","Red-03::2006629","Red-04::2006631","Red-05::2006633"];
 
     //Types: Flat = 0, Short = 1, Tall = 2, Building = 3
     //Dash: Road = 0,Country = 1,Terrain = 2, Tank Obstacle = 3, Impassable = 4
@@ -573,6 +574,7 @@ const TY = (() => {
 
     //core classes
     class Formation {
+        //used for morale purposes
         constructor(nation,id,name){
             if (!id) {
                 id = stringGen();
