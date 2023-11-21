@@ -862,10 +862,8 @@
 
             let sn = parseInt(values.startnumber) || 1;
 
-            if (type === "Infantry") {
+            if (type.includes("Infantry")) {
                 info = "Teams: " + sn;
-            } else if (sn > 1) {
-                info = "Vehicles: " + sn;
             }
 
             if (type === "Aircraft" || type === "Helicopter") {
