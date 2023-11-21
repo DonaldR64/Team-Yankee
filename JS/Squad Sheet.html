@@ -911,10 +911,9 @@
             }
 
             let move = "Other";
-            if (type === "Aircraft" || type === "Helicopter") {
-                move = "Aircraft";
-            } 
-            if (type === "Infantry") {
+            if (type === "Aircraft" || type === "Helicopter") {move = "Aircraft"}; 
+            if (type === "Mechanized Infantry") {move = "Mech"};
+            if (type.includes("Infantry")) {
                 tact = '6';
                 tactDisplay = '6';
                 ter = '6';
