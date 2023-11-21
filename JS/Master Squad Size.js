@@ -1024,10 +1024,10 @@ log("Special Text: " + specialText)
             let top = parseInt(attributeArray.armourT) || 0;
 
             //Mech Infantry
-            mounted = false;
+            let mounted = false;
             if (type === "Mechanized Infantry") {
                 let sides = token.get("sides").split("|");
-                let side = sides.indexOf(team.token.get("imgsrc"));
+                let side = sides.indexOf(token.get("imgsrc"));
                 if (side === 1) {
                     mounted = true;
                 }
@@ -1338,7 +1338,7 @@ log(hit)
 
             if (bp === "Artillery") {
                 bp = hexMap[this.hexLabel].bp;
-                if (hexMap[this.hexLabel].foxholes === true && this.type === "Infantry") {bp = true};
+                if (hexMap[this.hexLabel].foxholes === true && this.type.includes("Infantry")) {bp = true};
             } 
             if (bp === "Passenger") {
                 bp = false;
@@ -1423,7 +1423,7 @@ log(hit)
                         save.result = "destroyed";
                     }
                 }
-            } else if (this.type === "Infantry" || this.type === "Unarmoured Tank" || this.type === "Gun") {
+            } else if (this.type.includes("Infantry") || this.type === "Unarmoured Tank" || this.type === "Gun") {
                 if (this.special.includes("Gun Shield") && facing === front && this.order !== "Dash" && bp !== "Artillery") {
                     bp = true;
                 }
@@ -1436,7 +1436,7 @@ log(hit)
                 if (saveNeeded === 7) {
                     save.tip = hitNum + ": No Save";
                 }
-                if (rangedIn && this.type === "Infantry" && saveRoll >= saveNeeded) {
+                if (rangedIn && this.type.includes("Infantry") && saveRoll >= saveNeeded) {
                     //reroll passed saves on rangedIn artillery for infantry
                     saveRoll = randomInteger(6);
                     save.tip += "<br>Rerolled due to RangedIn: " + saveRoll;
@@ -1490,7 +1490,7 @@ log(hit)
                     save.tip += "<br>Firepower Roll: " + fpRoll + " vs. " + weapon.fp + "+";
                     let noRerollWeapons = ["Guided","Guided AA","Anti-helicopter","Dedicated AA"];
                     let notes = weapon.notes.split(",");
-                    if (((shooterType === "Infantry" && findCommonElements(noRerollWeapons,notes) === false) || weapon.type === "AA MG") && fpRoll >= weapon.fp) {
+                    if (((shooterType.includes("Infantry") && findCommonElements(noRerollWeapons,notes) === false) || weapon.type === "AA MG") && fpRoll >= weapon.fp) {
                         fpRoll = randomInteger(6);
                         save.tip += "<br>Rerolled: " + fpRoll;
                     }
@@ -1919,7 +1919,7 @@ log(hit)
         //height of token based on terrain, with additional based on type
         let hex = hexMap[team.hexLabel];
         let height = parseInt(hex.elevation);
-        if (team.type === "Infantry" && hex.terrain.includes("Building")) {
+        if (team.type.includes("Infantry") && hex.terrain.includes("Building")) {
             height = parseInt(hex.height) - 1;
         } 
         if (team.type === "Aircraft") {
@@ -2690,7 +2690,7 @@ log(hit)
             let name = NameAndRank(team,i);
             team.name = name;
             let hp = parseInt(team.starthp);
-            let r = (team.type === "Infantry") ? 7:0.1;
+            let r = (team.type === "Foot Infantry") ? 7:0.1;
             team.token.set({
                 name: name,
                 tint_color: "transparent",
@@ -2700,7 +2700,7 @@ log(hit)
                 showname: true,
                 statusmarkers: unitMarker,
             })
-            if ((team.type === "Infantry" || team.type === "Unarmoured Tank") && hp > 1) {
+            if ((team.type.includes("Infantry") || team.type === "Unarmoured Tank") && hp > 1) {
                 team.token.set({
                     bar1_value: hp,
                     bar1_max: hp,
@@ -2726,7 +2726,7 @@ log(hit)
             name = name.replace(team.nation + " ","");
             let item = ((unit.number+1) * 100) + i
             name += " " + item.toString();
-        } else if (team.type === "Infantry" || team.type === "Gun") {
+        } else if (team.type.includes("Infantry") || team.type === "Gun") {
             name += " "+ letter + "/" + i;
         } 
         let rank;
@@ -2912,7 +2912,7 @@ log(hit)
         let los = true;
     
         if (special.includes("NLOS")) {
-            if (team2.type === "Infantry" && team2.moved === false && team2Hex.bp === true) {
+            if (team2.type.includes("Infantry") && team2.moved === false && team2Hex.bp === true) {
                 let result = {
                     los: true,
                     concealed: true,
@@ -2955,7 +2955,7 @@ log(hit)
 
         let fKeys = Object.keys(TeamArray);
 
-        if ((team2Hex.bp === true || team2Hex.foxholes === true) && team2.type === "Infantry") {
+        if ((team2Hex.bp === true || team2Hex.foxholes === true) && team2.type.includes("Infantry")) {
             //this catches foxholes, craters and similar
             concealed = true;
             bulletproof = true;
@@ -3075,7 +3075,7 @@ log("Neither is Air")
                     for (let t=0;t<fKeys.length;t++) {
                         let fm = TeamArray[fKeys[t]];
                         if (fm.id === team1.id || fm.id === team2.id || fm.player !== team1.player || fm.unitID === team1.unitID) {continue};
-                        if (fm.type === "Infantry" && fm.moved === false) {continue}; //ignore these infantry
+                        if (fm.type.includes("Infantry") && fm.moved === false) {continue}; //ignore these infantry
                         if (fm.hex === qrs) {
         //log(fm.name)
                             friendlyFlag = true;
@@ -3135,7 +3135,7 @@ log("Neither is Air")
 
                 }
             }
-            if (team2.type === "Infantry" && team2.moved === false) {
+            if (team2.type.includes("Infantry") && team2.moved === false) {
                 concealed = true //infantry teams that didnt move are concealed to all but Aircraft
         //log("Infantry didnt move = Concealed")
             }
@@ -3195,7 +3195,7 @@ log("Neither is Air")
 
         if (losResult.los !== false) {
             outputCard.body.push("Concealed: " + losResult.concealed);
-            if (team2.type === "Infantry") {
+            if (team2.type.includes("Infantry")) {
                 outputCard.body.push("Bulletproof Cover: " + losResult.bulletproof);
             }
             outputCard.body.push("Smoke: " + losResult.smoke);
@@ -3460,11 +3460,13 @@ log("Neither is Air")
         let type = team.type;
         let special = team.special;
 
+        /*
         if (special.includes("Passengers")) {
             abilityName = "Dismount Passengers";
             action = "!DismountPassengers";
             AddAbility(abilityName,action,char.id);     
         }
+        */
 
         if (type === "Aircraft") {
             abilityName = "Order Airstrike";
@@ -3479,7 +3481,7 @@ log("Neither is Air")
         }
 
         if (type !== "Aircraft") {
-            if (type === "Infantry") {
+            if (type.includes("Infantry")) {
                 action = "!Activate;?{Order|Tactical|Dash|Hold|Assault}";
             } else if (type === "Gun") {
                 if (team.tactical === 0) {
@@ -3499,7 +3501,7 @@ log("Neither is Air")
         }
 
         let specOrders;
-        if (type === "Infantry") {
+        if (type.includes("Infantry")) {
              specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Dig In|Follow Me|Shoot and Scoot|Clear Minefield"
         } else if (type === "Gun") {
             specOrders = "!SpecialOrders;?{Special Order|Dig In|Cross Here"
@@ -3524,9 +3526,9 @@ log("Neither is Air")
             AddAbility(abilityName,specOrders,char.id);
         }
 
-        if (type === "Infantry") {
-            abilityName = "Mount";
-            AddAbility(abilityName,"!Mount;@{selected|token_id};@{target|Transport|token_id}",char.id);
+        if (type === "Mechanized Infantry") {
+            abilityName = "Mount/Dismount";
+            AddAbility(abilityName,"!Mount",char.id);
         }
 
         if (team.cross > 1) {
@@ -3534,7 +3536,7 @@ log("Neither is Air")
             AddAbility(abilityName,"!Cross",char.id);
         }
 
-        if (type === "Tank" || type === "Infantry") {
+        if (type === "Tank" || type.includes("Infantry")) {
             abilityName = "Call Artillery";
             AddAbility(abilityName,"!CreateBarrages",char.id);
         }
@@ -3545,11 +3547,14 @@ log("Neither is Air")
 
         let types = {
             "Small Arms": [],
-            "MG": [],
-            "Flamethrower": [],
+            "Heavy Weapon": [],
+            "LAW": [],
+            "MAW": [],
+            "Infantry SAM": [],
+            "Vehicle MG": [],
+            "Vehicle Flamethrower": [],
             "Gun": [],
             "Autocannon": [],
-            "Handheld AT": [],
             "Vehicle Missile": [],
             "Artillery": [],
         }
@@ -3559,13 +3564,7 @@ log("Neither is Air")
             let weapon = team.weaponArray[i];
             if (weapon.type === " " || weapon.name === " ") {continue};
             if (weapon.notes.includes("Close Combat")) {continue};
-            if (weapon.type.includes("MG")) {
-                types["MG"].push(weapon.name);
-            } else if (weapon.type === "Artillery" || weapon.type === "Rockets"){
-                types["Artillery"].push(weapon.name);
-            } else {
-                types[weapon.type].push(weapon.name); 
-            }
+            types[weapon.type].push(weapon.name); 
             if (weapon.notes.includes("Smoke")) {
                 smoke = true;
             }
@@ -3578,7 +3577,7 @@ log("Neither is Air")
             let weaponType = weaponTypes[i];
             let names = types[weaponType]
             if (names.length > 0) {
-                if (weaponType === "MG" && names.length > 1) {
+                if (weaponType === "Vehicle MG" && names.length > 1) {
                     names = "MGs";
                 }
                 names = names.toString();
@@ -3821,7 +3820,7 @@ log("Neither is Air")
 
     const DigIn = (array) => {
         _.forEach(array,team => {
-            if (team.token.get("layer") !== "walls" && (team.type === "Infantry" || team.type === "Gun")) {
+            if (team.token.get("layer") !== "walls" && (team.type.includes("Infantry") || team.type === "Gun")) {
                 RemoveRangedInMarker(team.unitID);
                 let hex = hexMap[team.hexLabel];
                 if (hex.terrain.includes("Building") === false && hex.terrain.includes("Foxholes") === false && hex.terrain.includes("Offboard") === false) {
@@ -4537,7 +4536,7 @@ log("Same had 2")
                     let newUnit = new Unit(team.nation,stringGen(),"Promoted HQ",team.formationID);
                     newUnit.add(team);
                     let r = 0.1;
-                    if (team.type === "Infantry") {r = 0.25};
+                    if (team.type === "Foot Infantry") {r = 0.25};
                     let name = PromotedName(team);
                     team.token.set({
                         name: name,
@@ -4820,7 +4819,7 @@ log("Mistaken: " + mistaken)
                         if (st.type === "Aircraft" && weapon.notes.includes("Anti-Helicopter") === false) {
                             weaponExclusion = " cannot fire at Helicopters";
                         }
-                        if (st.type === "Infantry" && (st.special.includes("Heavy Weapon") || weapon.notes.includes("Heavy"))) {
+                        if (st.type.includes("Infantry") && (st.special.includes("Heavy Weapon") || weapon.notes.includes("Heavy"))) {
                             if (weapon.notes.includes("Guided") === false && weapon.notes.includes("Dedicated AA") === false && weapon.type !== "AA MG" && weapon.notes.includes("Anti-Helicopter") === false) {
                                 weaponExclusion = " cannot fire at Helicopters";
                             }
@@ -4999,7 +4998,7 @@ log(weapons)
                     toHit++;
                     toHitTips += "<br>Failed Blitz";
                 }
-                if (weapon.notes.includes("No HE") && (target.type === "Infantry" || target.type === "Gun")) {
+                if (weapon.notes.includes("No HE") && (target.type.includes("Infantry") || target.type === "Gun")) {
                     toHit++;
                     toHitTips += "<br>No HE +1";
                 }
@@ -5063,7 +5062,7 @@ log(weapons)
                 }
                 if (target.type === "Helicopter" && target.landed() === false) {
                     //allowable weapons should be screened out above
-                    if ((weapon.type === "AA MG" && weapon.notes.includes("Dedicated AA") === false) || sTeam.type === "Infantry" || (weapon.notes.includes("Guided") && weapon.notes.includes("Guided AA") === false) || (weapon.notes.includes("Anti-Helicopter") && sTeam.type !== "Aircraft")) {
+                    if ((weapon.type === "AA MG" && weapon.notes.includes("Dedicated AA") === false) || sTeam.type.includes("Infantry") || (weapon.notes.includes("Guided") && weapon.notes.includes("Guided AA") === false) || (weapon.notes.includes("Anti-Helicopter") && sTeam.type !== "Aircraft")) {
                         if (rof === 1) {
                             toHit += 1;
                             toHitTips.push("+1 as ROF 1 Weapon vs. Air");
@@ -6070,7 +6069,7 @@ log(weapon)
 
             if (roll >= neededToHit) {
                 team.hitArray = [hit];
-                if (team.type === "Infantry" || team.type === "Unarmoured Tank" || team.type === "Gun") {
+                if (team.type.includes("Infantry") || team.type === "Unarmoured Tank" || team.type === "Gun") {
                     pinningUnits.push(unit);                             
                 }
                 if (!unitIDs4Saves[unitID]) {
@@ -6368,7 +6367,7 @@ log(results)
             }
             unit = UnitArray[keys[i]];
             if (unit) {
-                if (unit.type === "Infantry" || unit.type === "Gun" || unit.type.includes("Unarmoured")) {
+                if (unit.type.includes("Infantry") || unit.type === "Gun" || unit.type.includes("Unarmoured")) {
                     unitLeader = TeamArray[unit.teamIDs[0]]; //in case original killed
                     unitLeader.token.set("bar3_value",unitHits);
                     if (unitHits >= pinMargin && unit.pinned() === false) {
@@ -6458,7 +6457,7 @@ log(results)
                 if (outputArray.smoked > 0) {
                     saveResult.push("Target Smoked");
                 }
-            } else if (team.type === "Infantry" || team.type === "Unarmoured Tank" || team.type === "Gun") {
+            } else if (team.type.includes("Infantry") || team.type === "Unarmoured Tank" || team.type === "Gun") {
                 if (outputArray.destroyed > 0) {
                     saveResult.push(SaveResultsMult.destroyed);
                 } else if (outputArray.injury > 0) {
@@ -6812,17 +6811,22 @@ log("Charge Dist: " + chargeDist)
 
 
     const Mount = (msg) => {
+        //Mount or Dismount
         let id = msg.selected[0]._id;
         let team = TeamArray[id];
         let sides = team.token.get("sides").split("|");
-        if (team.mounted === true) {
-            sendChat("","Team already Mounted");
-        } else if (parseInt(team.token.get("bar2_value") === 0)) {
-            sendChat("","Transport Destroyed")
-        } else {
+        if (parseInt(team.token.get("bar2_value") === 0)) {
+            sendChat("","Transport Destroyed");
+        } else if (team.mounted === true) {
+            let img = tokenImage(sides[0]);
+            team.token.set("imgsrc",img);
+            team.mounted === false;
+        } else if (team.mounted === false) {
             let img = tokenImage(sides[1]);
             team.token.set("imgsrc",img);
             team.mounted === true;
+        } else {
+            sendChat("","Error");
         }
     }
 
@@ -6939,7 +6943,7 @@ log("Charge Dist: " + chargeDist)
         let rot;
         let flip = false;
         angle = Angle(angle);
-        if (team.type === "Infantry") {
+        if (team.type === "Foot Infantry") {
             rot = 0;
         } else {
             rot = angle;
