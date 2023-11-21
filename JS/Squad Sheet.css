@@ -351,17 +351,17 @@ input[type="hidden"][name="attr_nation"]:is([value="Canada"]) ~ .header :is(h1,h
 }
 .row31 {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 3;
     align-items: center;
 }
 .row32 {
     grid-column: 2;
-    grid-row: 2;
+    grid-row: 3;
     align-items: center;
 }
 .row33 {
     grid-column: 3;
-    grid-row: 2;
+    grid-row: 3;
     align-items: center;
 }
 
