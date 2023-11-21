@@ -318,6 +318,24 @@ input[type="hidden"][name="attr_nation"]:is([value="Canada"]) ~ .header :is(h1,h
   align-items: center;
 }
 
+.mechinfantry{
+    grid-area: mechinfantry;
+    display: grid;
+    grid-gap: 2px;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    background-color: white;
+    text-align: center;
+    align-items: center;
+}
+
+.row1 {
+  grid-column: 1/4;
+  grid-row: 1;
+  align-items: center;
+}
+
+
 .specials {
   grid-area: specials;
   background-color: white;
