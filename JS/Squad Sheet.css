@@ -521,6 +521,7 @@ input[type="hidden"][value="Equipped"].weapon3-status ~ .weapon3{
     grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr 3fr;
     grid-template-rows: 1;
     text-align: center;
+    background-color: white;
     align-items: center;
     padding: 3px;
 }
@@ -540,6 +541,7 @@ input[type="hidden"][value="Equipped"].weapon4-status ~ .weapon4{
     grid-template-rows: 1;
     text-align: center;
     align-items: center;
+    background-color: white;
     padding: 3px;
 }
 
@@ -558,6 +560,7 @@ input[type="hidden"][value="Equipped"].weapon5-status ~ .weapon5{
     grid-template-rows: 1;
     text-align: center;
     align-items: center;
+    background-color: white;
     padding: 3px;
 }
 
@@ -575,7 +578,8 @@ input[type="hidden"][value="Equipped"].weaponSplit-status ~ .weaponSplit{
     grid-template-columns: 1fr;
     grid-template-rows: 1;
     text-align: center;
-    align-items: center;
+    align-items: center;    
+    background-color: white;
     padding: 3px;
 }
 
@@ -593,6 +597,7 @@ input[type="hidden"][value="Equipped"].weapon6-status ~ .weapon6{
     grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr 1fr 3fr;
     grid-template-rows: 1;
     text-align: center;
+    background-color: white;
     align-items: center;
     padding: 3px;
 }
@@ -612,6 +617,7 @@ input[type="hidden"][value="Equipped"].weapon7-status ~ .weapon7{
     grid-template-rows: 1;
     text-align: center;
     align-items: center;
+    background-color: white;
     padding: 3px;
 }
 
@@ -630,6 +636,7 @@ input[type="hidden"][value="Equipped"].weapon8-status ~ .weapon8{
     grid-template-rows: 1;
     text-align: center;
     align-items: center;
+    background-color: white;
     padding: 3px;
 }
 
@@ -648,6 +655,7 @@ input[type="hidden"][value="Equipped"].weapon9-status ~ .weapon9{
     grid-template-rows: 1;
     text-align: center;
     align-items: center;
+    background-color: white;
     padding: 3px;
 }
 
@@ -666,5 +674,6 @@ input[type="hidden"][value="Equipped"].weapon10-status ~ .weapon10{
     grid-template-rows: 1;
     text-align: center;
     align-items: center;
+    background-color: white;
     padding: 3px;
 }
