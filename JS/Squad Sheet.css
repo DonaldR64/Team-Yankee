@@ -334,6 +334,39 @@ input[type="hidden"][name="attr_nation"]:is([value="Canada"]) ~ .header :is(h1,h
   grid-row: 1;
   align-items: center;
 }
+.row21 {
+    grid-column: 1;
+    grid-row: 2;
+    align-items: center;
+}
+.row22 {
+    grid-column: 2;
+    grid-row: 2;
+    align-items: center;
+}
+.row23 {
+    grid-column: 3;
+    grid-row: 2;
+    align-items: center;
+}
+.row31 {
+    grid-column: 1;
+    grid-row: 2;
+    align-items: center;
+}
+.row32 {
+    grid-column: 2;
+    grid-row: 2;
+    align-items: center;
+}
+.row33 {
+    grid-column: 3;
+    grid-row: 2;
+    align-items: center;
+}
+
+
+
 
 
 .specials {
