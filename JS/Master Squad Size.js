@@ -1023,20 +1023,16 @@ log("Special Text: " + specialText)
             let side = parseInt(attributeArray.armourS) || 0;
             let top = parseInt(attributeArray.armourT) || 0;
 
-            //passengers
-            let maxPass = 0;
-            if (special.includes("Passengers")) {
-                let s = special.split(",");
-                for (let a=0;a<s.length;a++) {
-                    let sub = s[a];
-                    if (sub.includes("Passengers")) {
-                        maxPass = sub.replace(/[^\d]/g,"");
-                        break;
-                    }
+            //Mech Infantry
+            mounted = false;
+            if (type === "Mechanized Infantry") {
+                let sides = token.get("sides").split("|");
+                let side = sides.indexOf(team.token.get("imgsrc"));
+                if (side === 1) {
+                    mounted = true;
                 }
             }
-
-            let uat = (special.includes("Passengers") && (weaponArray.length === 0 || type === "Unarmoured Tank")) ? true:false;
+            
 
             this.id = tokenID;
             this.token = token;
@@ -1101,10 +1097,8 @@ log("Special Text: " + specialText)
             this.aaFired = this.queryCondition("AA Fire");
             this.moved = ((this.queryCondition("Tactical") || this.queryCondition("Dash")) === true) ? true:false;
             this.gonetoground = this.queryCondition("GTG");
-
-            this.maxPass = maxPass;
-            this.passenger = false;
-            this.unarmouredTransport = uat;
+            this.mounted = mounted;
+            
 
             if (!state.TY.teams[this.id]) {
                 state.TY.teams[this.id] = {
@@ -1660,6 +1654,15 @@ log(hit)
             return parts[1]+'thumb'+parts[3]+(parts[4]?parts[4]:`?${Math.round(Math.random()*9999999)}`);
         }
         return;
+    }
+
+    const tokenImage = (img) => {
+        //modifies imgsrc to fit api's requirement for token
+        img = getCleanImgSrc(img);
+        img = img.replace("%3A", ":");
+        img = img.replace("%3F", "?");
+        img = img.replace("med", "thumb");
+        return img;
     }
 
     const DeepCopy = (variable) => {
@@ -3589,8 +3592,12 @@ log("Neither is Air")
                     }
                 } else {
                     let shellType = "Regular";
-                    if (weaponType === "Gun" && smoke === true) {
-                        shellType = "?{Fire Smoke|No,Regular|Yes,Smoke}";
+                    if (weaponType === "Gun") {
+                        shellType = "?{Shell Type|AP|HE";
+                        if (smoke === true) {
+                            shellType += "|Smoke";
+                        }
+                        shellType += "}";
                     }
                     abilityName = weaponNum + ": " + names;
                     action = "!Shooting;@{selected|token_id};@{target|token_id};" + weaponType + ";" + shellType;
@@ -6805,92 +6812,33 @@ log("Charge Dist: " + chargeDist)
 
 
     const Mount = (msg) => {
-        let Tag = msg.content.split(";");
-        let passengerID = Tag[1];
-        let transportID = Tag[2];
-        let passengerTeam = TeamArray[passengerID];
-        let pSize = parseInt(passengerTeam.token.get("bar1_value")) || 1;
-        let transportTeam = TeamArray[transportID];
-        SetupCard(passengerTeam.name,"Mount",passengerTeam.nation);
-        let errorMsg;
-        let distance = passengerTeam.hex.distance(transportTeam.hex);
-        if (state.TY.step !== "Move and Fire" && state.TY.turn > 0) {
-            errorMsg = "Teams can only Mount in the Move and Fire Step";
-        }
-        if (transportTeam.maxPass === 0) {
-            errorMsg = "Not a Transport or Tank";
-        }
-        if (distance > 1) {
-            errorMsg = "Need to be Adjacent to Transport";
-        }
-        if (!state.TY.passengers[transportID]) {
-            state.TY.passengers[transportID] = [];
-        }
-        let passengers = state.TY.passengers[transportID];
-        let taken = 0;
-
-        for (let p=0;p<passengers.length;p++) {
-            let pTeam = TeamArray[passengers[p]];
-            let pTeamSize = parseInt(pTeam.token.get("bar1_value")) || 1;
-            taken += pTeamSize;
-        }
-        let room = parseInt(transportTeam.maxPass) - taken;
-        if (room < pSize) {
-            errorMsg = "Not enough Room for this Team or Squad";
-        }
-        room -= pSize;
-        if (errorMsg !== undefined) {
-            outputCard.body.push(errorMsg);
-            PrintCard();
-            return;
-        }
-        passengers.push(passengerID);
-        passengerTeam.location = transportTeam.location;
-        passengerTeam.hexLabel = transportTeam.hexLabel;
-        passengerTeam.hex = transportTeam.hex;
-
-        if (passengers.length === 1) {
-            //after first, dont need to add icon
-            transportTeam.addCondition("Passengers");
-        }
-        state.TY.passengers[transportID] = passengers;
-        //move passengerTeam token to lighting layer
-        passengerTeam.token.set("layer","walls");
-
-        outputCard.body.push(passengerTeam.name + " Loaded");
-        if (room > 0) {
-            outputCard.body.push("Transport has " + room + " Transport Left");
+        let id = msg.selected[0]._id;
+        let team = TeamArray[id];
+        let sides = team.token.get("sides").split("|");
+        if (team.mounted === true) {
+            sendChat("","Team already Mounted");
+        } else if (parseInt(team.token.get("bar2_value") === 0)) {
+            sendChat("","Transport Destroyed")
         } else {
-            outputCard.body.push("Transport is full.");
+            let img = tokenImage(sides[1]);
+            team.token.set("imgsrc",img);
+            team.mounted === true;
         }
-        PrintCard();
     }
 
     const Dismount = (msg) => {
         let id = msg.selected[0]._id;
-        let transportTeam = TeamArray[id];
-        let passengers;
-        SetupCard(transportTeam.name,"Dismount",transportTeam.nation);
-        if (state.TY.step !== "Move and Fire" && state.TY.turn > 0) {
-            outputCard.body.push("Can only Dismount in the Move and Fire Step");
-            PrintCard();
-            return;
-        }
-        if (!state.TY.passengers[id]) {
-            outputCard.body.push("No Passengers");
+        let team = TeamArray[id];
+        let sides = team.token.get("sides").split("|");
+        if (team.mounted === false) {
+            sendChat("","Team already Dismounted");
+        } else if (parseInt(team.token.get("bar2_value") === 0)) {
+            sendChat("","Transport Destroyed")
         } else {
-            passengers = state.TY.passengers[id];
-            for (let i=0;i<passengers.length;i++) {
-                let passengerTeam = TeamArray[passengers[i]];
-                passengerTeam.token.set("layer","objects");
-                toFront(passengerTeam.token);
-            }
-            transportTeam.removeCondition("Passengers");
-            state.TY.passengers[id] = [];
-            outputCard.body.push("Teams can be Activated");
-            outputCard.body.push("Orders must include Movement so that the Team moves away from the Transport");
+            let img = tokenImage(sides[0]);
+            team.token.set("imgsrc",img);
+            team.mounted === false;
         }
-        PrintCard();
     }
 
     const PlaceInFoxholes = (msg) => {
