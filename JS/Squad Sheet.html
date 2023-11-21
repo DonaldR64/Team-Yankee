@@ -147,7 +147,13 @@
                 <label>Air Move:</label><input type="text" name="attr_airmove">
         </div>        
     </div>
-
+    <div>
+        <select name="attr_weaponSplit">
+            <option value = "Off">Off</option>
+            <option value = "Equipped">Equipped</option>
+        </select>
+    </div>
+ 
     <div class="row">
         <h3>Weapons</h3>
         <div class="weapons">
@@ -1020,6 +1026,12 @@
                 <h4><span name="attr_weapon5fp"></span></h4>
                 <h4><span name="attr_weapon5notes"></span></h4>
             </div>
+
+            <input type="hidden" name="attr_weaponSplit" class="weaponSplit-status" value="Off">
+            <div class="weaponSplit">
+                <h4>Vehicle Weapons</h4>
+            </div>
+
 
             <input type="hidden" name="attr_weapon6equipped" class="weapon6-status" value="Off">
             <div class="weapon6">
