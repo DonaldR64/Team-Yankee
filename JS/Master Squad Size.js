@@ -785,6 +785,7 @@ log(team.name + " inCommand: " + team.inCommand)
                     team.maxTact = false;
                     team.fired = false;
                     team.aaFired = false;
+                    this.mounted = false;
                     if (i===0) {
                         team.token.set("aura1_color",Colours.green);
                     } else {
@@ -1023,16 +1024,8 @@ log("Special Text: " + specialText)
             let side = parseInt(attributeArray.armourS) || 0;
             let top = parseInt(attributeArray.armourT) || 0;
 
-            //Mech Infantry
-            let mounted = false;
-            if (type === "Mechanized Infantry") {
-                let sides = token.get("sides").split("|");
-                let side = sides.indexOf(token.get("imgsrc"));
-                if (side === 1) {
-                    mounted = true;
-                }
-            }
-            
+            //used for Mech Infantry
+            let currentSide = parseInt(token.get('currentSide'))||0;
 
             this.id = tokenID;
             this.token = token;
@@ -1097,7 +1090,8 @@ log("Special Text: " + specialText)
             this.aaFired = this.queryCondition("AA Fire");
             this.moved = ((this.queryCondition("Tactical") || this.queryCondition("Dash")) === true) ? true:false;
             this.gonetoground = this.queryCondition("GTG");
-            this.mounted = mounted;
+            this.mounted = false;
+            this.currentSide = currentSide;
             
 
             if (!state.TY.teams[this.id]) {
@@ -2709,6 +2703,12 @@ log(hit)
                     playersedit_bar1: true,
                 });
             } 
+            if ((team.type === "Mechanized Infantry")) {
+                team.token.set({
+                    bar2_value: 1,
+                    currentSide: 0,
+                });        
+            }
         }
         if (state.TY.nations[player].includes(nation) === false) {
             state.TY.nations[player].push(nation);
@@ -3358,6 +3358,10 @@ log("Neither is Air")
                     };
                 };
             }
+        }
+
+        if (unitLeader.mounted === true && order !== "Dash" || order !== "Hold") {  
+            errorMsg = "Team Mounted and can only be given Dash or Hold Order";
         }
 
         if (order === "Dash" && targetTeam.specialorder.includes("Blitz")) {errorMsg = "Cannot Dash due to Blitz"};
@@ -6815,34 +6819,28 @@ log("Charge Dist: " + chargeDist)
         let id = msg.selected[0]._id;
         let team = TeamArray[id];
         let sides = team.token.get("sides").split("|");
-        if (parseInt(team.token.get("bar2_value") === 0)) {
-            sendChat("","Transport Destroyed");
-        } else if (team.mounted === true) {
-            let img = tokenImage(sides[0]);
-            team.token.set("imgsrc",img);
-            team.mounted === false;
-        } else if (team.mounted === false) {
-            let img = tokenImage(sides[1]);
-            team.token.set("imgsrc",img);
-            team.mounted === true;
-        } else {
-            sendChat("","Error");
+        let currentSide = parseInt(team.token.get('currentSide'))||0;
+        let errorMsg = "";
+        if (currentSide === 2) {
+            errorMsg = "Transport Destroyed";
+        } 
+        if (team.moved === true && currentSide === 1) {
+            errorMsg = "Moved, can't Dismount this turn";
         }
-    }
-
-    const Dismount = (msg) => {
-        let id = msg.selected[0]._id;
-        let team = TeamArray[id];
-        let sides = team.token.get("sides").split("|");
-        if (team.mounted === false) {
-            sendChat("","Team already Dismounted");
-        } else if (parseInt(team.token.get("bar2_value") === 0)) {
-            sendChat("","Transport Destroyed")
-        } else {
-            let img = tokenImage(sides[0]);
-            team.token.set("imgsrc",img);
-            team.mounted === false;
+        if (team.mounted === true && state.TY.turn > 0) {
+            errorMsg = "Can't Mount and Dismount in same Turn";
         }
+        if (errorMsg !== "") {
+            sendChat("",errorMsg);
+            return;
+        }
+        let newSide = (currentSide === 0) ? 1:0;
+        let newImg = tokenImage(sides[newSide]);
+        team.token.set({
+            imgsrc: newImg,
+            currentSide: newSide,
+        })
+        if (newSide === 1 && state.TY.turn > 0) {team.mounted = true};
     }
 
     const PlaceInFoxholes = (msg) => {
@@ -7121,8 +7119,6 @@ log("Charge Dist: " + chargeDist)
                 log(FormationArray);
                 log("Ranged In Array");
                 log(RangedInArray)
-                log("CC Team IDs");
-                log(CCTeamIDs);
                 break;
             case '!TokenInfo':
                 TokenInfo(msg);
