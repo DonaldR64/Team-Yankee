@@ -4603,30 +4603,15 @@ log("Same had 2")
         //will be unitLeader if pinning, counterattack
         //else will be an individual tank team if remounting
         let reroll = -1;
-        let formation = FormationArray[team.formationID];
-        let formationLeaders = [];
-        if (formation.name !== "Support") {
-            for (let i=0;i<formation.unitIDs.length;i++) {
-                let unit = UnitArray[formation.unitIDs[i]];
-                if (unit.hqUnit === true) {
-                    let leader = TeamArray[unit.teamIDs[0]];
-                    formationLeaders.push(leader);
-                }
+        let leaders = [];
+        _.forEach(UnitArray,unit => {
+            if (unit.hq === true && unit.player === team.player) {
+                leaders.push(TeamArray[unit.teamIDs[0]]);
             }
-        } else {
-            let keys = Object.keys(UnitArray);
-            for (let i=0;i<keys.length;i++) {
-                let unit = UnitArray[keys[i]];
-                if (unit.hqUnit === true && unit.player === team.player) {
-                    let leader = TeamArray[unit.teamIDs[0]];
-                    formationLeaders.push(leader);
-                }
-            }
-        }
-        for (let i=0;i<formationLeaders.length;i++) {
-            let leader = formationLeaders[i];
-            let checkID = leader.id;
-            let losCheck = LOS(team.id,checkID);
+        })
+        for (let i=0;i<leaders.length;i++) {
+            let leader = leaders[i];
+            let losCheck = LOS(team.id,leader.id,"Overhead");
             if (losCheck.los === true && losCheck.distance <= 8) {
                 reroll = randomInteger(6);
                 break;
