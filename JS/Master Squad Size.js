@@ -1970,7 +1970,7 @@ log(hit)
             lineArray: [],
             labmode: false,
             darkness: false,
-            vision: 5, //randomize if night to d6+2 and show when start
+            visibility: 70, //change if darkness etc
             turn: 0,
             step: "",
             gametype: "",
@@ -2811,6 +2811,7 @@ log(hit)
         if (team.specialorder !== "") {
             outputCard.body.push("Special Order: " + team.specialorder);
         }
+        /*
         if (state.TY.passengers[team.id]) {
             outputCard.body.push("[hr]");
             outputCard.body.push("[U]Passengers[/u]");
@@ -2820,7 +2821,7 @@ log(hit)
                 outputCard.body.push(passengerTeam.name);
             }
         }
-
+        */
         outputCard.body.push("[hr]");
         outputCard.body.push("Unit: " + unit.name);
         outputCard.body.push("# Teams: " + unit.teamIDs.length);
@@ -2836,6 +2837,7 @@ log(hit)
         PrintCard();
     }
 
+
     const LOS = (id1,id2,special) => {
         if (!special || special === "") {special = " "}; //  overhead - ignores concealment/BP for Short and intervening units, Spotter
         
@@ -2850,46 +2852,45 @@ log(hit)
     
         let distanceT1T2 = team1.hex.distance(team2.hex);
         let losReason = "";
-    
-        if (state.TY.darkness === true && team2.queryCondition("Flare") === false && special.includes("NLOS") === false) {
-            let vision = state.TY.vision;
-            if (team1.special.includes("Infra-Red")) {
-                vision = NightVision.IR
-            }
-            if (team1.special.includes("Thermal Imaging")) {
-                vision = NightVision.Gen1Thermal;
-            }
-            if (team1.special.includes("2nd Gen Thermal Imaging")) {
-                vision = NightVision.Gen2Thermal;
-            }
-            //check if adjacnt to burning wreck
-            let wreckKeys = Object.keys(WreckArray);
-            for (let w=0;w<wreckKeys.length;w++) {
-                let dist = WreckArray[wreckKeys[w]].distance(team2.hex);
-                if (dist <= 1) {
-                    vision = distanceT1T2 + 3;
-                    break;
+        let visibility = state.TY.visibility;
+        if (state.TY.darkness === true) {visibility = Visibility["Night"]};
+        if (team2.queryCondition("Flare") === true) {
+            visibility = state.TY.visibility;
+        }
+        let conds = ["Infra-Red","Thermal Imaging","2nd Gen Thermal Imaging"];
+        for (let i=0;i<conds.length;i++) {
+            if (team1.special.includes(conds[i])) {
+                if (state.TY.visibility === 15 && conds[i] === "Infra-Red") {
+                    visibility = 15;
+                } else {
+                    visibility = Math.max(visibility,Visibility[conds[i]]);
                 }
-            }
-
-            if (distanceT1T2 > vision) {
-                let result = {
-                    los: false,
-                    concealed: false,
-                    bulletproof: false,
-                    smoke: false,
-                    facing: facing,
-                    shooterface: shooterFace,
-                    distance: distanceT1T2,
-                    special: special,
-                }
-                losReason = "Distance > Night Vision Range";
-                return result;   
             }
         }
-    
+        if (special.includes("NLOS")) {
+            visibility = 1000;
+        }
+
         let facing = Facing(id1,id2);
         let shooterFace = Facing(id2,id1);
+
+        if (distanceT1T2 > visibility) {
+            losReason = "Distance > Visibility";
+            let result = {
+                los: false,
+                concealed: false,
+                bulletproof: false,
+                smoke: false,
+                facing: facing,
+                shooterface: shooterFace,
+                distance: distanceT1T2,
+                special: special,
+                visibility: visibility,
+                losReason: losReason,
+            }
+            return result;   
+        }
+
         let team1Height = teamHeight(team1);
         let team2Height = teamHeight(team2);
         let teamLevel = Math.min(team1Height,team2Height);
@@ -2912,7 +2913,7 @@ log(hit)
         let los = true;
     
         if (special.includes("NLOS")) {
-            if (team2.type.includes("Infantry") && team2.moved === false && team2Hex.bp === true) {
+            if (team2.type === "Infantry" && team2.moved === false && team2Hex.bp === true) {
                 let result = {
                     los: true,
                     concealed: true,
@@ -2922,6 +2923,8 @@ log(hit)
                     shooterface: shooterFace,
                     distance: distanceT1T2,
                     special: special,
+                    visibility: visibility,
+                    losReason: "",
                 }
                 return result;    
             } else if (team2.type !== "Aircraft" || team2.type !== "Helicopter") {
@@ -2934,9 +2937,12 @@ log(hit)
                     shooterface: shooterFace,
                     distance: distanceT1T2,
                     special: special,
+                    visibility: visibility,
+                    losReason: "",
                 }
                 return result;    
             } else {
+                losReason = "Invalid Target"
                 let result = {
                     los: false,
                     concealed: true,
@@ -2946,8 +2952,9 @@ log(hit)
                     shooterface: shooterFace,
                     distance: distanceT1T2,
                     special: special,
+                    visibility: visibility,
+                    losReason: losReason,
                 }
-                losReason = "Invalid Target"
                 return result;    
             }
         }
@@ -2955,7 +2962,7 @@ log(hit)
 
         let fKeys = Object.keys(TeamArray);
 
-        if ((team2Hex.bp === true || team2Hex.foxholes === true) && team2.type.includes("Infantry")) {
+        if ((team2Hex.bp === true || team2Hex.foxholes === true) && team2.type === "Infantry") {
             //this catches foxholes, craters and similar
             concealed = true;
             bulletproof = true;
@@ -3075,7 +3082,7 @@ log("Neither is Air")
                     for (let t=0;t<fKeys.length;t++) {
                         let fm = TeamArray[fKeys[t]];
                         if (fm.id === team1.id || fm.id === team2.id || fm.player !== team1.player || fm.unitID === team1.unitID) {continue};
-                        if (fm.type.includes("Infantry") && fm.moved === false) {continue}; //ignore these infantry
+                        if (fm.type === "Infantry" && fm.moved === false) {continue}; //ignore these infantry
                         if (fm.hex === qrs) {
         //log(fm.name)
                             friendlyFlag = true;
@@ -3135,7 +3142,7 @@ log("Neither is Air")
 
                 }
             }
-            if (team2.type.includes("Infantry") && team2.moved === false) {
+            if (team2.type === "Infantry" && team2.moved === false) {
                 concealed = true //infantry teams that didnt move are concealed to all but Aircraft
         //log("Infantry didnt move = Concealed")
             }
@@ -3162,9 +3169,11 @@ log("Neither is Air")
             shooterface: shooterFace,
             distance: distanceT1T2,
             special: special,
+            visibility: visibility,
         }
         return result;
     }
+
 
     
     const TestLOS = (msg) => {
