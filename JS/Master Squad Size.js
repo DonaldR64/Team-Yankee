@@ -5372,8 +5372,10 @@ log("Array Length: " + array.length)
         array = array.sort(function(a,b){
             return b.priority - a.priority;
         })
-        let roll = 6; //trial of 1st mistaken being passed
-        //let roll = randomInteger(6);
+        let roll = randomInteger(6);
+        if (array[0].priority === 4) {
+            roll = 6;
+        }
 log("Roll: " + roll)
 
         for (let i=0;i<array.length;i++) {
