@@ -656,14 +656,14 @@ const TY = (() => {
         }
 
         rally() {
-            _.forEach(this.teamIDs,id => {
+            _.each(this.teamIDs,id => {
                 let team = TeamArray[id];
                 team.rally();
             });
         }
 
         Suppress() {
-            _.forEach(this.teamIDs,id => {
+            _.each(this.teamIDs,id => {
                 let team = TeamArray[id];
                 team.suppress();
             });
@@ -768,7 +768,7 @@ log(team.name + " inCommand: " + team.inCommand)
 
         Size() {
             let size = 0;
-            _.forEach(this.teamIDs,id => {
+            _.each(this.teamIDs,id => {
                 let team = TeamArray[id];
                 let number = parseInt(team.token.get("bar1_value")) || 1;
                 size += number;
@@ -1608,6 +1608,45 @@ log(hit)
         p = JSON.parse(JSON.stringify(o));
         return p;
     }
+    
+    const newLeader = (team,oldTeam) => { 
+        let newC = getObj("character",team.token.get("represents"));
+        let c = simpleObj(newC);
+
+        let oldCid = newTeam.id;
+        delete c.id;
+        c.name += " Leader";
+        c.avatar = getCleanImgsrc(c.avatar) || '';
+
+        newC = createObj('character',c);
+
+        _.each(findObjs({type:'attribute',characterid:oldCid}),(a)=>{
+            let sa = simpleObj(a);
+            delete sa.id;
+            delete sa._type;
+            delete sa._characterid;
+            sa.characterid = newC.id;
+            createObj('attribute',sa);
+        });
+
+        _.each(findObjs({type:'ability',characterid:oldCid}),(a)=>{
+            let sa = simpleObj(a);
+            delete sa.id;
+            delete sa._type;
+            delete sa._characterid;
+            sa.characterid = newC.id;
+            createObj('ability',sa);
+        });
+
+        //add unit leader abilities
+        //auras, flags etc
+        team.name = PromotedName(team,oldTeam);
+        team.token.set({
+            represents: newC.id,
+            name: team.name,
+        });
+        setDefaultTokenForCharacter(newC, nTok);
+    }
 
     const getCleanImgSrc = (imgsrc) => {
         let parts = imgsrc.match(/(.*\/images\/.*)(thumb|med|original|max)([^?]*)(\?[^?]+)?$/);
@@ -2336,7 +2375,7 @@ log(hit)
         //add tokens to hex map, rebuild Team/Unit Arrays
         RebuildArrays();
         //check what is in command
-        _.forEach(UnitArray,unit => {
+        _.each(UnitArray,unit => {
             unit.IC();
         })
         BuildReserve();//places flag on units in reserve when rebuilding a map
@@ -3277,7 +3316,7 @@ log("Neither is Air")
         if (team.id === unitLeader.id) {
             targetTeam = unitLeader;
             targetName = unit.name;
-            _.forEach(unit.teamIDs,id => {
+            _.each(unit.teamIDs,id => {
                 let tm = TeamArray[id];
                 if (tm.inCommand === true && tm.bailed === false) {
                     targetArray.push(tm);
@@ -3649,7 +3688,7 @@ log("Neither is Air")
                 targetTeam = unitLeader;
                 targetName = unit.name;
                 noun = "Unit";
-                _.forEach(unit.teamIDs,id => {
+                _.each(unit.teamIDs,id => {
                     let tm = TeamArray[id];
                     if (tm.inCommand === true && tm.bailed === false && tm.queryCondition("Spot") === false) {
                         targetArray.push(tm);
@@ -3770,7 +3809,7 @@ log("Neither is Air")
             case "Land/Take Off":
                 if (targetTeam.landed() === true) {
                     outputCard.body.push("The Helicopter(s) Take Off and may now move");
-                    _.forEach(targetArray,team => {
+                    _.each(targetArray,team => {
                         team.removeCondition("Land/Take Off");
                     })
                 } else {
@@ -3779,7 +3818,7 @@ log("Neither is Air")
                     condition = "Land/Take Off";
                 }
         }
-        _.forEach(targetArray,team => {
+        _.each(targetArray,team => {
             team.specialorder = specialorder;
             if (condition) {
                 team.addCondition(condition);
@@ -3789,7 +3828,7 @@ log("Neither is Air")
     }
 
     const DigIn = (array) => {
-        _.forEach(array,team => {
+        _.each(array,team => {
             if (team.token.get("layer") !== "walls" && (team.type.includes("Infantry") || team.type === "Gun")) {
                 RemoveRangedInMarker(team.unitID);
                 let hex = hexMap[team.hexLabel];
@@ -3942,10 +3981,10 @@ log("Same had 2")
                 return;
             }
             if (state.TY.gametype === "Meeting Engagement") {
-                _.forEach(TeamArray,team => {
+                _.each(TeamArray,team => {
                     DigIn([team])
                 })
-                _.forEach(UnitArray,unit => {
+                _.each(UnitArray,unit => {
                     GTG(unit);
                 })
             }
@@ -4259,7 +4298,7 @@ log("Same had 2")
                 outputCard.body.push("3 - Roll for Strike Aircraft");
             }
             PrintCard();
-            _.forEach(UnitArray,unit => {
+            _.each(UnitArray,unit => {
                 unit.resetflags();
             });
 
@@ -4276,11 +4315,11 @@ log("Same had 2")
             let gtg = (team.moved === true || team.fired === true) ? false:true;
 
             let movexceptions = ["Hunter-Killer","Scout"];
-            _.forEach(movexceptions,exception => {
+            _.each(movexceptions,exception => {
                 if (team.special.includes(exception) && team.fired === false) {gtg = true};
             })
             let fireexceptions = ["Swingfire","Hammerhead"];
-            _.forEach(fireexceptions,exception => {
+            _.each(fireexceptions,exception => {
                 if (team.special.includes(exception) && team.moved === false) {gtg = true};
             })
 
@@ -4539,7 +4578,7 @@ log("Same had 2")
                 let counterAttackingUnitIDs = [];
                 let counterAttackingTeamIDs = [];
                 let breakingOffUnitIDs = [];
-                _.forEach(defUnitIDs,unitID => {
+                _.each(defUnitIDs,unitID => {
                     let unit = UnitArray[unitID];
                     let defendingPlayer = unit.player;
                     outputCard.body.push("[U]" + unit.name + "[/u]");
@@ -4557,7 +4596,7 @@ log("Same had 2")
                     } else {
                         outputCard.body.push("Unit may Counterattack");
                         unit.order = "Assault";
-                        _.forEach(unit.teamIDs,id => {
+                        _.each(unit.teamIDs,id => {
                             let team = TeamArray[id];
                             counterAttackingTeamIDs.push(team.id);
                             team.addCondition("Assault");
@@ -4569,10 +4608,10 @@ log("Same had 2")
                 if (breakingOffUnitIDs.length > 0) {
                     outputCard.body.push('Breaking Off Teams must move at Tactical speed the shortest distance to be further than 3 hexes away from all Assaulting Teams');
                     outputCard.body.push("Any Teams not able to do so surrender and are destroyed");
-                    _.forEach(breakingOffUnitIDs,unitID => {
+                    _.each(breakingOffUnitIDs,unitID => {
                         let unit = UnitArray[unitID];
                         let teamIDs = DeepCopy(unit.teamIDs)
-                        _.forEach(teamIDs,teamID => {
+                        _.each(teamIDs,teamID => {
                             let team = TeamArray[teamID];
                             if (team.bailed === true) {
                                 team.kill();
@@ -4600,7 +4639,7 @@ log("Same had 2")
         //else will be an individual tank team if remounting
         let reroll = -1;
         let leaders = [];
-        _.forEach(UnitArray,unit => {
+        _.each(UnitArray,unit => {
             if (unit.hq === true && unit.player === team.player) {
                 leaders.push(TeamArray[unit.teamIDs[0]]);
             }
@@ -5481,7 +5520,7 @@ log(ai)
             artUnits.push(UnitArray[spotter.unitID]);
         } else {
         log("Units")
-            _.forEach(UnitArray,unit => {
+            _.each(UnitArray,unit => {
                 log(unit)
                 if (unit.player === spotter.player && unit.artillery === true && unit.pinned() === false && unit.specialorder !== "Failed Blitz" && unit.specialorder.includes("Dig In") === false && unit.type !== "Aircraft" && unit.type !== "Helicopter" && unit.inReserve === false) {
                     artUnits.push(unit);
@@ -6040,7 +6079,7 @@ log(weapon)
         pinningUnits = [...new Set(pinningUnits)];
         if (pinningUnits.length > 0) {
             outputCard.body.push("[hr]");
-            _.forEach(pinningUnits,unit => {
+            _.each(pinningUnits,unit => {
                 let courage = TeamArray[unit.teamIDs[0]].courage;
                 let roll = randomInteger(6);
                 let end = unit.name + ": Not Pinned";
@@ -6300,7 +6339,7 @@ log(keys)
             log(unit.teamIDs)
             let teamIDs = DeepCopy(unit.teamIDs)
 
-            _.forEach(teamIDs,id => {
+            _.each(teamIDs,id => {
                 let team = TeamArray[id];
 log(team.name)
 log("Hits: " + team.hitArray.length)
@@ -6485,7 +6524,7 @@ log("In B2B")
             defendingUnit = UnitArray[team2.unitID];
             if (defendingUnit.order === "Assault") {
                 defendingUnit.order = "Tactical";
-                _.forEach(defendingUnit.teamIDs,id => {
+                _.each(defendingUnit.teamIDs,id => {
                     let tm = TeamArray[id];
                     if (tm.order === "Assault") {
                         tm.order = "Tactical";
@@ -6606,11 +6645,11 @@ log("Charge Dist: " + chargeDist)
 
         let attackerIDs = Object.keys(attackingTeamIDs);
 
-        _.forEach(attackerIDs,attackerID => {
+        _.each(attackerIDs,attackerID => {
                 let attTeam = TeamArray[attackerID];
                 let line,end,bracket1,bracket2;
                 let defenders = []; //teams
-                _.forEach(attackingTeamIDs[attackerID],defenderID => {
+                _.each(attackingTeamIDs[attackerID],defenderID => {
                         let team = TeamArray[defenderID];
                         if (team) {defenders.push(team)}
                 })
@@ -6682,7 +6721,7 @@ log("Charge Dist: " + chargeDist)
         let finalDefIDs = [];
         let defUnitIDs = [];
         let bailedIDs = [];
-        _.forEach(AssaultIDs[defendingPlayer],id2 => {
+        _.each(AssaultIDs[defendingPlayer],id2 => {
                 let team2 = TeamArray[id2];
                 if (team2) {
                         if (team2.bailed === true) {bailedTeamIDs.push(id2)};
@@ -6712,7 +6751,7 @@ log("Charge Dist: " + chargeDist)
                 outputCard.body.push("Any Teams not able to do so (due to Bailed or Movement) surrender and are destroyed");
                 outputCard.body.push('The Winning Teams may Consolidate 2 hexes, this Move may not bring them into contact with an enemy Team.')  
                 AssaultIDs = [[],[]];
-                _.forEach(bailedIDs,id => {
+                _.each(bailedIDs,id => {
                     let team = TeamArray[id];
                     team.kill();
                 })
@@ -6720,7 +6759,7 @@ log("Charge Dist: " + chargeDist)
                 SetupCard("Counterattack","",state.TY.nations[defendingPlayer]);
                 outputCard.body.push("The Defenders may now choose to Counterattack or may Break Off");
                 let part2 = "!RollD6;Counterattack;";
-                _.forEach(defUnitIDs,unitID => {
+                _.each(defUnitIDs,unitID => {
                     part2 += unitID + ";";
                 })
                 part2 += round;
@@ -6800,7 +6839,7 @@ log("Charge Dist: " + chargeDist)
         let unit = UnitArray[TeamArray[msg.selected[0]._id].unitID];
         if (unit) {
             let array = [];
-            _.forEach(unit.teamIDs,id=>{
+            _.each(unit.teamIDs,id=>{
                 array.push(TeamArray[id]);
             })
             DigIn(array);
@@ -6821,7 +6860,7 @@ log("Charge Dist: " + chargeDist)
         for (let i=0;i<msg.selected.length;i++) {
             tokenIDs.push(msg.selected[i]._id);
         }
-        _.forEach(tokenIDs,tokenID => {
+        _.each(tokenIDs,tokenID => {
             let token = findObjs({_type:"graphic", id: tokenID})[0];
             token.set({
                 width: 75,
@@ -6855,7 +6894,7 @@ log("Charge Dist: " + chargeDist)
            outputCard.body.push("[#ff0000]The Unit is Refuelling/Refitting this turn[/#]");
            order = "Hold"
         }
-        _.forEach(unit.teamIDs,id => {
+        _.each(unit.teamIDs,id => {
             let team = TeamArray[id];
             team.addCondition(order);
             team.order = order;
