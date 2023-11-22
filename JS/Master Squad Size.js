@@ -1079,15 +1079,8 @@ log("Special Text: " + specialText)
         addCondition(condition) {
             let imgSrc,charID;
             let size = 70;
+            let rotation = 0;
             switch (condition) {
-                case 'Bailed Out':
-                    imgSrc = Nations[this.nation].bailed;
-                    charID = "-Nht9LnFvLCRVCbmcCZd";
-                    break;
-                case 'Pinned':
-                    imgSrc = Nations[this.nation].pinned;
-                    charID = "-Nht9LnFvLCRVCbmcCZd";
-                    break;
                 case 'Dash':
                     imgSrc = "https://s3.amazonaws.com/files.d20.io/images/367732138/K6sIzwifj9tIXcgYPIaw6g/thumb.png?1700012748";
                     charID = "-NhnnimsL_fUE_I44tij";
@@ -1132,6 +1125,8 @@ log("Special Text: " + specialText)
                 case 'Flare':
                     imgSrc = "https://s3.amazonaws.com/files.d20.io/images/366077896/UYxOO1P7P1wBDD75gtpsFA/thumb.png?1699038152";
                     charID = "-NiLYVaQvQOHD16lukjv";
+                    rotation = this.token.get("rotation");
+                    size = 130;
                     break;
             }
 
@@ -1162,6 +1157,7 @@ log("Special Text: " + specialText)
                 top: this.location.y,
                 width: size, 
                 height: size,
+                rotation: rotation,
                 isdrawing: true,
                 pageid: this.token.get("pageid"),
                 imgsrc: imgSrc,
