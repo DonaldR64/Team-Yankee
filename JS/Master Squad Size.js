@@ -4586,8 +4586,7 @@ log("Same had 2")
                     let defendingPlayer = unit.player;
                     outputCard.body.push("[U]" + unit.name + "[/u]");
                     let unitLeader = TeamArray[unit.teamIDs[0]];
-                    let needed = unitLeader.counterattack;
-                    let reroll = CommandReroll(unitLeader);
+                    let needed = Math.min(unitLeader.counterattack,Commander(unitLeader,"counterattack"));
                     let line = "Roll: " + DisplayDice(roll,unit.nation,24);
                     if (reroll > 0) {
                         line += " / Reroll: " + DisplayDice(reroll,unit.nation,24);
@@ -4637,10 +4636,10 @@ log("Same had 2")
         }
     }
 
-    const CommandReroll = (team) => {
-        //will be unitLeader if pinning, counterattack
-        //else will be an individual tank team if remounting
-        let reroll = -1;
+    const Commander = (team,statname) => {
+        //will be unitLeader if rally, counterattack
+        //else will be an individual tank team if rally
+        let needed = 7;
         let leaders = [];
         _.each(UnitArray,unit => {
             if (unit.hq === true && unit.player === team.player) {
@@ -4650,12 +4649,12 @@ log("Same had 2")
         for (let i=0;i<leaders.length;i++) {
             let leader = leaders[i];
             let losCheck = LOS(team.id,leader.id,"Overhead");
-            if (losCheck.los === true && losCheck.distance <= 8) {
-                reroll = randomInteger(6);
+            if (losCheck.los === true && losCheck.distance <= 10) {
+                needed = leader.statname;
                 break;
             }
         }
-        return reroll;
+        return needed;
     }
 
     const Shooting = (msg) => {
