@@ -6970,7 +6970,7 @@ log("Charge Dist: " + chargeDist)
 
                 let oldHexLabel = team.hexLabel;
 
-                let moveBack = team.bailed;
+                let moveBack = team.suppressed;
                 if ((team.type === "Tank" || team.type === "Unarmoured Tank") && hexMap[newHexLabel].dash === 3) {
                     moveBack = true;
                 }
@@ -7000,12 +7000,13 @@ log("Charge Dist: " + chargeDist)
                     hexMap[oldHexLabel].teamIDs.splice(index,1);
                 }
                 hexMap[newHexLabel].teamIDs.push(tok.id);
-                team.CheckIC();
-                //let theta = oldHex.angle(newHex);
+                if (unit) {
+                    unit.IC();
+                }                //let theta = oldHex.angle(newHex);
                 //tok.set("rotation",theta);
                 FlipGraphic(tok.get("rotation"),tok,team);
                 MovementSound(team);
-
+                /*
                 if (state.TY.passengers[tok.id]) {
                     //carrying passengers
                     let passengers = state.TY.passengers[tok.id];
@@ -7025,7 +7026,7 @@ log("Charge Dist: " + chargeDist)
                         hexMap[newHexLabel].teamIDs.push(passengerTeam.id);
                     }
                 }
-
+                */
                 if (state.TY.turn > 0) {
                     if (team.hexLabel !== team.prevHexLabel) {
                         if (team.moved === false) {
