@@ -37,7 +37,6 @@ const TY = (() => {
     }
 
     const SM = {
-        "Leader": "status_black-flag",
         "oneshot": "status_oneshot::5503748",
     };
 
@@ -614,7 +613,7 @@ const TY = (() => {
                     this.teamIDs.push(team.id);
                 }
                 team.unitID = this.id;
-                if (team.special.includes("HQ") || team.token.get(SM.HQ)) {
+                if (team.special.includes("HQ")) {
                     this.hqUnit = true;
                 }
                 if (team.artillery === true) {
@@ -1624,12 +1623,12 @@ log(hit)
                 represents: c.id,
             });
         } else {
-            let newC = getObj("character",team.token.get("represents"));
-            c = simpleObj(newC);
-            let oldCid = newC.id;
+            let oldC = getObj("character",team.token.get("represents"));
+            c = simpleObj(oldC);
+            let oldCid = oldC.id;
             delete c.id;        
             c.name += " Leader";
-            c.avatar = getCleanImgsrc(c.avatar) || '';
+            c.avatar = getCleanImgSrc(c.avatar) || '';
             newC = createObj('character',c);
             _.each(findObjs({type:'attribute',characterid:oldCid}),(a)=>{
                 let sa = simpleObj(a);
@@ -1652,7 +1651,9 @@ log(hit)
             team.token.set({
                 represents: newC.id,
             });
-            setDefaultTokenForCharacter(newC, nTok);
+            team.characterID = newC.id;
+            team.characterName = newC.get("name");
+            setDefaultTokenForCharacter(newC, team.token);
         }
     }
 
@@ -2677,7 +2678,7 @@ log(hit)
             name += " "+ letter + "/" + i;
         } 
         let rank;
-        if (team.special.includes("HQ") || team.token.get(SM.HQ) === true) {
+        if (team.special.includes("HQ")) {
             rank = Math.min(i,1);
             unit.hqUnit = true;
             name = Ranks[Nations[team.nation].ranks][rank] + Name(Nations[team.nation].names);
@@ -7087,9 +7088,6 @@ log("Charge Dist: " + chargeDist)
                 break;
             case '!UnitCreation':
                 UnitCreation(msg);
-                break;
-            case '!UnitCreation2':
-                UnitCreation2(msg);
                 break;
             case '!TestLOS':
                 TestLOS(msg);
