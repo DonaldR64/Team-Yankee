@@ -2618,7 +2618,7 @@ log(hit)
         }
         //check if unit has leader
         let leader = TeamArray[unit.teamIDs[0]];
-        if (leader.special.includes("HQ") === false || leader.special.includes("Leader") === false) {
+        if (leader.special.includes("HQ") === false && leader.special.includes("Leader") === false) {
             MakeLeader(leader);
         }
         for (let i=0;i<unit.teamIDs.length;i++) {
