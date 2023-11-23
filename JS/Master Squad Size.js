@@ -2662,7 +2662,7 @@ log(hit)
         if (state.TY.nations[player].includes(nation) === false) {
             state.TY.nations[player].push(nation);
         }
-        sendChat("","Unit Added");
+        sendChat("",unit.name + " Added");
     }
 
     const NameAndRank = (team,i) => {
