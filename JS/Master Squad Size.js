@@ -4051,7 +4051,7 @@ log("Same had 2")
                 pageInfo.page.set("dynamic_lighting_enabled",false);
             }
 
-            StartStep("ResLeaders");
+            StartStep("Rally");
         }
         if (currentStep === "Artillery and Air") {
             SetupCard("Artillery and Air","Turn: " + state.TY.turn,"Neutral");
@@ -4101,71 +4101,11 @@ log("Same had 2")
     }
 
     const StartStep = (pass) => {
-        if (pass === "ResLeaders") {
-            CheckArray = [];
-            for (let p=0;p<2;p++) {
-                //check if a formation HQ for the player is dead
-                let formationIDs = deadHQs[p];
-                for (let i=0;i<formationIDs.length;i++) {
-                    let formation = FormationArray[formationIDs[i]];
-                    if (formation) {
-                        let eligibleUnitIDs = formation.unitIDs;
-                        let team;
-                        let possibleTeams = [];
-                        for (let i=0;i<eligibleUnitIDs.length;i++) {
-                            let unit = UnitArray[eligibleUnitIDs[i]];
-                            let unitLeader = TeamArray[unit.teamIDs[0]];
-                            if (unitLeader.special.includes("Passengers")) {continue};
-                            if ((unit.teamIDs.length > (lastStandCount[unit.type] + 1)) || unit.teamIDs.length === 1) {
-                                team = unitLeader;
-                                break;
-                            } else {
-                                possibleTeams.push(unitLeader);
-                            }
-                        }
-                        if (team === undefined && possibleTeams.length > 0) {
-                            team = possibleTeams[0];
-                        }
-                        if (team !== undefined) {
-                            CheckArray.push(team);
-                        }
-                    }
-                }
-            }
-
-            if (CheckArray.length > 0) {
-                SetupCard("Field Promotions","","Neutral");
-                ButtonInfo("Start","!FieldPromotions");
-                PrintCard();            
-            } else {
-                StartStep("Remount");
-            }
-        }
-        if (pass === "Remount") {
-            deadHQs = [[],[]];
-            CheckArray = [];
-            let keys = Object.keys(UnitArray); 
-            for (let i=0;i<keys.length;i++) {
-                let unit = UnitArray[keys[i]];
-                if (unit.type !== "Tank") {continue};
-                let ids = unit.teamIDs;
-                for (let j=0;j<ids.length;j++) {
-                    let team = TeamArray[ids[j]];
-                    if (team.bailed === true) {
-                        CheckArray.push(team);
-                    }
-                }
-            }
-            if (CheckArray.length > 0) {
-                SetupCard("Remount Checks","","Neutral");
-                ButtonInfo("Start Remount Checks","!RemountChecks");
-                PrintCard();            
-            } else {
-                StartStep("Rally");
-            }
-        }
         if (pass === "Rally") {
             CheckArray = [];
+
+
+
             let keys = Object.keys(UnitArray);
             for (let i=0;i<keys.length;i++) {
                 let unit = UnitArray[keys[i]];
@@ -4225,24 +4165,8 @@ log("Same had 2")
                 ButtonInfo("Start Morale Checks","!MoraleChecks");
                 PrintCard();            
             } else {
-                StartStep("Formation Morale");
+                StartStep("Final");
             }
-        }
-        if (pass === "Formation Morale") {      
-            let keys = Object.keys(FormationArray);
-            for (let i=0;i<keys.length;i++) {
-                let formation = FormationArray[keys[i]];
-                if (formation.name === "Support" || formation.name === "Barrages") {continue};
-                let unitNumbers = formation.unitIDs.length;
-                if (unitNumbers < 2) {
-                    SetupCard(formation.name,"Morale",formation.nation);
-                    outputCard.body.push("The Formation as a whole breaks and flees the field!");
-                    outputCard.body.push("Check Victory Conditions");
-                    //destroy units/teams
-                    PrintCard();
-                }
-            }
-            StartStep("Final");
         }
         if (pass === "Final") {
             SetupCard("Turn: " + state.TY.turn,"Starting Step","Neutral");
