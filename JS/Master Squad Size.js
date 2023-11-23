@@ -2649,9 +2649,6 @@ log(hit)
             if (team.type === "Mechanized Infantry") {
                 team.token.set({
                     bar2_value: 1,
-                    bar2_max: 1,
-                    showplayers_bar2: true,
-                    playersedit_bar2: true,
                 });
             }
             if (team.special.includes("HQ")) {
