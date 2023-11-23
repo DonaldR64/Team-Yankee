@@ -125,7 +125,7 @@ const TY = (() => {
         "saved": "Hit Saved",
         "cover": "Hit Saved by Cover",
         "smoked": "Target Smoked",
-        "injury": "[#0000ff]Hit kills some of the Men[/#]",
+        "injury": "[#0000ff]Hit kills several soldiers[/#]",
     }
 
     const SaveResultsMult = {
@@ -137,7 +137,7 @@ const TY = (() => {
         "flees": "[#ff0000]Hit causes Crew to Flee, Vehicle Destroyed![/#]",
         "saved": "All Hits Saved",
         "cover": "All Hits Saved (Cover)",
-        "injury": "[#0000ff]Hits kills some of the Men[/#]",
+        "injury": "[#0000ff]Hits kill several soldiers[/#]",
     }
 
     let outputCard = {title: "",subtitle: "",nation: "",body: [],buttons: []};
@@ -738,7 +738,6 @@ log(team.name + " inCommand: " + team.inCommand)
 
         IC() {
             if (this.type === "System Unit") {return};
-            let commandRadius = (this.size > 7 || this.type === "Aircraft" || this.type === "Helicopter") ? 8:6;
             let unitLeader = TeamArray[this.teamIDs[0]];
             unitLeader.IC(true);
             if (this.teamIDs.length === 1) {return};
@@ -807,6 +806,8 @@ log(team.name + " inCommand: " + team.inCommand)
             //create array of weapon info
             let weaponArray = [];
             let atWeapons = [];
+            let vehicleWeaponTypes = [];
+            let weaponTypes = [];
             let artilleryWpn;
             let artilleryTeam = false;
 
@@ -855,6 +856,7 @@ log(team.name + " inCommand: " + team.inCommand)
                 if (!type || type === "") {
                     type = "Small Arms";
                 }
+                weaponTypes.push(type);
                 let at = parseInt(attributeArray["weapon"+i+"at"]) || 0;
 
                 let weapon = {
@@ -889,11 +891,16 @@ log(team.name + " inCommand: " + team.inCommand)
                         atWeapons.push(weapon);
                     }
                 }
+                if (weapon.type.includes("Vehicle")) {
+                    vehicleWeaponTypes.push(weapon.type);
+                }
 
                 weaponArray.push(weapon);
                 
             }
-
+            vehicleWeaponTypes = [...new Set(vehicleWeaponTypes)];
+            weaponTypes = [...new Set(weaponTypes)];
+log(weaponTypes)
             let dif = starthp - atWeapons.length;
             for (let e=0;e<dif;e++) {
                 let weapon = {
@@ -926,7 +933,7 @@ log(atWeapons)
 
             //update sheet with info
             let specials = attributeArray.special || " "
-log("Specials: " + specials)
+
             let specialText = "";
 
 
@@ -986,8 +993,7 @@ log(infoArray)
             }
 
             let special = infoArray.toString() || " "
-log("Special: " + special)
-log("Special Text: " + specialText)
+
             if (specialText === "") {
                 DeleteAttribute(char.id,"specialText");
             } else {
@@ -1056,12 +1062,14 @@ log("Special Text: " + specialText)
 
             this.weaponArray = weaponArray;
             this.assaultWpns = atWeapons;
+            this.weaponTypes = weaponTypes;
+            this.vehicleWeaponTypes = vehicleWeaponTypes; //used by leaders of Mech Infantry
             this.hitArray = [];
             this.eta = [];
             this.shooterIDs = [];
             this.priority = 0;
 
-            this.bailed = this.queryCondition("Bailed Out");
+            this.suppressed = (token.get("tint_color") === Colours.red) ? true:false;
             this.fired = this.queryCondition("Fired");
             this.aaFired = this.queryCondition("AA Fire");
             this.moved = ((this.queryCondition("Tactical") || this.queryCondition("Dash")) === true) ? true:false;
@@ -1130,11 +1138,32 @@ log("Special Text: " + specialText)
                     rotation = this.token.get("rotation");
                     size = 130;
                     break;
+                case 'One':
+                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/368873568/ISg1ynNuJvVw_o_kycXPRA/thumb.png?1700772975";
+                    charID = "-Njxy_D2X0dIt31cEC8F";
+                    break;
+                case 'Two':
+                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/368873704/5hrYP6wQhe2FC2KGlJ7qlQ/thumb.png?1700773090";
+                    charID = "-Njxy_NNdP0k0o1c3grC";
+                    break;
+                case 'Three':
+                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/368873698/AkZogtZIv6Jr2ENbunjVsA/thumb.png?1700773087";
+                    charID = "-Njxy_TeA0BU5vkCPT47";
+                    break;
+                case 'Four':
+                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/368875584/-HdDVZmi-kqUpFyKpcQ8fA/thumb.png?1700774502";
+                    charID = "-Njy2w40Y9tag-Uq8iiW";
+                    break;
+                case 'Five':
+                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/368875585/8LzwVXprt_YcdLncZ2UiQg/thumb.png?1700774502";
+                    charID = "-Njy2wCTYOEZb3ZW4FM1";
+                    break;
             }
 
             let leftConditions = ["Tactical","Dash","Hold","Assault"];
             let rightConditions = ["Fired","AAFire","GTG","Land/Take Off"];
             let topConditions = ["Flare"];
+            let midConditions = ["One","Two","Three","Four","Five"]
             let array = [];
             if (leftConditions.includes(condition)) {
                 array = leftConditions;
@@ -1142,6 +1171,8 @@ log("Special Text: " + specialText)
                 array = rightConditions;
             } else if (topConditions.includes(condition)) {
                 array = topConditions;
+            } else if (midConditions.includes(condition)) {
+                array = midConditions;
             }
             //clear other conditions in that array
             if (state.TY.conditions[this.id]) {
@@ -1196,39 +1227,38 @@ log("Special Text: " + specialText)
             return result;  
         }
 
-        BailOut() {
+        Suppress() {
             let result = {
                 result: "",
                 tip: "",
             }
-            if (this.bailed === true) {
+            if (this.suppressed === true) {
                 let roll = randomInteger(6);
-                let reroll = CommandReroll(this);
                 result.tip = "<br>Remount Roll: " + roll + " vs. " + this.remount + "+";
-                if (roll < this.remount && reroll !== -1) {
-                    result.tip += "<br>Reroll from Formation Commander: " + reroll;
-                }
-                roll = Math.max(roll,reroll);  
                 if (roll >= this.remount) {
-                    result.result = "bailedAgain"
+                    result.result = "suppressedAgain"
                 } else {
                     result.result = "flees"
                 }
             } else {
-                result.result = "bailed";
-                this.bail();
+                result.result = "suppressed";
+                this.suppress();
             }
             return result;
         }
 
-        bail() {
-            this.addCondition("Bailed Out");
-            this.bailed = true;
+        suppress() {
+            this.token.set("tint_color",Colours.red);
+            this.suppressed = true;
         }
 
-        remountTank() {
-            this.removeCondition("Bailed Out");
-            this.bailed = false;
+        rally() {
+            if (this.inCommand === true) {
+                this.token.set("tint_color","transparent");
+            } else {
+                this.token.set("tint_color",Colours.black);
+            }
+            this.suppressed = false;
         }
 
         IC(ic) {
@@ -1238,28 +1268,6 @@ log("Special Text: " + specialText)
                 colour = Colours.black;
             }
             this.token.set("tint_color",colour);
-        }
-
-        CheckIC() {
-            let ic = false;
-            if (this.special.includes("HQ") || this.special.includes("Independent") || this.type === "System Unit") {
-                ic = true;
-            } else {
-                let unit = UnitArray[this.unitID];
-                let unitLeader = TeamArray[unit.teamIDs[0]];
-                let index = unit.teamIDs.indexOf(this.id);
-                if (index === 0) {
-                    ic = true;
-                    unit.IC();
-                } else {
-                    let dist = this.hex.distance(unitLeader.hex);
-                    let commandRadius = (unit.size > 7 || this.type === "Aircraft" || this.type === "Helicopter") ? 8:6;
-                    if (dist <= commandRadius) {
-                        ic = true;
-                    } 
-                }
-            }
-            this.IC(ic);
         }
 
         landed() {
@@ -1646,13 +1654,20 @@ log(hit)
                 sa.characterid = newC.id;
                 createObj('ability',sa);
             });
-            //add unit leader abilities
-            //auras, flags etc
             team.token.set({
                 represents: newC.id,
             });
             team.characterID = newC.id;
             team.characterName = newC.get("name");
+            let special = Attribute(newC,"special");
+            if (special !== "") {
+                special += ",Leader";
+            } else {
+                special = "Leader";
+            }
+            AttributeSet(newC.id,"special",special);
+            team.special = special;
+            AddAbilities2(team.id);
             setDefaultTokenForCharacter(newC, team.token);
         }
     }
@@ -2188,22 +2203,15 @@ log(hit)
         outputCard = {title: "",subtitle: "",nation: "",body: [],buttons: [],};
     }
 
-    const parseStat = (x) => {
-        if (x) {
-            p = x.replace(/[^\d]/g, "");
-        }
-        if (isNaN(p)) {
-            p = 7;
-        }
+    const parseStat = (stat) => {
+        p = parseInt(stat);
+        if (isNaN(p)) {p = 7};
         return p;
     }
 
-    const crossStat = (x) => {
-        let c = 1;
-        if (x) {
-            c = parseInt(x);
-            if (isNaN(c)) {c = 1};
-        }
+    const crossStat = (stat) => {
+        c = parseInt(stat);
+        if (isNaN(c)) {c = 1};
         return c;
     }
 
@@ -2638,12 +2646,10 @@ log(hit)
                 statusmarkers: unitMarker,
             });
             if (team.type.includes("Infantry") && hp > 1) {
+                let conds = ["Two","Three","Four","Five"];
+                team.addCondition(conds[hp - 2]);
                 team.token.set({
                     bar1_value: hp,
-                    bar1_max: hp,
-                    compact_bar: "standard",
-                    showplayers_bar1: true,
-                    playersedit_bar1: true,
                 });
             } 
             if (team.type === "Mechanized Infantry") {
@@ -2745,17 +2751,37 @@ log(hit)
         } else {
             outputCard.body.push("Team is NOT In Command");
         }
-        if (team.bailed === true) {
-            outputCard.body.push("[#ff0000]Team is Bailed Out[/#]");
+        if (team.suppressed === true) {
+            if (team.type.includes("Infantry")) {
+                outputCard.body.push("[#ff0000]Team is Pinned[/#]");
+            } else {
+                outputCard.body.push("[#ff0000]Team is Suppressed[/#]");
+            }
         }
         if (team.order === "") {
             outputCard.body.push("No Order this Turn");
         } else {
             outputCard.body.push("Team Order: " + team.order);
         }
-        if (team.specialorder !== "") {
-            outputCard.body.push("Special Order: " + team.specialorder);
+        if (team.special.includes("Leader")) {
+            outputCard.body.push("[hr]");
+            outputCard.body.push("Unit: " + unit.name);
+            outputCard.body.push("# Teams: " + unit.teamIDs.length);
+            if (unit.order === "") {
+                outputCard.body.push("No Order this Turn");
+            } else {
+                outputCard.body.push("Unit Order: " + unit.order);
+            }
+            if (team.suppressed === true) {
+                outputCard.body.push("[#ff0000]Unit is Pinned[/#]");
+            }
+
+
+
         }
+
+
+
         /*
         if (state.TY.passengers[team.id]) {
             outputCard.body.push("[hr]");
@@ -2767,17 +2793,6 @@ log(hit)
             }
         }
         */
-        outputCard.body.push("[hr]");
-        outputCard.body.push("Unit: " + unit.name);
-        outputCard.body.push("# Teams: " + unit.teamIDs.length);
-        if (unit.order === "") {
-            outputCard.body.push("No Order this Turn");
-        } else {
-            outputCard.body.push("Unit Order: " + unit.order);
-        }
-        if (unit.pinned() === true) {
-            outputCard.body.push("[#ff0000]Unit is Pinned[/#]");
-        }
 
         PrintCard();
     }
@@ -3405,11 +3420,16 @@ log("Neither is Air")
             return;
         };
         let id = msg.selected[0]._id;
+        /*
         let data = TokenCondition.LookUpMaster(id);
         if (data) {
             id = data.target;
         }
+        */
+        AddAbilities2(id);
+    }
 
+    const AddAbilities2 = (id) => {
         let token = findObjs({_type:"graphic", id: id})[0];
         let char = getObj("character", token.get("represents"));
 
@@ -3420,22 +3440,14 @@ log("Neither is Air")
         } 
         let team = TeamArray[id];
         if (!team) {return};
-
+        let unit = UnitArray[team.unitID];
+        let action,specOrders,weaponTypes;
         let type = team.type;
-        let special = team.special;
-
         /*
         if (special.includes("Passengers")) {
             abilityName = "Dismount Passengers";
             action = "!DismountPassengers";
             AddAbility(abilityName,action,char.id);     
-        }
-        */
-
-        if (type === "Aircraft") {
-            abilityName = "Order Airstrike";
-            action = "!EnterAircraft";
-            AddAbility(abilityName,action,char.id);
         }
 
         if (char.get("name").includes("Mine") && type === "System Unit") {
@@ -3444,54 +3456,104 @@ log("Neither is Air")
             AddAbility(abilityName,action,char.id);
         }
 
-        if (type !== "Aircraft") {
+        */
+
+
+        if (type !== "Aircraft" && team.special.includes("Leader") === false) {
+            action = "!Activate;Team;"
             if (type.includes("Infantry")) {
-                action = "!Activate;?{Order|Tactical|Dash|Hold|Assault}";
+                action += "?{Order|Tactical|Dash|Hold}";
             } else if (type === "Gun") {
                 if (team.tactical === 0) {
-                    action = "!Activate;?{Order|Dash|Hold}";
+                    action += "?{Order|Dash|Hold}";
                 } else {
-                    action = "!Activate;?{Order|Tactical|Dash|Hold}";
+                    action += "?{Order|Tactical|Dash|Hold}";
                 }
             } else if (type === "Tank") {
-                action = "!Activate;?{Order|Tactical|Dash|Hold|Assault}";
+                action += "?{Order|Tactical|Dash|Hold}";
             } else if (type === "Unarmoured Tank") {
-                action = "!Activate;?{Order|Tactical|Dash|Hold}";
+                action += "?{Order|Tactical|Dash|Hold}";
             } else if (type === "Helicopter") {
-                action = "!Activate;?{Order|Tactical|Hold}";
+                action += "?{Order|Tactical|Hold";
+                if (team.special.includes("Passengers")) {
+                    action += "|Land/Take Off";
+                }
             }
-            abilityName = "Order";
+            abilityName = "Activate Team";
             AddAbility(abilityName,action,char.id);
         }
 
-        let specOrders;
-        if (type.includes("Infantry")) {
-             specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Dig In|Follow Me|Shoot and Scoot|Clear Minefield"
-        } else if (type === "Gun") {
-            specOrders = "!SpecialOrders;?{Special Order|Dig In|Cross Here"
-        } else if (type === "Tank") {
-            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Cross Here|Follow Me|Shoot and Scoot";
-            if (special.includes("Mine")) {
-                specOrders += "|Clear Minefield";
-            }
-        } else if (type === "Unarmoured Tank") {
-            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Cross Here|Follow Me|Shoot and Scoot";
-        } else if (type === "Helicopter") {
-            specOrders = "!SpecialOrders;?{Special Order|";
-            if (special.includes("Passengers")) {
-                specOrders += "Land/Take Off|";
-            }
-            specOrders += "Blitz Move|Shoot and Scoot";
-        }
-        specOrders += "}";
+        if (team.special.includes("Leader")) {
+            if (type === "Aircraft") {
+                abilityName = "Order Airstrike";
+                action = "!EnterAircraft";
+                AddAbility(abilityName,action,char.id);
+            } else if (type !== "System Unit") {
+                action = "!Activate;Unit;"
+                specOrders = "!SpecialOrders;?{Special Order|";
+                weaponTypes = team.weaponTypes;
 
-        if (type !== "Aircraft" && type !== "System Unit") {
-            abilityName = "Special Order";
-            AddAbility(abilityName,specOrders,char.id);
+                if (type.includes("Infantry")) {
+                    action += "?{Order|Tactical|Dash|Hold|Assault}";
+                    specOrders += "Blitz Move|Dig In|Follow Me|Shoot and Scoot|Clear Minefield}"
+                    weaponTypes = ["Small Arms","Heavy Weapon","LAW"]; //some leaders wont have all the weapons their platoon/company mates have
+                    if (type === "Mechanized Infantry") {
+                        _.each(team.vehicleWeaponTypes,vwt => {
+                            weaponTypes.push(vwt);
+                        })
+                    }
+                } else if (type === "Gun") {
+                    if (team.tactical === 0) {
+                        action += "?{Order|Dash|Hold}";
+                    } else {
+                        action += "?{Order|Tactical|Dash|Hold}";
+                    }
+                    specOrders += "Dig In|Cross Here}"
+                } else if (type === "Tank") {
+                    action += "?{Order|Tactical|Dash|Hold}";
+        log("Assault: " + team.assault)
+                    if (team.assault < 7) {
+                        action += "|Assault";
+                    }
+                    action += "}"
+                    specOrders += "Blitz Move|Cross Here|Follow Me|Shoot and Scoot|Clear Minefield}";
+                } else if (type === "Unarmoured Tank") {
+                    action += "?{Order|Tactical|Dash|Hold}";
+                    specOrders += "Blitz Move|Cross Here|Follow Me|Shoot and Scoot}";
+                } else if (type === "Helicopter") {
+                    action += "?{Order|Tactical|Hold";
+                    if (team.special.includes("Passengers")) {
+                        action += "|Land/Take Off";
+                    }
+                    action += "}";
+                    specOrders += "Blitz Move|Shoot and Scoot}";
+                }
+                abilityName = "Activate Unit";
+                AddAbility(abilityName,action,char.id);
+
+                abilityName = "Special Orders";
+                AddAbility(abilityName,specOrders,char.id);
+
+                let num = 1;
+                _.each(weaponTypes,type => {
+                    abilityName = num + ": " + type;
+                    if (type !== "Small Arms") {abilityName += "s"}
+                    action = "!Shooting;@{selected|token_id};@{target|tokenID};" + type + ";Regular;Unit"
+                    AddAbility(abilityName,action,char.id);
+                    num++;
+                });
+
+        
+                if (type === "Tank" || type.includes("Infantry")) {
+                    abilityName = "Call Artillery";
+                    AddAbility(abilityName,"!CreateBarrages",char.id);
+                }
+        
+            }
         }
 
         if (type === "Mechanized Infantry") {
-            abilityName = "Mount/Dismount";
+            abilityName = "Mount/Dismount Team";
             AddAbility(abilityName,"!Mount",char.id);
         }
 
@@ -3500,83 +3562,72 @@ log("Neither is Air")
             AddAbility(abilityName,"!Cross",char.id);
         }
 
-        if (type === "Tank" || type.includes("Infantry")) {
-            abilityName = "Call Artillery";
-            AddAbility(abilityName,"!CreateBarrages",char.id);
-        }
-
-
-
-
-
-        let types = {
-            "Small Arms": [],
-            "Heavy Weapon": [],
-            "LAW": [],
-            "MAW": [],
-            "Infantry SAM": [],
-            "Vehicle MG": [],
-            "Vehicle Flamethrower": [],
-            "Gun": [],
-            "Autocannon": [],
-            "Vehicle Missile": [],
-            "Artillery": [],
-        }
-        let vehicleTypes = ["Vehicle MG","Vehicle Flamethrower","Gun","Autocannon","Vehicle Missile"]
-
-        let smoke = false; //true if gun fires smoke
-        for (let i=0;i<team.weaponArray.length;i++) {
-            let weapon = team.weaponArray[i];
-            if (weapon.notes.includes("Close Combat")) {continue};
-            types[weapon.type].push(weapon.name); 
-            if (weapon.notes.includes("Smoke")) {
-                smoke = true;
+        if (team.special.includes("Leader") === false) {     
+            let types = {
+                "Small Arms": [],
+                "Heavy Weapon": [],
+                "LAW": [],
+                "MAW": [],
+                "Infantry SAM": [],
+                "Vehicle MG": [],
+                "Vehicle Flamethrower": [],
+                "Gun": [],
+                "Autocannon": [],
+                "Vehicle Missile": [],
+                "Artillery": [],
             }
-        }
-        
+            let vehicleTypes = ["Vehicle MG","Vehicle Flamethrower","Gun","Autocannon","Vehicle Missile"]
 
-        let weaponNum = 1;
-        let weaponTypes = Object.keys(types);
-        for (let i=0;i<weaponTypes.length;i++) {
-            let weaponType = weaponTypes[i];
-
-
-
-            let names = types[weaponType]
-            if (names.length > 0) {
-                if (weaponType === "Vehicle MG" && names.length > 1) {
-                    names = "MGs";
+            let smoke = false; //true if gun fires smoke
+            for (let i=0;i<team.weaponArray.length;i++) {
+                let weapon = team.weaponArray[i];
+                if (weapon.notes.includes("Close Combat")) {continue};
+                types[weapon.type].push(weapon.name); 
+                if (weapon.notes.includes("Smoke")) {
+                    smoke = true;
                 }
-                names = names.toString();
-                
-                if (type === "Mechanized Infantry" && vehicleTypes.includes(weaponType)) {
-                    names = "IFV: " + names;
-                }
-                if (names.charAt(0) === ",") {names = names.replace(",","")};
-                names = names.replaceAll(",","+");
-                if (weaponType === "Artillery") {
-                    if (team.type === "Aircraft" || team.type === "Helicopter") {
-                        AddAbility(weaponNum + ": " + names,"!CreateBarrages",char.id);
-                    } else {
-                        AddAbility("Preplan","!PlaceRangedIn",char.id);
+            }
+            
+
+            let weaponNum = 1;
+            weaponTypes = Object.keys(types);
+            for (let i=0;i<weaponTypes.length;i++) {
+                let weaponType = weaponTypes[i];
+                let names = types[weaponType]
+                if (names.length > 0) {
+                    if (weaponType === "Vehicle MG" && names.length > 1) {
+                        names = "Vehicle MGs";
                     }
-                } else {
-                    let shellType = "Regular";
-                    if (weaponType === "Gun") {
-                        shellType = "?{Shell Type|AP|HE";
-                        if (smoke === true) {
-                            shellType += "|Smoke";
+                    names = names.toString();
+                    
+                    if (type === "Mechanized Infantry" && vehicleTypes.includes(weaponType)) {
+                        names = "IFV: " + names;
+                    }
+                    if (names.charAt(0) === ",") {names = names.replace(",","")};
+                    names = names.replaceAll(",","+");
+                    if (weaponType === "Artillery") {
+                        if (team.type === "Aircraft" || team.type === "Helicopter") {
+                            AddAbility(weaponNum + ": " + names,"!CreateBarrages",char.id);
+                        } else {
+                            AddAbility("Preplan","!PlaceRangedIn",char.id);
                         }
-                        shellType += "}";
+                    } else {
+                        let shellType = "Regular";
+                        if (weaponType === "Gun") {
+                            shellType = "?{Shell Type|AP|HE";
+                            if (smoke === true) {
+                                shellType += "|Smoke";
+                            }
+                            shellType += "}";
+                        }
+                        abilityName = weaponNum + ": " + names;
+                        action = "!Shooting;@{selected|token_id};@{target|token_id};" + weaponType + ";" + shellType;
+                        AddAbility(abilityName,action,char.id);
+                        weaponNum++;
                     }
-                    abilityName = weaponNum + ": " + names;
-                    action = "!Shooting;@{selected|token_id};@{target|token_id};" + weaponType + ";" + shellType;
-                    AddAbility(abilityName,action,char.id);
-                    weaponNum++;
                 }
             }
         }
-
 
     }
 
@@ -6846,7 +6897,20 @@ log("Charge Dist: " + chargeDist)
         PlaySound(sound);
     }
  
-
+    const UserImage = (msg) => {
+        output = _.chain(msg.selected)
+        .map( s => getObj('graphic',s._id))
+        .reject(_.isUndefined)
+        .map( o => o.get('imgsrc') )
+        .map( getCleanImgSrc )
+        .reject(_.isUndefined)
+        .map(u => `<div><img src="${u}" style="max-width: 3em;max-height: 3em;border:1px solid #333; background-color: #999; border-radius: .2em;"><code>${u}</code></div>`)
+        .value()
+        .join('') || `<span style="color: #aa3333; font-weight:bold;">No selected tokens have images in a user library.</span>`
+        ;
+        output = '<div>' + output + '</div>'
+        sendChat("",output);
+    }
 
 
 
@@ -6982,6 +7046,9 @@ log("Charge Dist: " + chargeDist)
         let args = msg.content.split(";");
         log(args);
         switch(args[0]) {
+            case '!user-image':
+                UserImage(msg);
+                break;
             case '!Dump':
                 log("STATE");
                 log(state.TY);
