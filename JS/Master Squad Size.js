@@ -3421,7 +3421,24 @@ log("Neither is Air")
             if (spotted === true) {
                 outputCard.body.push("Teams that Called Artillery must remain Stationary and cannot Assault");
             }
-        } 
+        } else if (order === "Clear Minefield") {
+            outputCard.body.push('The Team is ordered to clear a Minefield within 2 Hexes');
+            outputCard.body.push("That Team counts as having Dashed, and cannot Shoot or Assault");
+            outputCard.body.push("The Minefield can be removed immediately");
+            outputCard.body.push("Other Teams may be given the same order");   
+            order = "Dash";
+            targetTeam.moved = true;
+        } else if (order === "Land/Take Off") {
+            if (targetTeam.landed() === true) {
+                outputCard.body.push("The Helicopter Takes Off and may now move");
+                    targetTeam.removeCondition("Land/Take Off");
+            } else {
+                outputCard.body.push('The Helicopter lands. It may not land within 4 hexes of an enemy team');
+                outputCard.body.push('Passengers may embark/disembark the following turn');
+                condition = "Land/Take Off";
+            }
+        }
+
         targetTeam.token.set("aura1_color",Colours.black);
         state.TY.currentUnitID = unit.id;
 
@@ -3485,7 +3502,7 @@ log("Neither is Air")
         if (type !== "Aircraft" && team.special.includes("Leader") === false) {
             action = "!Activate;Team;"
             if (type.includes("Infantry")) {
-                action += "?{Order|Tactical|Dash|Hold}";
+                action += "?{Order|Tactical|Dash|Hold|Clear Minefield}";
             } else if (type === "Gun") {
                 if (team.tactical === 0) {
                     action += "?{Order|Dash|Hold}";
@@ -3493,9 +3510,17 @@ log("Neither is Air")
                     action += "?{Order|Tactical|Dash|Hold}";
                 }
             } else if (type === "Tank") {
-                action += "?{Order|Tactical|Dash|Hold}";
+                action += "?{Order|Tactical|Dash|Hold";
+                if (team.special.includes("Mine")) {
+                    action += "|Clear Minefield";
+                }
+                action += "}";
             } else if (type === "Unarmoured Tank") {
-                action += "?{Order|Tactical|Dash|Hold}";
+                action += "?{Order|Tactical|Dash|Hold";
+                if (team.special.includes("Mine")) {
+                    action += "|Clear Minefield";
+                }
+                action += "}";
             } else if (type === "Helicopter") {
                 action += "?{Order|Tactical|Hold";
                 if (team.special.includes("Passengers")) {
@@ -3506,7 +3531,7 @@ log("Neither is Air")
             AddAbility(abilityName,action,char.id);
         }
 
-        if (team.special.includes("Leader")) {
+        if (team.special.includes("Leader") || team.special.includes("HQ")) {
             if (type === "Aircraft") {
                 abilityName = "Order Airstrike";
                 action = "!EnterAircraft";
@@ -3518,7 +3543,7 @@ log("Neither is Air")
 
                 if (type.includes("Infantry")) {
                     action += "?{Order|Tactical|Dash|Hold|Assault}";
-                    specOrders += "Blitz Move|Dig In|Follow Me|Shoot and Scoot|Clear Minefield}"
+                    specOrders += "Blitz Move|Dig In|Follow Me|Shoot and Scoot}"
                     weaponTypes = ["Small Arms","Heavy Weapon","LAW"]; //some leaders wont have all the weapons their platoon/company mates have
                     if (type === "Mechanized Infantry") {
                         _.each(team.vehicleWeaponTypes,vwt => {
@@ -3538,7 +3563,7 @@ log("Neither is Air")
                         action += "|Assault";
                     }
                     action += "}"
-                    specOrders += "Blitz Move|Cross Here|Follow Me|Shoot and Scoot|Clear Minefield}";
+                    specOrders += "Blitz Move|Cross Here|Follow Me|Shoot and Scoot}";
                 } else if (type === "Unarmoured Tank") {
                     action += "?{Order|Tactical|Dash|Hold}";
                     specOrders += "Blitz Move|Cross Here|Follow Me|Shoot and Scoot}";
@@ -3564,7 +3589,6 @@ log("Neither is Air")
                     AddAbility(abilityName,action,char.id);
                     num++;
                 });
-
         
                 if (type === "Tank" || type.includes("Infantry")) {
                     abilityName = "Call Artillery";
@@ -3810,27 +3834,6 @@ log("Neither is Air")
                     outputCard.body.push("Teams remain where they are")
                 }
                 break;
-/*
-            case "Clear Minefield":
-                outputCard.body.push('The Team is ordered to clear a Minefield within 2 Hexes');
-                outputCard.body.push("That Team counts as having Dashed, and cannot Shoot or Assault");
-                outputCard.body.push("The Minefield can be removed immediately");
-                outputCard.body.push("Other Teams may be given the same order");   
-                condition = "Dash";
-                targetTeam.moved = true;
-                break;
-            case "Land/Take Off":
-                if (targetTeam.landed() === true) {
-                    outputCard.body.push("The Helicopter(s) Take Off and may now move");
-                    _.each(targetArray,team => {
-                        team.removeCondition("Land/Take Off");
-                    })
-                } else {
-                    outputCard.body.push('The Helicopter(s) land. They may not land within 4 hexes of an enemy team');
-                    outputCard.body.push('Passengers may embark/disembark the following turn');
-                    condition = "Land/Take Off";
-                }
-*/
         }
         _.each(targetArray,team => {
             team.specialorder = specialorder;
