@@ -1,5 +1,5 @@
 const TY = (() => { 
-    const version = '3.11.23';
+    const version = '3.11.24';
     if (!state.TY) {state.TY = {}};
     //Constants and Persistent Variables
 
@@ -3584,8 +3584,12 @@ log("Neither is Air")
                 let num = 1;
                 _.each(weaponTypes,type => {
                     abilityName = num + ": " + type;
+                    shellType = "Regular";
                     if (type !== "Small Arms") {abilityName += "s"}
-                    action = "!Shooting;@{selected|token_id};@{target|tokenID};" + type + ";Regular;Unit"
+                    if (type === "Gun") {
+                        shellType = "?{Shell Type|AP|HE}";
+                    }
+                    action = "!Shooting;@{selected|token_id};@{target|token_id};" + type + ";" + shellType + ";Unit";
                     AddAbility(abilityName,action,char.id);
                     num++;
                 });
@@ -4533,22 +4537,18 @@ log("Same had 2")
         let targetID = Tag[2];
         let weaponType = Tag[3]; 
         let shellType = Tag[4]; //Regular,Smoke
-        ShootingTwo(shooterID,targetID,weaponType,shellType);
+        let unitFire = (Tag[5] === "Unit") ? true:false;
+        ShootingTwo(shooterID,targetID,weaponType,shellType,unitFire);
     }
 
-    const ShootingTwo = (shooterID,targetID,weaponType,shellType,observerID) => {
+    const ShootingTwo = (shooterID,targetID,weaponType,shellType,unitFire,observerID) => {
         let shooter = TeamArray[shooterID];
         let shooterUnit = UnitArray[shooter.unitID];
-        let unitFire = false;
         let sname = shooter.name;
+        if (unitFire === true) {snam = shooterUnit.name};
 
         let target = TeamArray[targetID];
         let targetUnit = UnitArray[target.unitID];
-        
-        if (shooterID === shooterUnit.teamIDs[0]) {
-            unitFire = true
-            sname = shooterUnit.name;
-        } 
 
         SetupCard(sname,"Shooting",shooter.nation);
 
@@ -4625,44 +4625,9 @@ log("Mistaken: " + mistaken)
                 for (let j=0;j<st.weaponArray.length;j++) {
                     let weapon = st.weaponArray[j];
                     let special = "";
-                    if (weaponType === "MG" && weapon.type.includes("MG") === false) {
-                        continue;
-                    } else if (weaponType !== "MG" && weapon.type !== weaponType) {
-                        continue;
-                    };
-                    if (weapon.notes.includes("Limited")) {
-                        let num;
-                        let wn = weapon.notes.split(";");
-                        for (let i=0;i<wn.length;i++) {
-                            if (wn[i].includes("Limited")) {
-                                num = wn[i].replace(/[^0-9]+/g, "");
-                                break;
-                            }
-                        }
-                        if (limited >= num) {
-                            continue;
-                        } else (limited++);
-                    }
-                    if (weapon.notes.includes("Mounted") && state.TY.passengers[st.id]) {
-                        //check if passenger has weapon with name eg Dragon
-                        let check = false;
-                        let substrings = weapon.name.split(" ");
-                        let passengers = state.TY.passengers[st.id];
-                        ploop1:
-                        for (let p=0;p<passengers.length;p++) {
-                            let passengerTeam = TeamArray[passengers[p]];
-                            for (let w=0;w<passengerTeam.weaponArray.length;w++) {
-                                let wnam = passengerTeam.weaponArray[w].name;
-                                for (let s=0;s<substrings.length;s++) {
-                                    if (wnam.includes(substrings[s])) {
-                                        check = true;
-                                        break ploop1;
-                                    }
-                                }
-                            }
-                        }
-                        if (check === false) {continue};
-                    }
+                    if (weapon.type !== weaponType){continue};
+                    if (weapon.notes.includes("Close Combat")) {continue};
+                    //MOunted here ????
 
                     if (weapon.notes.includes("Overhead")) {special += ",Overhead"};
                     if (weapon.notes.includes("NLOS")) {special += ",NLOS"};
@@ -4893,7 +4858,7 @@ log(weapons)
                 if (sTeam.moved === true) {
                     rof = weapon.moving;
                 }
-                if (shooterUnit.pinned() === true) {
+                if (shooterUnit.suppressed === true) {
                     if (weapon.notes.includes("Pinned ROF")) {
                         let substring = weapon.notes.split(",");
                         substring = substring.filter((string) => string.includes("Pinned ROF"));
@@ -4947,19 +4912,6 @@ log(weapons)
 
                 if (rof === 0) {
                     continue;
-                }
-
-                let hp = parseInt(sTeam.token.get("bar1_value")) || 1;
-                let hpMax = parseInt(sTeam.token.get("bar1_max")) || 1;
-                if (hp/hpMax !== 1) {
-                    let newROF = (hp * rof)/hpMax;
-                    if (newROF < 1) {
-                        rof = 1;
-                        toHit++;
-                        toHitTips.push("+1 due to Casualties");
-                    } else {
-                        rof = Math.round(newROF);
-                    }
                 }
 
                 let rolls = [];
@@ -5027,7 +4979,11 @@ log(weapons)
                     let targNum = 0;
                     for (let t=0;t<(eta.length - 1);t++) {
                         let t1 = TeamArray[eta[t].targetID];
-                        let num1 = t1.hitArray.length;
+                        let t1Denom = 1;
+                        if (t1.type.includes("Infantry") && shellType !== "AP") {
+                            t1Denom = parseInt(t1.token.get("bar1_value")) || 1;
+                        }
+                        let num1 = t1.hitArray.length / t1Denom;
                         let t2 = TeamArray[eta[t+1].targetID];
                         let num2 = t2.hitArray.length;
     log("Target " + t + ": " + t1.name + " Hits: " + num1);
@@ -5105,16 +5061,19 @@ log(weapons)
                 break;
             }
         }
-
+/*
         if (allFired === false) {
             outputCard.body.push("[hr]");
             outputCard.body.push("Not all Teams have fired");
             ButtonInfo("End Unit Fire","!EndFire;" + shootingType);
         }    
+*/
         PrintCard();
+/*
         if (allFired === true) {
             ProcessSaves(shootingType);
-        } 
+        }
+*/
     }
 
     const CompareHits = (ta1,ta2) => {
@@ -5162,7 +5121,7 @@ log(weapons)
         let ids = targetUnit.teamIDs;
 
         //if HQ or independent, can add nearby formation in
-        if (targetTeam.special.includes("HQ") || targetTeam.special.includes("Independent") || targetTeam.token.get(SM.HQ) === true) {
+        if (targetTeam.special.includes("HQ") || targetTeam.special.includes("Independent")) {
             let keys = Object.keys(UnitArray);
             btaLoop1:
             for (let j=0;j<keys.length;j++) {
@@ -5394,7 +5353,7 @@ log(ai)
         log("Units")
             _.each(UnitArray,unit => {
                 log(unit)
-                if (unit.player === spotter.player && unit.artillery === true && unit.pinned() === false && unit.specialorder !== "Failed Blitz" && unit.specialorder.includes("Dig In") === false && unit.type !== "Aircraft" && unit.type !== "Helicopter" && unit.inReserve === false) {
+                if (unit.player === spotter.player && unit.artillery === true && unit.suppressed === false && unit.specialorder !== "Failed Blitz" && unit.specialorder.includes("Dig In") === false && unit.type !== "Aircraft" && unit.type !== "Helicopter" && unit.inReserve === false) {
                     artUnits.push(unit);
                 }
             });
@@ -5717,7 +5676,7 @@ log(weapon)
         if (ammoType === "Laser Guided" || ammoType === "Krasnopol") {
             let laserTargetID = hexMap[targetHex.label()].tokenIDs[0];
             observerTeam.spotAttempts = 3;
-            ShootingTwo(artilleryUnit.leaderID,laserTargetID,"Laser Guided",ammoType,observerID);
+            ShootingTwo(artilleryUnit.leaderID,laserTargetID,"Laser Guided",ammoType,"Unit",observerID);
             RemoveBarrageToken()
             return;
         }
@@ -6238,14 +6197,14 @@ log(results)
                 if (unit.type.includes("Infantry") || unit.type === "Gun" || unit.type.includes("Unarmoured")) {
                     unitLeader = TeamArray[unit.teamIDs[0]]; //in case original killed
                     unitLeader.token.set("bar3_value",unitHits);
-                    if (unitHits >= pinMargin && unit.pinned() === false) {
+                    if (unitHits >= pinMargin && unit.suppressed === false) {
                         outputCard.body.push("The Unit is Pinned");
                         unit.pin();
                         if (shootingType === "Defensive") {
                             outputCard.body.push("The Unit must Fall Back");
                         }
                     }
-                    if (flamethrowerFlag === true && unit.pinned() === false) {
+                    if (flamethrowerFlag === true && unit.suppressed === false) {
                         outputCard.body.push("The Unit is Pinned");
                         unit.pin();
                     }
@@ -6368,7 +6327,7 @@ log(team1.name + " is Moving")
             sendChat("","Team does not have an Assault Order");
             return true;
         };
-        if (unit.pinned() === true) {
+        if (unit.suppressed === true) {
             sendChat("","Unit is Pinned");
             return true;
         }
