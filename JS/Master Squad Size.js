@@ -4604,9 +4604,9 @@ log("Mistaken: " + mistaken)
             if (st.fired === true) {
                 if (st.type === "Infantry") {
                     let hp = parseInt(st.token.get("bar1_value")) || 1;
-                    if (weaponsFired.length >= hp) {
+                    if (st.weaponsFired.length >= hp) {
                         excluded = "Fired Already";
-                    } else if (weaponsFired.includes(weaponType)) {
+                    } else if (st.weaponsFired.includes(weaponType)) {
                         excluded = "Fired that Weapon Already";
                     }
                 } else {
