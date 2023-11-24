@@ -724,6 +724,7 @@ log(team.name + " inCommand: " + team.inCommand)
                     team.moved = false;
                     team.maxTact = false;
                     team.fired = false;
+                    team.weaponsFired = [];
                     team.aaFired = false;
                     this.mounted = false;
                     if (i===0) {
@@ -1080,6 +1081,7 @@ log(infoArray)
 
             this.suppressed = (token.get("tint_color") === Colours.red) ? true:false;
             this.fired = this.queryCondition("Fired");
+            this.weaponsFired = [];
             this.aaFired = this.queryCondition("AA Fire");
             this.moved = ((this.queryCondition("Tactical") || this.queryCondition("Dash")) === true) ? true:false;
             this.gonetoground = this.queryCondition("GTG");
@@ -4592,7 +4594,6 @@ log("Same had 2")
         if (defensive === true) {mistaken = false};
 log("Mistaken: " + mistaken)
 
-        let limited = parseInt(shooterUnit.limited);
         let exclusions = [];
 
         for (let i=0;i<shooterUnit.teamIDs.length;i++) {
@@ -4601,7 +4602,16 @@ log("Mistaken: " + mistaken)
             if (unitFire === false && shooterID !== st.id) {continue}; //single team firing
             if (st.inCommand === false && unitFire === true) {continue};
             if (st.fired === true) {
-                excluded = " Fired Already";
+                if (st.type === "Infantry") {
+                    let hp = parseInt(st.token.get("bar1_value")) || 1;
+                    if (weaponsFired.length >= hp) {
+                        excluded = "Fired Already";
+                    } else if (weaponsFired.includes(weaponType)) {
+                        excluded = "Fired that Weapon Already";
+                    }
+                } else {
+                    excluded = " Fired Already";
+                }
             }
             if (st.aaFired === true) {
                 excluded = " Fired AA";
@@ -5014,14 +5024,10 @@ log(weapons)
 
                 }
             }
+
+            sTeam.weaponsFired.push(weaponType);
+
             //place markers on shooter
-            /*
-            sTeam.addCondition("Fired");
-            if (sTeam.token.get("aura1_color") === Colours.lightpurple) {
-                sTeam.token.set("aura1_color",Colours.black);
-            }
-            sTeam.fired = true;
-            */
             if (sTeam.token.get("aura1_color") === Colours.lightpurple) {
                 sTeam.token.set("aura1_color",Colours.black);
             }
@@ -5033,7 +5039,7 @@ log(weapons)
                 sTeam.addCondition("Fired");
                 sTeam.fired = true;
             }
-            
+    
             if (state.TY.darkness === true) {
                 sTeam.addCondition("Flare");
             }
@@ -5061,19 +5067,19 @@ log(weapons)
                 break;
             }
         }
-/*
+
         if (allFired === false) {
             outputCard.body.push("[hr]");
             outputCard.body.push("Not all Teams have fired");
             ButtonInfo("End Unit Fire","!EndFire;" + shootingType);
         }    
-*/
+
         PrintCard();
-/*
+
         if (allFired === true) {
             ProcessSaves(shootingType);
         }
-*/
+
     }
 
     const CompareHits = (ta1,ta2) => {
