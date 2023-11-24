@@ -3692,63 +3692,35 @@ log("Neither is Air")
         let Tag = msg.content.split(";");
         let teamID = msg.selected[0]._id;
         let specialorder = Tag[1];
-        let team = TeamArray[teamID];
+        let unitLeader = TeamArray[teamID];
         let unit = UnitArray[team.unitID];
-        let unitLeader = TeamArray[unit.teamIDs[0]];
-        SetupCard(unit.name,specialorder,team.nation);
+        SetupCard(unit.name,specialorder,unitLeader.nation);
         let errorMsg = [];
 
         let roll = randomInteger(6);
         let stat = 1;
 
-        let targetTeam,targetName,noun;
         let targetArray = [];
 
-        if (team.id !== unitLeader.id) {
-            if (specialorder === "Clear Minefield" || specialorder === "Land/Take Off" || team.special.includes("HQ") || specialorder === "Dig In") {
-                targetArray.push(team);
-                targetTeam = team;
-                targetName = team.name;
-                noun = "Team";
-            } else {
-                errorMsg = "That Special Order must be issued by the Unit Leader";
+        _.each(unit.teamIDs,id => {
+            let tm = TeamArray[id];
+            if (tm.inCommand === true && tm.suppressed === false && tm.queryCondition("Spot") === false) {
+                targetArray.push(tm);
             }
-        } else {
-            if (specialorder === "Clear Minefield") {
-                targetArray.push(team);
-                targetTeam = team;
-                targetName = team.name;
-                noun = "Team";
-            } else {
-                targetTeam = unitLeader;
-                targetName = unit.name;
-                noun = "Unit";
-                _.each(unit.teamIDs,id => {
-                    let tm = TeamArray[id];
-                    if (tm.inCommand === true && tm.bailed === false && tm.queryCondition("Spot") === false) {
-                        targetArray.push(tm);
-                    }
-                });
-            }
-        }
-
-        if (targetTeam.specialorder !== "") {
+        });
+        
+        if (unit.specialorder !== "") {
             errorMsg.push("Teams can only have one Special Order per turn");
         }
         
         if (specialorder === "Blitz Move" || specialorder === "Dig In" || specialorder === "Clear Minefield" || specialorder === "Cross Here") {
-            if (targetTeam.moved === true || state.TY.step === "Assault") {
+            if (unitLeader.moved === true || state.TY.step === "Assault") {
                 errorMsg.push(specialorder + " Order must be given before movement");
-            }
-        }
-        if (specialorder === "Dig In") {
-            if (targetTeam.queryCondition("Spot") === true && noun === "Team") {
-                errorMsg.push("This Team Called in Artillery and so cannot Dig In");
             }
         }
 
         if (specialorder === "Shoot and Scoot") {
-            if (targetTeam.moved === true) {
+            if (unitLeader.moved === true) {
                 errorMsg.push("Unit has Moved and so cannot be given a Shoot and Scoot Order");
             }
             if (state.TY.step  !== "Assault") {
@@ -3756,8 +3728,17 @@ log("Neither is Air")
             }
         }
 
-        if (targetTeam.fired === true && specialorder !== "Shoot and Scoot") {
-            errorMsg.push(noun + " has Fired this turn, cannot be given that Order");
+        if (specialorder === "Cross Here" && unit.order === "Assault") {
+            errorMsg.push("Assault order means cannot use Cross Here")
+        }
+
+
+        if (unitLeader.fired === true && specialorder !== "Shoot and Scoot") {
+            errorMsg.push("Unit has Fired this turn, cannot be given that Special Order");
+        }
+
+        if (unitLeader.queryCondition("Spot") === true && (specialorder === "Follow Me" || specialorder === "Cross Here")) {
+            errorMsg.push("Unit Leader has Spotted for Artillery");
         }
 
         if (errorMsg.length > 0) {
@@ -3767,12 +3748,13 @@ log("Neither is Air")
             PrintCard();
             return;
         }
+
         let line = DisplayDice(roll,unitLeader.nation,24) + " vs. ";
         if (specialorder === "Cross Here" || specialorder === "Clear Minefield" || specialorder === "Land/Take Off") {
             line = "Auto";
         } else {
             if (specialorder === "Follow Me") {
-                stat = unitLeader.motivation;
+                stat = unitLeader.courage;
                 line += stat + "+  ";
             } else {
                 stat = unitLeader.skill;
@@ -3785,7 +3767,6 @@ log("Neither is Air")
             }
         }
         
-        let condition;
         outputCard.body.push(line);
         switch (specialorder) {
             case "Blitz Move":
@@ -3799,27 +3780,23 @@ log("Neither is Air")
                 break;
             case "Cross Here":
                 outputCard.body.push("Any Teams (including the Unit Leader) from the Unit rolling to Cross Difficult Terrain within 3 hexes of where the Unit Leader crosses improve their chance of crossing safely, reducing the score they need to pass a Cross Test by 1.");
+                outputCard.body.push("Teams cannot Shoot or Assault this turn");
                 break;
             case "Dig In":
                 let line;
                 if (roll >= stat) {
-                    if (noun === "Team") {
-                        line = "The Team Digs In"
-                    } else {
-                        line = "In Command Teams that did not Call Artillery Dig In";
-                    } 
-                    outputCard.body.push(line);
+                    outputCard.body.push("In Command Teams that did not Call Artillery Dig In");
                     DigIn(targetArray);
                 } else {
-                    outputCard.body.push("The " + noun + " failed to Dig In");
+                    outputCard.body.push("The Unit failed to Dig In");
                     specialorder = "Failed Dig In";
                 }
-                outputCard.body.push(noun + " can fire at a moving ROF");
-                outputCard.body.push("If Teams do not Shoot or Assault, they are Gone to Ground");
+                outputCard.body.push("Unit can fire at a moving ROF");
+                outputCard.body.push("If Teams do not Shoot, they are Gone to Ground");
                 break;
             case "Follow Me":
                 if (roll >= stat) {
-                    outputCard.body.push("In Command Teams may immediately Move directly forward up to an additional 2 hexes, remaining In Command.")
+                    outputCard.body.push("In Command Teams may immediately Move directly forward up to an additional 2 hexes, while remaining In Command.")
                 } else {
                     outputCard.body.push("Teams remain where they are")
                     specialorder = "Failed Follow Me";
@@ -3833,6 +3810,7 @@ log("Neither is Air")
                     outputCard.body.push("Teams remain where they are")
                 }
                 break;
+/*
             case "Clear Minefield":
                 outputCard.body.push('The Team is ordered to clear a Minefield within 2 Hexes');
                 outputCard.body.push("That Team counts as having Dashed, and cannot Shoot or Assault");
@@ -3852,13 +3830,12 @@ log("Neither is Air")
                     outputCard.body.push('Passengers may embark/disembark the following turn');
                     condition = "Land/Take Off";
                 }
+*/
         }
         _.each(targetArray,team => {
             team.specialorder = specialorder;
-            if (condition) {
-                team.addCondition(condition);
-            }
-        })
+        });
+        unit.specialorder = specialorder;
         PrintCard();
     }
 
