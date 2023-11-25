@@ -1288,7 +1288,11 @@ log(infoArray)
         }
 
         landed() {
-            return this.queryCondition("Land/Take Off");
+            if (this.type === "Helicopter") {
+                return this.queryCondition("Land/Take Off");
+            } else {
+                return true;
+            }
         }
 
         activated() {
@@ -5299,7 +5303,7 @@ log("In Create Barrages")
         for(let a=0;a<abilArray.length;a++) {
             abilArray[a].remove();
         } 
-        let abilityAction = "!BarrageLOS;@{selected|token_id}";
+        let abilityAction = "!BarrageLOS";
         AddAbility("Check",abilityAction,represents);
 
         let newToken = createObj("graphic", {   
@@ -5380,7 +5384,7 @@ log(artUnits)
             let unit = artUnits[i];
             for (let j=0;j<unit.teamIDs.length;j++) {
                 let team = TeamArray[unit.teamIDs[j]];
-                if (team.special.includes("Artillery") === false || team.fired === true || team.aaFired === true || team.suppressed === true) {continue};
+                if (team.fired === true || team.aaFired === true || team.suppressed === true) {continue};
                 if (team.type !== "Aircraft" && team.type !== "Helicopter") {
                     if (hexMap[team.hexLabel].terrain.includes("Building") || team.moved === true) {
                         continue; //moved or in building
@@ -5465,12 +5469,15 @@ log(weapon)
 
 
     const BarrageLOS = (msg) => {
-        let Tag = msg.content.split(";");
-        let barrageID = Tag[1];
+        let barrageID = msg.selected[0]._id;
         let barrageTeam = TeamArray[barrageID];
 
         let observerID = state.TY.BarrageInfo.observerID;
         let observerTeam = TeamArray[observerID];
+        if (!observerTeam) {
+            sendChat("","Error with Barrage Info");
+            return;
+        }
         let artUnitIDs = state.TY.BarrageInfo.artUnitIDs;
         let artUnits = [];
         let air = false;
@@ -5493,24 +5500,27 @@ log(weapon)
             return;
         } 
         //check "Danger Close" - template within 2"  or 3" of edge if Salvo Template (6mm)
-        let keys = Object.keys(TeamArray);
         let tooClose = [false,false];
-
-        for (let i=0;i<keys.length;i++) {
-            let team2 = TeamArray[keys[i]];
-            if (team2.type === "Aircraft" || (team2.type === "Helicopter" && team2.landed() === false) || team2.type === "System Unit" || hexMap[team2.hexLabel].terrain.includes("Offboard")) {continue};
-            if (team2.player !== observerTeam.player) {continue};
-            let distance2 = team2.hex.distance(barrageTeam.hex);
-            if (air === true) {
-                //4" from edge of template 6mm
-                if (distance2 < (2+4)) {tooClose[0] = true};
-                if (distance2 < (4+4)) {tooClose[1] = true};
-            } else {
-                //2" from edge of template or 3" for Salvo 6mm
-                if (distance2 < (2+2)) {tooClose[0] = true};
-                if (distance2 < (4+3)) {tooClose[1] = true};
+        _.each(TeamArray,team2 => {
+            if (team2.player === observerTeam.player) {
+                if (team2.type !== "Aircraft" && team2.type !== "Helicopter" && team2.type !== "System Unit" && hexMap[team2.hexLabel].terrain.includes("Offboard") === false) {
+                    let distance2 = team2.hex.distance(barrageTeam.hex);
+log(team2.name)
+log(distance2)
+                    if (air === true) {
+                        //4" from edge of template 6mm
+                        if (distance2 < (2+4)) {tooClose[0] = true};
+                        if (distance2 < (4+4)) {tooClose[1] = true};
+                    } else {
+                        //2" from edge of template or 3" for Salvo 6mm
+                        if (distance2 < (2+2)) {tooClose[0] = true};
+                        if (distance2 < (4+3)) {tooClose[1] = true};
+                    }
+                }
             }
-        }
+        });
+
+
         outputCard.body.push("[U]Units[/u]");
 
         for (let i=0;i<artUnits.length;i++) {
