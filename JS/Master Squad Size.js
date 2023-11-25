@@ -1188,7 +1188,6 @@ log(infoArray)
             //clear other conditions in that array
             if (state.TY.conditions[this.id]) {
                 for (let a=0;a<array.length;a++) {
-                    if (array[a] === condition) {continue};
                     if (state.TY.conditions[this.id][array[a]]) {
                         this.removeCondition(array[a]);
                     }
@@ -2887,7 +2886,7 @@ log(hit)
         let los = true;
     
         if (special.includes("NLOS")) {
-            if (team2.type === "Infantry" && team2.moved === false && team2Hex.bp === true) {
+            if (team2.type.includes("Infantry") && team2.moved === false && team2Hex.bp === true) {
                 let result = {
                     los: true,
                     concealed: true,
@@ -2936,7 +2935,7 @@ log(hit)
 
         let fKeys = Object.keys(TeamArray);
 
-        if ((team2Hex.bp === true || team2Hex.foxholes === true) && team2.type === "Infantry") {
+        if ((team2Hex.bp === true || team2Hex.foxholes === true) && team2.type.includes("Infantry")) {
             //this catches foxholes, craters and similar
             concealed = true;
             bulletproof = true;
@@ -3056,7 +3055,7 @@ log("Neither is Air")
                     for (let t=0;t<fKeys.length;t++) {
                         let fm = TeamArray[fKeys[t]];
                         if (fm.id === team1.id || fm.id === team2.id || fm.player !== team1.player || fm.unitID === team1.unitID) {continue};
-                        if (fm.type === "Infantry" && fm.moved === false) {continue}; //ignore these infantry
+                        if (fm.type.includes("Infantry") && fm.moved === false) {continue}; //ignore these infantry
                         if (fm.hex === qrs) {
         //log(fm.name)
                             friendlyFlag = true;
@@ -3116,7 +3115,7 @@ log("Neither is Air")
 
                 }
             }
-            if (team2.type === "Infantry" && team2.moved === false) {
+            if (team2.type.includes("Infantry") && team2.moved === false) {
                 concealed = true //infantry teams that didnt move are concealed to all but Aircraft
         //log("Infantry didnt move = Concealed")
             }
@@ -4602,12 +4601,12 @@ log("Mistaken: " + mistaken)
             if (unitFire === false && shooterID !== st.id) {continue}; //single team firing
             if (st.inCommand === false && unitFire === true) {continue};
             if (st.fired === true) {
-                if (st.type === "Infantry") {
+                if (st.type.includes("Infantry")) {
                     let hp = parseInt(st.token.get("bar1_value")) || 1;
                     if (st.weaponsFired.length >= hp) {
-                        excluded = "Fired Already";
+                        excluded = " Fired Already";
                     } else if (st.weaponsFired.includes(weaponType)) {
-                        excluded = "Fired that Weapon Already";
+                        excluded = " Fired that Weapon Already";
                     }
                 } else {
                     excluded = " Fired Already";
