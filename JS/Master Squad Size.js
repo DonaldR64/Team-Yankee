@@ -5277,9 +5277,7 @@ log("In Create Barrages")
             return;
         }
 
-
-        let img = Nations[observerTeam.nation].barrageimage;
-        img = getCleanImgSrc(img);
+        let img = getCleanImgSrc(Nations[observerTeam.nation].barrageimage);
         let represents = "-NMza8uwbYRMNnvLa-VU";
         let colour = Nations[observerTeam.nation].borderColour;
         let location = hexMap[observerTeam.hexLabel].centre;
@@ -5370,7 +5368,7 @@ log(artUnits)
             let unit = artUnits[i];
             for (let j=0;j<unit.teamIDs.length;j++) {
                 let team = TeamArray[unit.teamIDs[j]];
-                if (team.special.includes("Artillery") === false || team.fired === true || team.aaFired === true || team.bailed === true) {continue};
+                if (team.special.includes("Artillery") === false || team.fired === true || team.aaFired === true || team.suppressed === true) {continue};
                 if (team.type !== "Aircraft" && team.type !== "Helicopter") {
                     if (hexMap[team.hexLabel].terrain.includes("Building") || team.moved === true) {
                         continue; //moved or in building
@@ -5540,8 +5538,6 @@ log(weapon)
                 if (hexMap[artTeam.hexLabel].terrain.includes("Offboard") ){
                     dist += 100; //5km off map
                 }
-
-
                 if (dist > artTeam.artilleryWpn.maxRange || dist < artTeam.artilleryWpn.minRange) {
                     oor = true;
                     continue;
@@ -5583,8 +5579,6 @@ log(weapon)
         let barrageTeam = TeamArray[barrageID];
         let observerTeam = TeamArray[observerID];
         let artilleryUnit = UnitArray[artUnitID];
-    
-
 
         unitIDs4Saves = {};
         let rangedIn = false;
@@ -5729,6 +5723,7 @@ log(weapon)
                 }
             }
             targetArray = [...new Set(targetArray)]; //eliminate duplicates
+
         }
     
         let tip2 = "";
@@ -5744,8 +5739,6 @@ log(weapon)
             needed -=1;
             tip2 += "<br>Specialist Observer -1";
         }
-
-
     
         if (rangedIn) {needed = 0};
         let neededText;
@@ -5868,48 +5861,67 @@ log(weapon)
             let unit = UnitArray[unitID];
             let neededToHit = parseInt(team.hit) + (spotAttempts - 1);
             if (observerLOS.los === false) {neededToHit += 1};//repeat bombardment, spotter doesnt have LOS
-            let roll = randomInteger(6);
-            if (gunNum < 3 && roll >= neededToHit) {
-                //reroll hits if only 1 or 2 guns
-                roll = randomInteger(6);
-            }
-            if (gunNum > 4 && roll < neededToHit) {
-                //reroll misses if 5+ guns
-                roll = randomInteger(6);
-            }
-            let tip =  "To Hit: " + roll + " vs. " + neededToHit + "+";
+
+            let numberTeams = parseInt(team.token.get("bar1_value")) || 1;
+            let mechTeams = parseInt(team.token.get("bar2_value")) || 0;
+            totalTeams = numberTeams + mechTeams;
+            for (let j=0;j<totalTeams;j++) {
+                let targetName = team.name;
+                let targetType = team.type;
+                if (mechTeams > 0 || numberTeams > 0) {
+                    if (mechTeams > 0 && j === 0) {
+                        targetType = "Mech";
+                        targetName = team.name + " - IFV";
+                    } else {
+                        targetType = "Infantry";
+                        targetName = team.name + " - Infantry Team";
+                    }
+                }
+
+                let roll = randomInteger(6);
+                if (gunNum < 3 && roll >= neededToHit) {
+                    //reroll hits if only 1 or 2 guns
+                    roll = randomInteger(6);
+                }
+                if (gunNum > 4 && roll < neededToHit) {
+                    //reroll misses if 5+ guns
+                    roll = randomInteger(6);
+                }
+                let tip =  "To Hit: " + roll + " vs. " + neededToHit + "+";
+        
+                if (ammoType === "Bomblets") {
+                    weapon = {
+                        name: "DPICM Rounds",
+                        at: 3,
+                        fp: 6,
+                        notes: " ",
+                        type: "Artillery",
+                    }
+                }
     
-            if (ammoType === "Bomblets") {
-                weapon = {
-                    name: "DPICM Rounds",
-                    at: 3,
-                    fp: 6,
-                    notes: " ",
-                    type: "Artillery",
+                let hit = {
+                    weapon: weapon,
+                    bp: hexMap[team.hexLabel].bp,
+                    facing: "Top",
+                    range: 0,
+                    shooterType: artilleryTeams[0].type,
+                    rangedIn: rangedIn,
+                    closeCombat: false,
+                    target: targetType,
                 }
-            }
-
-            let hit = {
-                weapon: weapon,
-                bp: hexMap[team.hexLabel].bp,
-                facing: "Top",
-                range: 0,
-                shooterType: artilleryTeams[0].type,
-                rangedIn: rangedIn,
-                closeCombat: false,
-            }
-
-            if (roll >= neededToHit) {
-                team.hitArray = [hit];
-                if (team.type.includes("Infantry") || team.type === "Unarmoured Tank" || team.type === "Gun") {
-                    pinningUnits.push(unit);                             
+    
+                if (roll >= neededToHit) {
+                    team.hitArray = [hit];
+                    if (team.type.includes("Infantry") || team.type === "Unarmoured Tank" || team.type === "Gun") {
+                        pinningUnits.push(unit);                             
+                    }
+                    if (!unitIDs4Saves[unitID]) {
+                        unitIDs4Saves[unitID] = false; //no mistaken for artillery
+                    }
+                    outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + "[#ff0000]" + targetName + ": Hit[/#]");
+                } else {
+                    outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + targetName + ": Missed");
                 }
-                if (!unitIDs4Saves[unitID]) {
-                    unitIDs4Saves[unitID] = false; //no mistaken for artillery
-                }
-                outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + "[#ff0000]" + team.name + ": Hit[/#]");
-            } else {
-                outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + team.name + ": Missed");
             }
         }
         pinningUnits = [...new Set(pinningUnits)];
@@ -5928,7 +5940,7 @@ log(weapon)
             });
         }
         PrintCard();
-        ProcessSaves("Artillery");
+        //ProcessSaves("Artillery");
     }
 
     const RemoveLines = () => {
