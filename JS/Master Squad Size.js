@@ -3588,7 +3588,11 @@ log("Neither is Air")
                     shellType = "Regular";
                     if (type !== "Small Arms") {abilityName += "s"}
                     if (type === "Gun") {
-                        shellType = "?{Shell Type|AP|HE}";
+                        if (team.special.includes("No HE")) {
+                            shellType = "AP";
+                        } else {
+                            shellType = "?{Shell Type|AP|HE}";
+                        }
                     }
                     action = "!Shooting;@{selected|token_id};@{target|token_id};" + type + ";" + shellType + ";Unit";
                     AddAbility(abilityName,action,char.id);
