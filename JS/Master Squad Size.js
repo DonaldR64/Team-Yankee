@@ -126,6 +126,7 @@ const TY = (() => {
         "cover": "Hit Saved by Cover",
         "smoked": "Target Smoked",
         "injury": "[#0000ff]Hit kills several soldiers[/#]",
+        "mech": "[#0000ff]Hit destroys the IFV[/#]",
     }
 
     const SaveResultsMult = {
@@ -138,6 +139,7 @@ const TY = (() => {
         "saved": "All Hits Saved",
         "cover": "All Hits Saved (Cover)",
         "injury": "[#0000ff]Hits kill several soldiers[/#]",
+        "mech": "[#0000ff]Hits destroy the IFV[/#]",
     }
 
     let outputCard = {title: "",subtitle: "",nation: "",body: [],buttons: []};
@@ -1250,6 +1252,8 @@ log(infoArray)
                 result.tip = "<br>Remount Roll: " + roll + " vs. " + this.remount + "+";
                 if (roll >= this.remount) {
                     result.result = "suppressedAgain"
+                } else if (this.type === "Mechanized Infantry") {
+                    result.result = "mech"
                 } else {
                     result.result = "flees"
                 }
@@ -1299,8 +1303,8 @@ log(hit)
             let weapon = hit.weapon;
             let rangedIn = hit.rangedIn;
             let shooterType = hit.shooterType;
-            let closeCombat = hit.closeCombat;
-            if (!hit.closeCombat) {closeCombat = false};
+            let closeCombat = hit.closeCombat || false;
+            let teamType = hit.target;
 
             let notes = weapon.notes;
             let saveRoll = randomInteger(6);
@@ -1332,7 +1336,7 @@ log(hit)
                 bp = false;
             }
 
-            if (this.type === "Tank") {
+            if (this.type === "Tank" || (this.type === "Mechanized Infantry" && teamType === "Mech")) {
                 if (weapon.type === "Flamethrower") {
                     facing = "Top";
                 }
@@ -1385,26 +1389,30 @@ log(hit)
                     if (fpRoll < weapon.fp) {
                         save.result = "minor"
                     } else {
-                        let result = this.BailOut();
+                        let result = this.Suppress();
                         PlaySound("Hit");
                         save.result = result.result;
                         save.tip += result.tip;
-                        if (result.result === "flees") {save.tip = "*" + save.tip}
+                        if (result.result === "flees" || result.result === "mech") {save.tip = "💀" + save.tip};
                     }           
                 } else {
                     save.tip += "<br>Firepower Roll: " + fpRoll + " vs. " + weapon.fp + "+"; 
                     if (fpRoll < weapon.fp) {
-                        let result = this.BailOut();
+                        let result = this.Suppress();
                         save.result = result.result;
                         save.tip += result.tip;
-                        if (result.result === "flees" && save.tip.charAt(0) != "💀") {
+                        if ((result.result === "flees" || result.result === "mech") && save.tip.charAt(0) != "💀") {
                             save.tip = "💀" + save.tip
                         }
                     } else {
                         if (save.tip.charAt(0) != "💀") {
                             save.tip = "💀" + save.tip
                         }
-                        save.result = "destroyed";
+                        if (teamType === "Mech") {
+                            save.result = "mech";
+                        } else {
+                            save.result = "destroyed";
+                        }
                     }
                 }
             } else if (this.type.includes("Infantry") || this.type === "Unarmoured Tank" || this.type === "Gun") {
@@ -6270,6 +6278,7 @@ log(results)
             "cover": 0,
             "smoked": 0,
             "injury": 0,
+            "mech": 0,
         }
         let save; //as single hit's save can then carry onto output part
     
@@ -6315,6 +6324,9 @@ log(results)
                 } else if (outputArray.saved > 0) {
                     saveResult.push(SaveResultsMult.saved);
                 }
+                if (outputArray.mech > 0) {
+                    saveResult.push(SaveResultsMult.mech);
+                }
                 if (outputArray.smoked > 0) {
                     saveResult.push("Target Smoked");
                 }
@@ -6331,6 +6343,16 @@ log(results)
     
         if (outputArray.destroyed > 0 || outputArray.flees > 0) {
             team.kill();
+        }
+        if (outputArray.mech > 0) {
+            team.token.set("bar2_value",0);
+            let sides = team.token.get("sides").split("|");
+            let newImg = tokenImage(sides[2]);
+            team.token.set({
+                imgsrc: newImg,
+                currentSide: 2,
+            });
+            team.mounted = false;
         }
     
         team.hitArray = [];
