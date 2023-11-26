@@ -2651,7 +2651,7 @@ log(hit)
         }
         //check if unit has leader
         let leader = TeamArray[unit.teamIDs[0]];
-        if (leader.special.includes("HQ") === false && leader.special.includes("Leader") === false) {
+        if (leader.special.includes("HQ") === false && leader.special.includes("Independent") === false && leader.special.includes("Leader") === false) {
             MakeLeader(leader);
         }
         for (let i=0;i<unit.teamIDs.length;i++) {
@@ -3393,7 +3393,7 @@ log("Neither is Air")
             }
         }
 
-        if (order.includes("Tactical")) {
+        if (order === "Tactical") {
             if (unit.type === "Helicopter") {
                 outputCard.body.push(noun + "can move up to " + targetTeam.airmove + ", and may fire at" + noun2 + "Moving ROF");
                 outputCard.body.push("Alternately " + noun + " can move off table and Loiter");
@@ -3408,7 +3408,7 @@ log("Neither is Air")
                     outputCard.body.push("Teams that Called Artillery must remain Stationary");
                 }
             }    
-        } else if (order.includes("Dash")) {
+        } else if (order === "Dash") {
             outputCard.body.push(noun + ' can move at a Dash Speed of ' + dash + ' but may not fire');
             outputCard.body.push(noun + ' cannot move within 4 hexes of visible enemies');
             if (state.TY.darkness === true) {
@@ -3417,7 +3417,7 @@ log("Neither is Air")
             if (spotted === true) {
                 outputCard.body.push("Teams that Called Artillery must remain Stationary");
             }
-        } else if (order.includes("Hold")) {
+        } else if (order === "Hold") {
             if (suppressedUnit === true) {
                 outputCard.body.push(noun + " stay in place, but fire at" + noun2 + "Moving ROF");
             } else if (suppressedTeams === true) {
@@ -3544,7 +3544,7 @@ log("Neither is Air")
             AddAbility(abilityName,action,char.id);
         }
 
-        if (team.special.includes("Leader") || team.special.includes("HQ")) {
+        if (team.special.includes("Leader") || team.special.includes("HQ") || team.special.includes("Independent")) {
             if (type === "Aircraft") {
                 abilityName = "Order Airstrike";
                 action = "!EnterAircraft";
@@ -3588,28 +3588,32 @@ log("Neither is Air")
                     action += "}";
                     specOrders += "Blitz Move|Shoot and Scoot}";
                 }
-                abilityName = "Activate Unit";
-                AddAbility(abilityName,action,char.id);
+                if (team.special.includes("Independent") === false) {
+                    abilityName = "Activate Unit";
+                    AddAbility(abilityName,action,char.id);
+                }
 
                 abilityName = "Special Orders";
                 AddAbility(abilityName,specOrders,char.id);
 
-                let num = 1;
-                _.each(weaponTypes,type => {
-                    abilityName = num + ": " + type;
-                    shellType = "Regular";
-                    if (type !== "Small Arms") {abilityName += "s"}
-                    if (type === "Gun") {
-                        if (team.special.includes("No HE")) {
-                            shellType = "AP";
-                        } else {
-                            shellType = "?{Shell Type|AP|HE}";
+                if (team.special.includes("Leader")) {
+                    let num = 1;
+                    _.each(weaponTypes,type => {
+                        abilityName = num + ": " + type;
+                        shellType = "Regular";
+                        if (type !== "Small Arms") {abilityName += "s"}
+                        if (type === "Gun") {
+                            if (team.special.includes("No HE")) {
+                                shellType = "AP";
+                            } else {
+                                shellType = "?{Shell Type|AP|HE}";
+                            }
                         }
-                    }
-                    action = "!Shooting;@{selected|token_id};@{target|token_id};" + type + ";" + shellType + ";Unit";
-                    AddAbility(abilityName,action,char.id);
-                    num++;
-                });
+                        action = "!Shooting;@{selected|token_id};@{target|token_id};" + type + ";" + shellType + ";Unit";
+                        AddAbility(abilityName,action,char.id);
+                        num++;
+                    });
+                }
         
                 if (type === "Tank" || type.includes("Infantry")) {
                     abilityName = "Call Artillery";
@@ -5471,7 +5475,6 @@ log(weapon)
     const BarrageLOS = (msg) => {
         let barrageID = msg.selected[0]._id;
         let barrageTeam = TeamArray[barrageID];
-
         let observerID = state.TY.BarrageInfo.observerID;
         let observerTeam = TeamArray[observerID];
         if (!observerTeam) {
@@ -5504,9 +5507,7 @@ log(weapon)
         _.each(TeamArray,team2 => {
             if (team2.player === observerTeam.player) {
                 if (team2.type !== "Aircraft" && team2.type !== "Helicopter" && team2.type !== "System Unit" && hexMap[team2.hexLabel].terrain.includes("Offboard") === false) {
-                    let distance2 = team2.hex.distance(barrageTeam.hex);
-log(team2.name)
-log(distance2)
+                    let distance2 = team2.hex.distance(barrageTeam.hex)
                     if (air === true) {
                         //4" from edge of template 6mm
                         if (distance2 < (2+4)) {tooClose[0] = true};
@@ -5954,8 +5955,8 @@ log(distance2)
                 let roll = randomInteger(6);
                 let end = unit.name + ": Not Pinned";
                 if (roll < courage) {
-                    end = "[#ff0000]" + unit.name + ": Pinned";
-                    unit.pin();
+                    end = "[#ff0000]" + unit.name + ": Pinned by Artillery";
+                    unit.Suppress();
                 } 
                 let line = '[🎲](#" class="showtip" title="Roll: ' + roll + " vs. " + courage +  '+)' + end;
                 outputCard.body.push(line);
