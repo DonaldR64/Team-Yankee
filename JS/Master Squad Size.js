@@ -1308,7 +1308,7 @@ log(hit)
             let rangedIn = hit.rangedIn;
             let shooterType = hit.shooterType;
             let closeCombat = hit.closeCombat || false;
-            let teamType = hit.target;
+            let mech = hit.mech || false;
 
             let notes = weapon.notes;
             let saveRoll = randomInteger(6);
@@ -1340,7 +1340,7 @@ log(hit)
                 bp = false;
             }
 
-            if (this.type === "Tank" || (this.type === "Mechanized Infantry" && teamType === "Mech")) {
+            if (this.type === "Tank" || (this.type === "Mechanized Infantry" && mech === true)) {
                 if (weapon.type === "Flamethrower") {
                     facing = "Top";
                 }
@@ -1425,6 +1425,8 @@ log(hit)
                 }
 
                 saveNeeded = parseInt(this.armourF);
+                if (this.type === "Mechanized Infantry") {saveNeeded = 3};
+
                 if (closeCombat === true) {
                     saveNeeded = 7;
                 }
@@ -1461,6 +1463,8 @@ log(hit)
                             this.token.set("bar1_value",hp);
                             save.result = "injury";
                             save.tip = "🩸" + save.tip;
+                            let conds = ["One","Two","Three","Four","Five"];
+                            this.addCondition(conds[hp-1]);
                         } else {
                             if (charZero === "🩸") {
                                 save.tip.charAt(0) = "💀"
@@ -1500,6 +1504,8 @@ log(hit)
                     }
                 } 
             }
+            if (save.result === "suppressed" && this.type === "Mechanized Infantry") {save.result = "minor"};
+            if (save.result === "suppressedAgain" && this.type === "Mechanized Infantry") {save.result = "mech"};
             return save;
         }
 
@@ -5966,18 +5972,11 @@ log(weapon)
         if (pinningUnits.length > 0) {
             outputCard.body.push("[hr]");
             _.each(pinningUnits,unit => {
-                let courage = TeamArray[unit.teamIDs[0]].courage;
-                let modDenom = (unit.size > 10) ? 8:5; 
-                let mod = Math.ceil(unitHits[unit.id]/modDenom);
                 let roll = randomInteger(6);
-                let needed = courage + mod;
-                let neededTip = roll + " vs. " + needed + "+";
-                neededTip += "<br>Courage: " + courage;
-                if (mod > 0) {
-                    neededTip += " + Mod: " + mod;
-                }
+                let courage = TeamArray[unit.teamIDs[0]].courage;
+                let neededTip = roll + " vs. Courage: " + courage + "+";
                 let end = unit.name + ": Not Pinned";
-                if (roll < needed) {
+                if (roll < courage) {
                     end = "[#ff0000]" + unit.name + ": Pinned by Artillery Fire[/#]";
                     unit.Suppress();
                 } 
@@ -5986,7 +5985,7 @@ log(weapon)
             });
         }
         PrintCard();
-        //ProcessSaves("Artillery");
+        ProcessSaves("Artillery");
     }
 
     const RemoveLines = () => {
@@ -6224,7 +6223,7 @@ log(keys)
             SetupCard(unit.name,"Saves",unit.nation);
             if (unitIDs4Saves[keys[i]] === true) {
                 //run Mistaken
-                Mistaken(unit);
+                //Mistaken(unit);
             }
             let flamethrowerFlag = false;
             let unitLeader = TeamArray[unit.teamIDs[0]];
@@ -6315,9 +6314,11 @@ log(results)
             "mech": 0,
         }
         let save; //as single hit's save can then carry onto output part
-    
+        let mechFlag = false;
+
         for (let k=0;k<hits.length;k++) {
             let hit = hits[k];
+            if (hit.mech === true) {mechFlag = true};
             save = team.Save(hit,k+1);
             if (k>0) {
                 tip += "<br>";
@@ -6328,9 +6329,11 @@ log(results)
     
         if (hits.length === 1) {
             saveResult.push('[🎲](#" class="showtip" title="' + tip + ') ' + team.name + ": 1 Hit");
+            if (mechFlag === true) {saveResult.push("IFV Hit")};
             saveResult.push(SaveResults[save.result]);
         } else {
             saveResult.push('[🎲](#" class="showtip" title="' + tip + ') ' + team.name + ": " + hits.length + " Hits");
+            if (mechFlag === true) {saveResult.push("IFV Hit")};
             if (team.type === "Tank") {
                 if (outputArray.destroyed > 0) {
                     saveResult.push(SaveResultsMult.destroyed);
