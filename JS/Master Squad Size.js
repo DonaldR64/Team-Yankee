@@ -5880,6 +5880,7 @@ log(weapon)
 
         for (let i=0;i<targetArray.length;i++) {
             let team = targetArray[i];
+            team.hitArray = [];
             let unitID = team.unitID;
             let unit = UnitArray[unitID];
             let neededToHit = parseInt(team.hit) + (spotAttempts - 1);
@@ -5887,20 +5888,11 @@ log(weapon)
 
             let numberTeams = parseInt(team.token.get("bar1_value")) || 1;
             let mechTeams = parseInt(team.token.get("bar2_value")) || 0;
-            totalTeams = numberTeams + mechTeams;
-            for (let j=0;j<totalTeams;j++) {
-                let targetName = team.name;
-                let targetType = team.type;
-                if (mechTeams > 0 || numberTeams > 0) {
-                    if (mechTeams > 0 && j === 0) {
-                        targetType = "Mech";
-                        targetName = team.name + " - IFV";
-                    } else {
-                        targetType = "Infantry";
-                        targetName = team.name + " - Infantry Team";
-                    }
-                }
+            let totalTeams = numberTeams + mechTeams;
 
+            let hits = 0;
+            let tip = "";
+            for (let j=0;j<totalTeams;j++) {
                 let roll = randomInteger(6);
                 if (gunNum < 3 && roll >= neededToHit) {
                     //reroll hits if only 1 or 2 guns
@@ -5910,43 +5902,63 @@ log(weapon)
                     //reroll misses if 5+ guns
                     roll = randomInteger(6);
                 }
-                let tip =  "To Hit: " + roll + " vs. " + neededToHit + "+";
-        
-                if (ammoType === "Bomblets") {
-                    weapon = {
-                        name: "DPICM Rounds",
-                        at: 3,
-                        fp: 6,
-                        notes: " ",
-                        type: "Artillery",
-                    }
-                }
-    
-                let hit = {
-                    weapon: weapon,
-                    bp: hexMap[team.hexLabel].bp,
-                    facing: "Top",
-                    range: 0,
-                    shooterType: artilleryTeams[0].type,
-                    rangedIn: rangedIn,
-                    closeCombat: false,
-                    target: targetType,
-                }
-    
+                tip +=  "To Hit: " + roll + " vs. " + neededToHit + "+";
+                if (j > 0) {tip += "<br>"};
                 if (roll >= neededToHit) {
-                    team.hitArray = [hit];
-                    if (team.type.includes("Infantry") || team.type === "Unarmoured Tank" || team.type === "Gun") {
-                        pinningUnits.push(unit);                             
-                    }
-                    if (!unitIDs4Saves[unitID]) {
-                        unitIDs4Saves[unitID] = false; //no mistaken for artillery
-                    }
-                    outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + "[#ff0000]" + targetName + ": Hit[/#]");
-                } else {
-                    outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + targetName + ": Missed");
+                    hits++;
                 }
             }
+    
+            let mechOdds = hits * (mechTeams/numberTeams) * 100;
+            let mechRoll = randomInteger(100);
+            let mech = (mechRoll <= mechOdds) ? true:false;
+
+            if (ammoType === "Bomblets") {
+                weapon = {
+                    name: "DPICM Rounds",
+                    at: 3,
+                    fp: 6,
+                    notes: " ",
+                    type: "Artillery",
+                }
+            }
+
+            let hit = {
+                weapon: weapon,
+                bp: hexMap[team.hexLabel].bp,
+                facing: "Top",
+                range: 0,
+                shooterType: artilleryTeams[0].type,
+                rangedIn: rangedIn,
+                closeCombat: false,
+                mech: false,
+            }
+    
+            if (hits > 0) {
+                for (let i=0;i<hits;i++) {
+                    if (i===0 && mech === true) {
+                        hit.mech = true;
+                    } else {
+                        hit.mech = false;
+                    }
+                    team.hitArray.push(hit);
+                }
+                if (team.type.includes("Infantry") || team.type === "Unarmoured Tank" || team.type === "Gun") {
+                    pinningUnits.push(unit);                             
+                }
+                if (!unitIDs4Saves[unitID]) {
+                    unitIDs4Saves[unitID] = false; //no mistaken for artillery
+                }   
+                let last = ": Hit";
+                if (hits > 1) {
+                    ": " + hits + " Hits"
+                }
+                outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + "[#ff0000]" + targetName + last + "[/#]");
+            } else {
+                outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + targetName + ": Missed");
+            }
         }
+
         pinningUnits = [...new Set(pinningUnits)];
         if (pinningUnits.length > 0) {
             outputCard.body.push("[hr]");
