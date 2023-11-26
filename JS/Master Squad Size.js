@@ -4867,6 +4867,10 @@ log(weapons)
                     toHit++;
                     toHitTips += "<br>No HE +1";
                 }
+                if (sTeam.suppressed === true) {
+                    toHit++;
+                    toHitTips += "<br>Suppressed +1";
+                }
                 if (sTeam.special.includes("Overworked") && moved === true) {
                     toHit++;
                     toHitTips += "<br>Overworked & Moved +1";
@@ -4892,7 +4896,7 @@ log(weapons)
                 if (sTeam.moved === true) {
                     rof = weapon.moving;
                 }
-                if (shooterUnit.suppressed === true) {
+                if (sTeam.suppressed === true) {
                     if (weapon.notes.includes("Pinned ROF")) {
                         let substring = weapon.notes.split(",");
                         substring = substring.filter((string) => string.includes("Pinned ROF"));
