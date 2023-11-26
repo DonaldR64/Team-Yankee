@@ -1280,8 +1280,8 @@ log(infoArray)
 
         IC(ic) {
             this.inCommand = ic;
-            let colour = "transparent";
-            if (ic === false) {
+            let colour = (this.suppressed === false) ? "transparent":Colours.red;
+            if (ic === false && this.suppressed === false) {
                 colour = Colours.black;
             }
             this.token.set("tint_color",colour);
@@ -4337,11 +4337,10 @@ log("Same had 2")
             sendPing(location.x,location.y, Campaign().get('playerpageid'), null, true); 
             if (team.type === "Tank") {
                 dispName = team.name;
-                needed = Math.min(team.remount,Commander(team,"remount"));
             } else {
                 dispName = unit.name;
-                needed = Math.min(team.rally,Commander(team,"rally"));
             }
+            needed = Math.min(team.remount,Commander(team,"remount"));
             SetupCard(dispName,"Rally",unit.nation);
             outputCard.body.push("Roll Against: " + needed);
             ButtonInfo("Roll","!RollD6;Rally;" + team.id + ";" + needed);
@@ -4545,7 +4544,7 @@ log("Same had 2")
             let leader = leaders[i];
             let losCheck = LOS(team.id,leader.id,"Overhead");
             if (losCheck.los === true && losCheck.distance <= 10) {
-                needed = leader.statname;
+                needed = leader[statname];
                 break;
             }
         }
@@ -5877,6 +5876,7 @@ log(weapon)
         }
     
         pinningUnits = [];
+        unitHits = {};
 
         for (let i=0;i<targetArray.length;i++) {
             let team = targetArray[i];
@@ -5903,7 +5903,7 @@ log(weapon)
                     roll = randomInteger(6);
                 }
                 tip +=  "To Hit: " + roll + " vs. " + neededToHit + "+";
-                if (j > 0) {tip += "<br>"};
+                if (totalTeams > 1) {tip += "<br>"};
                 if (roll >= neededToHit) {
                     hits++;
                 }
@@ -5949,13 +5949,16 @@ log(weapon)
                 if (!unitIDs4Saves[unitID]) {
                     unitIDs4Saves[unitID] = false; //no mistaken for artillery
                 }   
-                let last = ": Hit";
-                if (hits > 1) {
-                    ": " + hits + " Hits"
+                let s = (hits > 1) ? "s":"";
+                last = ": " + hits + " Hit" + s;
+                if (unitHits[unit.id]) {
+                    unitHits[unit.id] += hits;
+                } else if (!unitHits[unit.id]) {
+                    unitHits[unit.id] = hits;
                 }
-                outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + "[#ff0000]" + targetName + last + "[/#]");
+                outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + "[#ff0000]" + team.name + last + "[/#]");
             } else {
-                outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + targetName + ": Missed");
+                outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + team.name + ": Missed");
             }
         }
 
@@ -5964,13 +5967,21 @@ log(weapon)
             outputCard.body.push("[hr]");
             _.each(pinningUnits,unit => {
                 let courage = TeamArray[unit.teamIDs[0]].courage;
+                let modDenom = (unit.size > 10) ? 8:5; 
+                let mod = Math.ceil(unitHits[unit.id]/modDenom);
                 let roll = randomInteger(6);
+                let needed = courage + mod;
+                let neededTip = roll + " vs. " + needed + "+";
+                neededTip += "<br>Courage: " + courage;
+                if (mod > 0) {
+                    neededTip += " + Mod: " + mod;
+                }
                 let end = unit.name + ": Not Pinned";
-                if (roll < courage) {
-                    end = "[#ff0000]" + unit.name + ": Pinned by Artillery";
+                if (roll < needed) {
+                    end = "[#ff0000]" + unit.name + ": Pinned by Artillery Fire[/#]";
                     unit.Suppress();
                 } 
-                let line = '[🎲](#" class="showtip" title="Roll: ' + roll + " vs. " + courage +  '+)' + end;
+                let line = '[🎲](#" class="showtip" title="Roll: ' + neededTip + ')' + end;
                 outputCard.body.push(line);
             });
         }
@@ -6207,7 +6218,7 @@ log(keys)
         for (let i=0;i<keys.length;i++) {
             let unit = UnitArray[keys[i]];
             let pinMargin = 5;
-            if (unit.size > 11) {pinMargin = 8};
+            if (unit.size > 10) {pinMargin = 8};
             let casualties = 0;
             let bailedOut = 0;
             SetupCard(unit.name,"Saves",unit.nation);
