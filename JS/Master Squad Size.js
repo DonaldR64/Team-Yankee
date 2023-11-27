@@ -1252,15 +1252,24 @@ log(infoArray)
                 let roll = randomInteger(6);
                 result.tip = "<br>Remount Roll: " + roll + " vs. " + this.remount + "+";
                 if (roll >= this.remount) {
-                    result.result = "suppressedAgain"
-                } else if (this.type === "Mechanized Infantry") {
-                    result.result = "mech"
+                    if (this.type === "Mechanized Infantry") {
+                        result.result = "minor";
+                    } else {
+                        result.result = "suppressedAgain"
+                    }
                 } else {
-                    result.result = "flees"
+                    if (this.type === "Mechanized Infantry") {
+                        result.result = "mech";
+                    } else {
+                        result.result = "flees"
+                    }
                 }
             } else {
-                result.result = "suppressed";
-                this.suppress();
+                if (this.type === "Mechanized Infantry") {
+                    result.result = "minor";
+                } else {
+                    result.result = "suppressed"
+                }
             }
             return result;
         }
@@ -1333,11 +1342,6 @@ log(hit)
                 bp = hexMap[this.hexLabel].bp;
                 if (hexMap[this.hexLabel].foxholes === true && this.type.includes("Infantry")) {bp = true};
             } 
-
-
-            if (this.special.includes("Redemption")) {
-                bp = false;
-            }
 
             if (this.type === "Tank" || (this.type === "Mechanized Infantry" && (mech === true || this.token.get("currentSide") === 1))) {
                 if (weapon.type === "Flamethrower") {
@@ -1474,10 +1478,23 @@ log(hit)
                         }
                     }
                 } else {
-                    if (save.tip.charAt(0) != "💀") {
-                        save.tip = "💀" + save.tip
-                    }                    
-                    save.result = "destroyed";
+                    let hp = parseInt(this.token.get("bar1_value")) || 1;
+                    let charZero = save.tip.charAt(0);
+                    if (hp > 1) {
+                        hp--;
+                        this.token.set("bar1_value",hp);
+                        save.result = "injury";
+                        save.tip = "🩸" + save.tip;
+                        let conds = ["One","Two","Three","Four","Five"];
+                        this.addCondition(conds[hp-1]);
+                    } else {
+                        if (charZero === "🩸") {
+                            save.tip.charAt(0) = "💀"
+                        } else if (charZero !== "💀" || charZero !== "🩸") {
+                            save.tip = "💀" + save.tip
+                        }
+                        save.result = "destroyed";
+                    }
                 }
             } else if (this.type === "Aircraft" || this.type === "Helicopter") {
                 //only weapons capable of targetting aircraft/helos should make it to here
@@ -6225,8 +6242,8 @@ log(team.name)
 log("Hits: " + team.hitArray.length)
                 unitHits += team.hitArray.length;
                 let results = ProcessSavesTwo(team);
-log(results)
                 if (results) {
+log(results)
                     for (let m=0;m<results.length;m++) {
                         outputCard.body.push(results[m]);
                     }
@@ -6347,6 +6364,9 @@ log(results)
                     saveResult.push(SaveResultsMult.cover);
                 } else if (outputArray.saved > 0) {
                     saveResult.push(SaveResultsMult.saved);
+                }
+                if (outputArray.deflect > 0) {
+                    saveResult.push(outputArray.deflect + " Hits Deflected by Armour");
                 }
                 if (outputArray.mech > 0) {
                     saveResult.push(SaveResultsMult.mech);
