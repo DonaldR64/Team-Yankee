@@ -126,7 +126,7 @@ const TY = (() => {
         "cover": "Hit Saved by Cover",
         "smoked": "Target Smoked",
         "injury": "[#0000ff]Hit kills several soldiers[/#]",
-        "mech": "[#0000ff]Hit destroys the IFV[/#]",
+        "mech": "[#0000ff]Hit destroys the APC[/#]",
     }
 
     const SaveResultsMult = {
@@ -139,7 +139,7 @@ const TY = (() => {
         "saved": "All Hits Saved",
         "cover": "All Hits Saved (Cover)",
         "injury": "[#0000ff]Hits kill several soldiers[/#]",
-        "mech": "[#0000ff]Hits destroy the IFV[/#]",
+        "mech": "[#0000ff]Hits destroy the APC[/#]",
     }
 
     let outputCard = {title: "",subtitle: "",nation: "",body: [],buttons: []};
@@ -3652,7 +3652,7 @@ log("Neither is Air")
                     names = names.toString();
                     
                     if (type === "Mechanized Infantry" && vehicleTypes.includes(weaponType)) {
-                        names = "IFV: " + names;
+                        names = "APC: " + names;
                     }
                     if (names.charAt(0) === ",") {names = names.replace(",","")};
                     names = names.replaceAll(",","+");
@@ -5869,11 +5869,23 @@ log(weapon)
             let unit = UnitArray[unitID];
             let neededToHit = parseInt(team.hit) + (spotAttempts - 1);
             if (observerLOS.los === false) {neededToHit += 1};//repeat bombardment, spotter doesnt have LOS
+            let totalTeams = 1;
+            let mech = false;
 
-            let numberTeams = parseInt(team.token.get("bar1_value")) || 1;
-            let mechTeams = parseInt(team.token.get("bar2_value")) || 0;
-            let totalTeams = numberTeams + mechTeams;
-
+            if (team.type === "Mechanized Infantry") {
+                if (team.token.get("currentSide") === 1) {
+                    //infantry mounted, so only 1 team and is the mech
+                    mech = true;
+                } else {
+                    let numberTeams = parseInt(team.token.get("bar1_value")) || 1;
+                    let mechTeams = parseInt(team.token.get("bar2_value")) || 0;
+                    totalTeams = numberTeams + mechTeams;
+                    let mechOdds = hits * (mechTeams/numberTeams) * 100;
+                    let mechRoll = randomInteger(100);
+                    if (mechRoll <= mechOdds) {mech = true};
+                }
+            }
+            
             let hits = 0;
             let tip = "";
             for (let j=0;j<totalTeams;j++) {
@@ -5893,10 +5905,6 @@ log(weapon)
                 }
             }
     
-            let mechOdds = hits * (mechTeams/numberTeams) * 100;
-            let mechRoll = randomInteger(100);
-            let mech = (mechRoll <= mechOdds) ? true:false;
-
             if (ammoType === "Bomblets") {
                 weapon = {
                     name: "DPICM Rounds",
@@ -6308,11 +6316,11 @@ log(results)
     
         if (hits.length === 1) {
             saveResult.push('[🎲](#" class="showtip" title="' + tip + ') ' + team.name + ": 1 Hit");
-            if (mechFlag === true) {saveResult.push("IFV Hit")};
+            if (mechFlag === true) {saveResult.push("APC Hit")};
             saveResult.push(SaveResults[save.result]);
         } else {
             saveResult.push('[🎲](#" class="showtip" title="' + tip + ') ' + team.name + ": " + hits.length + " Hits");
-            if (mechFlag === true) {saveResult.push("IFV Hit")};
+            if (mechFlag === true) {saveResult.push("APC Hit")};
             if (team.type === "Tank") {
                 if (outputArray.destroyed > 0) {
                     saveResult.push(SaveResultsMult.destroyed);
