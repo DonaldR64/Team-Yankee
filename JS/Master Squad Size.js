@@ -6368,7 +6368,7 @@ log(results)
         if (outputArray.destroyed > 0 || outputArray.flees > 0) {
             team.kill();
         }
-        if (outputArray.mech > 0) {
+        if (outputArray.mech > 0 && outputArray.destroyed === 0) {
             if (team.token.get("currentSide") === 1) {
                 let hp = parseInt(team.token.get("bar1_value")) || 1;
                 let passKill = 0;
