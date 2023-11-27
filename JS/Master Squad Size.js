@@ -4590,30 +4590,31 @@ log("Same had 2")
             mistaken = false;
         }
         if (defensive === true) {mistaken = false};
-log("Mistaken: " + mistaken)
 
         let exclusions = [];
 
         for (let i=0;i<shooterUnit.teamIDs.length;i++) {
             let excluded;
             let st = TeamArray[shooterUnit.teamIDs[i]];
+log(st.name)
             if (unitFire === false && shooterID !== st.id) {continue}; //single team firing
             if (st.inCommand === false && unitFire === true) {continue};
-            if (st.fired === true) {
+            if (st.fired === true || st.aaFired === true) {
                 if (st.type.includes("Infantry")) {
                     let hp = parseInt(st.token.get("bar1_value")) || 1;
+                    hp += parseInt(st.token.get("bar2_value")) || 0;
+log("HP: " + hp)
+log(st.weaponsFired)
                     if (st.weaponsFired.length >= hp) {
-                        excluded = " Fired Already";
+                        excluded = " Fired All Weapons";
                     } else if (st.weaponsFired.includes(weaponType)) {
-                        excluded = " Fired that Weapon Already";
+                        excluded = " Fired that Weapon";
                     }
                 } else {
                     excluded = " Fired Already";
                 }
             }
-            if (st.aaFired === true) {
-                excluded = " Fired AA";
-            }
+
             if (st.order === "Dash") {
                 excluded = " Dashed";
             }
