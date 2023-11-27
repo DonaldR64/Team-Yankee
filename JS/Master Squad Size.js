@@ -6293,9 +6293,10 @@ log(results)
         }
         let save; //as single hit's save can then carry onto output part
         let mechFlag = false;
-
+        let CC = false;
         for (let k=0;k<hits.length;k++) {
             let hit = hits[k];
+            if (hit.closeCombat === true) {CC = true};
             if (hit.mech === true) {mechFlag = true};
             save = team.Save(hit,k+1);
             if (k>0) {
@@ -6365,7 +6366,7 @@ log(results)
                 let passKill = 0;
                 for (let i=0;i<hp;i++) {
                     let roll = randomInteger(6);
-                    if (roll < 3) {
+                    if (roll < 3 || CC === true) {
                         passKill++;
                     }
                 }
