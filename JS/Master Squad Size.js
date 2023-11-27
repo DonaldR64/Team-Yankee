@@ -1332,15 +1332,13 @@ log(hit)
                 bp = hexMap[this.hexLabel].bp;
                 if (hexMap[this.hexLabel].foxholes === true && this.type.includes("Infantry")) {bp = true};
             } 
-            if (bp === "Passenger") {
-                bp = false;
-            }
+
 
             if (this.special.includes("Redemption")) {
                 bp = false;
             }
 
-            if (this.type === "Tank" || (this.type === "Mechanized Infantry" && mech === true)) {
+            if (this.type === "Tank" || (this.type === "Mechanized Infantry" && (mech === true || this.token.get("currentSide") === 1))) {
                 if (weapon.type === "Flamethrower") {
                     facing = "Top";
                 }
@@ -1515,35 +1513,11 @@ log(hit)
             log("Team ID: " + this.id)
             if (this.type === "Tank" || this.type === "Helicopter") {
                 this.wreck();
-                PlaySound("Explosion")
-                if (this.queryCondition("Passengers") === true) {
-                    let passengers = state.TY.passengers[this.id];
-                    if (passengers) {
-                        for (let i=0;i<passengers.length;i++) {
-                            let passengerTeam = TeamArray[passengers[i]];
-                            UnitArray[passengerTeam.unitID].pin();
-                            passengerTeam.token.set("layer","objects");
-                            toFront(passengerTeam.token);
-                            let needed = passengerTeam.armourF;
-                            if (state.TY.step === "Assault") {
-                                needed = 7;
-                            }
-                            let roll = randomInteger(6);
-                            if (roll < needed) {
-                                outputCard.bottom.push(passengerTeam.name + " is killed as well");
-                                passengerTeam.kill();
-                            } else {
-                                outputCard.bottom.push(passengerTeam.name + " survives");
-                            }
-                        }
-                        this.removeCondition("Passengers");
-                    }
-                }
+                PlaySound("Explosion");
             } else {
                 this.token.set({
                     layer: "map",
                     statusmarkers: "dead",
-
                 });
                 toFront(this.token);
             }
@@ -6386,6 +6360,26 @@ log(results)
             team.kill();
         }
         if (outputArray.mech > 0) {
+            if (team.token.get("currentSide") === 1) {
+                let hp = parseInt(team.token.get("bar1_value")) || 1;
+                let passKill = 0;
+                for (let i=0;i<hp;i++) {
+                    let roll = randomInteger(6);
+                    if (roll < 3) {
+                        passKill++;
+                    }
+                }
+                hp -= passKill;
+                if (passKill > 0 & hp > 0) {
+                    saveResult.push("Several Passengers die trying to escape");
+                    team.token.set("bar1_value",hp);
+                    let unit = UnitArray[team.unitID];
+                    unit.Suppress();
+                } else if (hp === 0) {
+                    saveResult.push("The Passengers were killed");
+                    team.kill();
+                }
+            }
             team.token.set("bar2_value",0);
             let sides = team.token.get("sides").split("|");
             let newImg = tokenImage(sides[2]);
