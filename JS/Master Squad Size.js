@@ -745,6 +745,7 @@ log(team.name + " inCommand: " + team.inCommand)
         IC() {
             if (this.type === "System Unit") {return};
             let unitLeader = TeamArray[this.teamIDs[0]];
+            if (!unitLeader) {return};
             unitLeader.IC(true);
             if (this.teamIDs.length === 1) {return};
             let array = this.teamIDs.map(id => {
@@ -1410,7 +1411,7 @@ log(hit)
                         if (save.tip.charAt(0) != "💀") {
                             save.tip = "💀" + save.tip
                         }
-                        if (teamType === "Mech") {
+                        if (mech === true) {
                             save.result = "mech";
                         } else {
                             save.result = "destroyed";
@@ -5870,22 +5871,10 @@ log(weapon)
             let unit = UnitArray[unitID];
             let neededToHit = parseInt(team.hit) + (spotAttempts - 1);
             if (observerLOS.los === false) {neededToHit += 1};//repeat bombardment, spotter doesnt have LOS
-            let totalTeams = 1;
+            let numberTeams = parseInt(team.token.get("bar1_value")) || 1;
+            let mechTeams = parseInt(team.token.get("bar2_value")) || 0;
+            let totalTeams = numberTeams + mechTeams;
             let mech = false;
-
-            if (team.type === "Mechanized Infantry") {
-                if (team.token.get("currentSide") === 1) {
-                    //infantry mounted, so only 1 team and is the mech
-                    mech = true;
-                } else {
-                    let numberTeams = parseInt(team.token.get("bar1_value")) || 1;
-                    let mechTeams = parseInt(team.token.get("bar2_value")) || 0;
-                    totalTeams = numberTeams + mechTeams;
-                    let mechOdds = hits * (mechTeams/numberTeams) * 100;
-                    let mechRoll = randomInteger(100);
-                    if (mechRoll <= mechOdds) {mech = true};
-                }
-            }
             
             let hits = 0;
             let tip = "";
@@ -5905,7 +5894,18 @@ log(weapon)
                     hits++;
                 }
             }
-    
+
+            if (team.type === "Mechanized Infantry") {
+                if (team.token.get("currentSide") === 1) {
+                    //infantry mounted, so only 1 team and is the mech
+                    mech = true;
+                } else {
+                    let mechOdds = hits * (mechTeams/numberTeams) * 100;
+                    let mechRoll = randomInteger(100);
+                    if (mechRoll <= mechOdds) {mech = true};
+                }
+            }
+
             if (ammoType === "Bomblets") {
                 weapon = {
                     name: "DPICM Rounds",
@@ -6248,7 +6248,7 @@ log(results)
                     unitLeader.token.set("bar3_value",unitHits);
                     if (unitHits >= pinMargin && unit.suppressed === false) {
                         outputCard.body.push("The Unit is Pinned");
-                        unit.pin();
+                        unit.Suppress();
                         if (shootingType === "Defensive") {
                             outputCard.body.push("The Unit must Fall Back");
                         }
@@ -6301,12 +6301,12 @@ log(results)
             "mech": 0,
         }
         let save; //as single hit's save can then carry onto output part
-        let mechFlag = false;
+        let mechAdd = "";
         let CC = false;
         for (let k=0;k<hits.length;k++) {
             let hit = hits[k];
             if (hit.closeCombat === true) {CC = true};
-            if (hit.mech === true) {mechFlag = true};
+            if (hit.mech === true) {mechAdd = " - APC Hit"};
             save = team.Save(hit,k+1);
             if (k>0) {
                 tip += "<br>";
@@ -6315,13 +6315,12 @@ log(results)
             outputArray[save.result] += 1;
         }
     
+
         if (hits.length === 1) {
-            saveResult.push('[🎲](#" class="showtip" title="' + tip + ') ' + team.name + ": 1 Hit");
-            if (mechFlag === true) {saveResult.push("APC Hit")};
+            saveResult.push('[🎲](#" class="showtip" title="' + tip + ') ' + team.name + ": 1 Hit" + mechAdd);
             saveResult.push(SaveResults[save.result]);
         } else {
-            saveResult.push('[🎲](#" class="showtip" title="' + tip + ') ' + team.name + ": " + hits.length + " Hits");
-            if (mechFlag === true) {saveResult.push("APC Hit")};
+            saveResult.push('[🎲](#" class="showtip" title="' + tip + ') ' + team.name + ": " + hits.length + " Hits"  + mechAdd);
             if (team.type === "Tank") {
                 if (outputArray.destroyed > 0) {
                     saveResult.push(SaveResultsMult.destroyed);
@@ -6957,7 +6956,8 @@ log("Charge Dist: " + chargeDist)
                 hexMap[newHexLabel].teamIDs.push(tok.id);
                 if (unit) {
                     unit.IC();
-                }                //let theta = oldHex.angle(newHex);
+                }                
+                //let theta = oldHex.angle(newHex);
                 //tok.set("rotation",theta);
                 FlipGraphic(tok.get("rotation"),tok,team);
                 MovementSound(team);
