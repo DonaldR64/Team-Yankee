@@ -6394,13 +6394,14 @@ log(results)
                 let passKill = 0;
                 let tip = "";
                 for (let i=0;i<hp;i++) {
+                    tip += "Team " + (i+1) + ": ";
                     let roll = randomInteger(6);
                     let tipI = roll + " vs. Save of 3+";
                     if (CC === true) {
                         tipI = "Auto Failure in Close Combat";
                     } 
                     tip += tipI;
-                    if (i>0) {tip += "[br]"};
+                    if (i>0) {tip += "<br>"};
                     if (roll < 3 || CC === true) {
                         passKill++;
                     }
