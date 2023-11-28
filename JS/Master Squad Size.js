@@ -4645,6 +4645,12 @@ log(st.weaponsFired)
             if (st.type === "Tank" && st.bailed === true) {
                 excluded = " is Bailed Out";
             }
+            let apcHP = parseInt(st.token.get("bar2_value")) || 0;
+
+            if (st.type === "Mechanized Infantry" && weaponType.includes("Vehicle") && apcHP === 0) {
+                excluded = " APC destroyed";
+            }
+
             if (excluded === undefined) {
                 let weaponExclusion;
                 let flag = false;
