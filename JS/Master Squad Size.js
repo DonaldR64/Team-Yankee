@@ -6392,20 +6392,23 @@ log(results)
             if (team.token.get("currentSide") === 1) {
                 let hp = parseInt(team.token.get("bar1_value")) || 1;
                 let passKill = 0;
+                let tip = "";
                 for (let i=0;i<hp;i++) {
                     let roll = randomInteger(6);
+                    tip += roll + " vs. Save of 3+";
+                    if (i>0) {tip += "[br]"};
                     if (roll < 3 || CC === true) {
                         passKill++;
                     }
                 }
                 hp -= passKill;
                 if (passKill > 0 & hp > 0) {
-                    saveResult.push("Several Passengers die trying to escape");
+                    saveResult.push('[🎲](#" class="showtip" title="' + tip + ') Several Passengers die trying to escape');
                     team.token.set("bar1_value",hp);
                     let unit = UnitArray[team.unitID];
                     unit.Suppress();
                 } else if (hp === 0) {
-                    saveResult.push("The Passengers were killed");
+                    saveResult.push('[🎲](#" class="showtip" title="' + tip + ')The Passengers were all killed');
                     team.kill();
                 }
             }
