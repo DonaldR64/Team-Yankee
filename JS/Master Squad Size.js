@@ -53,7 +53,7 @@ const TY = (() => {
     let specialInfo = {
         "Air Assault": "An Air Assault Unit may only be held in Reserve if all the Units deployed on table are Air Assault Units",
         "Accurate": 'No Penalties for Long Range if Shooter did not Move',
-        "Advanced Stabiliser": 'Tactical Speed is 7 hexes. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 5 hexes',
+        "Advanced Stabiliser": 'Tactical Speed is 7 hexes. Machine s cannot Shoot and the Team cannot Assault if it moves more than 5 hexes',
         "Amphibious": "Treat Impassable Water as Difficult Terrain",
         "Anti-Helicopter": "Can shoot at Helicopters with a ROF of 1",
         "Applique Armour": 'Front and Side Armour is 13 against HEAT weapons',
@@ -5009,6 +5009,8 @@ log(weapons)
                 if (weapon.notes.includes("Limited")) {
                     shooterUnit.limited++;
                 }
+                let mech = false;
+                if (shellType === "AP") {mech = true;}
 
                 //assign hits
                 for (let q=0;q<hits;q++) {
@@ -5044,6 +5046,7 @@ log(weapons)
                         rangedIn: false,
                         closeCombat: false,
                         special: eta[targNum].los.special,
+                        mech: mech,
                     }
                     TeamArray[eta[targNum].targetID].hitArray.push(hit);
   
