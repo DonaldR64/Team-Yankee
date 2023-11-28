@@ -6395,7 +6395,11 @@ log(results)
                 let tip = "";
                 for (let i=0;i<hp;i++) {
                     let roll = randomInteger(6);
-                    tip += roll + " vs. Save of 3+";
+                    let tipI = roll + " vs. Save of 3+";
+                    if (CC === true) {
+                        tipI = "Auto Failure in Close Combat";
+                    } 
+                    tip += tipI;
                     if (i>0) {tip += "[br]"};
                     if (roll < 3 || CC === true) {
                         passKill++;
@@ -6406,11 +6410,14 @@ log(results)
                     saveResult.push('[🎲](#" class="showtip" title="' + tip + ') Several Passengers die trying to escape');
                     team.token.set("bar1_value",hp);
                     let unit = UnitArray[team.unitID];
-                    unit.Suppress();
                 } else if (hp === 0) {
                     saveResult.push('[🎲](#" class="showtip" title="' + tip + ')The Passengers were all killed');
                     team.kill();
+                } else {
+                    saveResult.push('[🎲](#" class="showtip" title="' + tip + ')The Passengers all survived');
                 }
+                unit.Suppress();
+
             }
             team.token.set("bar2_value",0);
             let sides = team.token.get("sides").split("|");
