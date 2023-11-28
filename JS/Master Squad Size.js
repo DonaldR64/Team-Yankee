@@ -3640,12 +3640,12 @@ log("Neither is Air")
                 "Infantry SAM": [],
                 "Vehicle MG": [],
                 "Vehicle Flamethrower": [],
-                "Gun": [],
-                "Autocannon": [],
+                "Vehicle Gun": [],
+                "Vehicle Autocannon": [],
                 "Vehicle Missile": [],
                 "Artillery": [],
             }
-            let vehicleTypes = ["Vehicle MG","Vehicle Flamethrower","Gun","Autocannon","Vehicle Missile"]
+            let vehicleTypes = ["Vehicle MG","Vehicle Flamethrower","Vehicle Gun","Vehicle Autocannon","Vehicle Missile"]
 
             let smoke = false; //true if gun fires smoke
             for (let i=0;i<team.weaponArray.length;i++) {
@@ -3682,7 +3682,7 @@ log("Neither is Air")
                         }
                     } else {
                         let shellType = "Regular";
-                        if (weaponType === "Gun") {
+                        if (weaponType === "Vehicle Gun") {
                             shellType = "?{Shell Type|AP|HE";
                             if (smoke === true) {
                                 shellType += "|Smoke";
