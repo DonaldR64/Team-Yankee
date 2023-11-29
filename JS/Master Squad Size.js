@@ -1310,6 +1310,7 @@ log(infoArray)
         }
 
         Save(hit,hitNum) {
+log("Hit Number: " + hitNum)
 log(hit)
             let facing = hit.facing;
             let range = hit.range;
@@ -1593,7 +1594,6 @@ log(hit)
             toFront(newToken);
 
             hexMap[this.hexLabel].terrain.push("Wreck");
-            WreckArray[this.id] = this.hex;
             hexMap[this.hexLabel].bp = true;
             if (hexMap[this.hexLabel].type === 0) {
                 hexMap[this.hexLabel].type = 1;
@@ -2504,9 +2504,6 @@ log(hit)
                 dash: t.dash,
             };
             TerrainArray[id] = info;
-            if (t.name === "WRECK") {
-                WreckArray[id] = hex;
-            }
         });
     };
 
@@ -3322,7 +3319,7 @@ log("Neither is Air")
             _.each(unit.teamIDs,id => {
                 let tm = TeamArray[id];
                 if (tm.inCommand === true) {
-                    if (tm.mounted === true && (order !== "Dash" || order !== "Hold")) {  
+                    if (tm.mounted === true && order !== "Dash" && order !== "Hold") {  
                         errorMsg = "A Team Mounted Up this Turn; The Unit can only be given Dash or Hold Order";
                     }
                     if (tm.suppressed === true) {suppressedTeams = true};
@@ -4646,10 +4643,11 @@ log(st.weaponsFired)
                 excluded = " is Bailed Out";
             }
             let apcHP = parseInt(st.token.get("bar2_value")) || 0;
+            let currentSide = parseInt(st.token.get("currentSide")) || 0
 
-            if (st.type === "Mechanized Infantry" && weaponType.includes("Vehicle") && apcHP === 0) {
-                excluded = " APC destroyed";
-            }
+log("Info: " + st.name)
+log(apcHP)
+log(currentSide)
 
             if (excluded === undefined) {
                 let weaponExclusion;
@@ -4660,7 +4658,6 @@ log(st.weaponsFired)
                     let special = "";
                     if (weapon.type !== weaponType){continue};
                     if (weapon.notes.includes("Close Combat")) {continue};
-                    //MOunted here ????
 
                     if (weapon.notes.includes("Overhead")) {special += ",Overhead"};
                     if (weapon.notes.includes("NLOS")) {special += ",NLOS"};
@@ -4676,21 +4673,21 @@ log(st.weaponsFired)
                     }
 
                     if (target.type === "Aircraft" && weapon.notes.includes("Guided AA") === false && weapon.notes.includes("Dedicated AA") === false && weapon.type !== "AA MG") {
-                        weaponExclusion = " cannot fire at Aircraft";
+                        weaponExclusion = " cannot fire " + weapon.name + " at Aircraft";
                     }
                     
                     if (target.type === "Helicopter" && target.landed() === false) {
                         if (st.type === "Aircraft" && weapon.notes.includes("Anti-Helicopter") === false) {
-                            weaponExclusion = " cannot fire at Helicopters";
+                            weaponExclusion = " cannot fire " + weapon.name + " at Helicopters";
                         }
                         if (st.type.includes("Infantry") && (st.special.includes("Heavy Weapon") || weapon.notes.includes("Heavy"))) {
                             if (weapon.notes.includes("Guided") === false && weapon.notes.includes("Dedicated AA") === false && weapon.type !== "AA MG" && weapon.notes.includes("Anti-Helicopter") === false) {
-                                weaponExclusion = " cannot fire at Helicopters";
+                                weaponExclusion = " cannot fire " + weapon.name + " at Helicopters";
                             }
                         }
                         if (st.type.includes("Tank") || st.type.includes("Gun")) {
                             if (weapon.notes.includes("Guided") === false && weapon.notes.includes("Dedicated AA") === false && weapon.notes.includes("Anti-Helicopter") === false && weapon.type !== "AA MG") {}
-                            weaponExclusion = " cannot fire at Helicopters";
+                            weaponExclusion = " cannot fire " + weapon.name + " at Helicopters";
                         }
                     }
 
@@ -4703,13 +4700,24 @@ log(st.weaponsFired)
                     }
 
                     if (weapon.minRange > initialLOS.distance || weapon.maxRange < initialLOS.distance) {
-                        weaponExclusion = " is Not In Range";
+                        weaponExclusion = " - " + weapon.name + " does not have Range";
                     };
                     if (weapon.notes.includes("Forward Firing") && initialLOS.shooterface !== "Front") {
-                        weaponExclusion = " is Out of Arc";
+                        weaponExclusion = "-" + weapon.name + " is Out of Arc";
                     };
                     if (st.type === "Helicopter" && st.landed() === true && weapon.notes.includes("Door Guns") === false) {
                         weaponExclusion = " is unable to fire while landed";
+                    }
+
+                    if (st.type === "Mechanized Infantry") {
+                        if (weaponType.includes("Vehicle") && apcHP === 0) {
+                            weaponExclusion = " - APC is Destroyed";
+                        }
+                        if (weaponType.includes("Vehicle") === false && currentSide === 1) {
+                            if (weapon.notes.includes("Mounted") === false) {
+                                weaponExclusion = " - " + weapon.name + " can't be fired while Mounted";
+                            }
+                        }
                     }
 
                     if (weaponExclusion === undefined) {
@@ -5955,10 +5963,9 @@ log(weapon)
     
             if (hits > 0) {
                 for (let i=0;i<hits;i++) {
+                    hit.mech = false;
                     if (i===0 && mech === true) {
                         hit.mech = true;
-                    } else {
-                        hit.mech = false;
                     }
                     team.hitArray.push(hit);
                 }
@@ -6419,15 +6426,13 @@ log(results)
                 if (passKill > 0 & hp > 0) {
                     saveResult.push('[🎲](#" class="showtip" title="' + tip + ') Several Passengers die trying to escape');
                     team.token.set("bar1_value",hp);
-                    let unit = UnitArray[team.unitID];
                 } else if (hp === 0) {
                     saveResult.push('[🎲](#" class="showtip" title="' + tip + ')The Passengers were all killed');
                     team.kill();
                 } else {
                     saveResult.push('[🎲](#" class="showtip" title="' + tip + ')The Passengers all survived');
                 }
-                unit.Suppress();
-
+                UnitArray[team.unitID].Suppress();
             }
             team.token.set("bar2_value",0);
             let sides = team.token.get("sides").split("|");
