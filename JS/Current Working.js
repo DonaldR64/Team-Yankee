@@ -2445,6 +2445,7 @@ log(hex)
         //WARPACT - Unit is the Company, but only lead token in Co is Commandable, larger unit is formation, not tracked in game
 
         if (player === 1) {
+            //NATO
             let unit = new Unit(nation,stringGen(),unitName,unitNumber);
             for (let i=0;i<teamIDs.length;i++) {
                 let team = new Team(teamIDs[i],unit.id);
