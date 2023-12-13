@@ -3241,7 +3241,60 @@ log("Type: " + interHex.type)
         PrintCard();
     }
 
-    const AddAbilities = (msg) => {
+    const MakeLeader = (team) => { 
+        //check if existing one
+        let c;
+        let name = team.characterName += " Leader";
+        c = findObjs({type: 'character', name: name})[0];
+        if (c) {
+            team.characterID = c.id;
+            team.characterName = c.get("name");
+            team.token.set({
+                represents: c.id,
+            });
+        } else {
+            let oldC = getObj("character",team.token.get("represents"));
+            c = simpleObj(oldC);
+            let oldCid = oldC.id;
+            delete c.id;        
+            c.name += " Leader";
+            c.avatar = getCleanImgSrc(c.avatar) || '';
+            newC = createObj('character',c);
+            _.each(findObjs({type:'attribute',characterid:oldCid}),(a)=>{
+                let sa = simpleObj(a);
+                delete sa.id;
+                delete sa._type;
+                delete sa._characterid;
+                sa.characterid = newC.id;
+                createObj('attribute',sa);
+            });
+            _.each(findObjs({type:'ability',characterid:oldCid}),(a)=>{
+                let sa = simpleObj(a);
+                delete sa.id;
+                delete sa._type;
+                delete sa._characterid;
+                sa.characterid = newC.id;
+                createObj('ability',sa);
+            });
+            team.token.set({
+                represents: newC.id,
+            });
+            team.characterID = newC.id;
+            team.characterName = newC.get("name");
+            let special = Attribute(newC,"special");
+            if (special !== "") {
+                special += ",Leader";
+            } else {
+                special = "Leader";
+            }
+            AttributeSet(newC.id,"special",special);
+            team.special = special;
+            AddAbilities2(team.id);
+            setDefaultTokenForCharacter(newC, team.token);
+        }
+    }
+
+    const AddAbilities = (msg) =>{
         if (!msg.selected) {
             sendChat("","No Token Selected");
             return;
@@ -3251,7 +3304,10 @@ log("Type: " + interHex.type)
         if (data) {
             id = data.target;
         }
+        AddAbilities2(id)
+    }
 
+    const AddAbilities2 = (id) => {
         let token = findObjs({_type:"graphic", id: id})[0];
         let char = getObj("character", token.get("represents"));
 
