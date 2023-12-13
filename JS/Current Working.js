@@ -3305,16 +3305,16 @@ log("Type: " + interHex.type)
 
         let specOrders;
         if (type === "Infantry") {
-             specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Dig In|Follow Me|Shoot and Scoot|Clear Minefield"
+             specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Dig In|Shoot and Scoot|Clear Minefield"
         } else if (type === "Gun") {
-            specOrders = "!SpecialOrders;?{Special Order|Dig In|Cross Here"
+            specOrders = "!SpecialOrders;?{Special Order|Dig In"
         } else if (type === "Tank") {
-            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Cross Here|Follow Me|Shoot and Scoot";
+            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Shoot and Scoot";
             if (special.includes("Mine")) {
                 specOrders += "|Clear Minefield";
             }
         } else if (type === "Unarmoured Tank") {
-            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Cross Here|Follow Me|Shoot and Scoot";
+            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Shoot and Scoot";
         } else if (type === "Helicopter") {
             specOrders = "!SpecialOrders;?{Special Order|";
             if (special.includes("Passengers")) {
@@ -3349,7 +3349,8 @@ log("Type: " + interHex.type)
 
 
         let types = {
-            "Small Arms": [],
+            "Small Arms and Light Weapons": [],
+            "Heavy Weapon": [],
             "MG": [],
             "Flamethrower": [],
             "Gun": [],
@@ -3357,6 +3358,10 @@ log("Type: " + interHex.type)
             "Handheld AT": [],
             "Vehicle Missile": [],
             "Artillery": [],
+            "LAW/MAW": [],
+            "Infantry Missile": [],
+            "Vehicle Missile": [],
+            "SAM": [],
         }
 
         let smoke = false; //true if gun fires smoke
