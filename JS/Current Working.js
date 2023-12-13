@@ -14,7 +14,6 @@ const TY = (() => {
     let CheckArray = []; //used by Remount, Rally and Morale checks
     let RangedInArray = {};
 
-    let unitCreationInfo = {}; //used during unit creation 
     let unitIDs4Saves = {}; //used during shooting routines
     let AssaultIDs = [[],[]]; //array of teams (IDs) in a CC, updated when charge/move
 
@@ -2421,6 +2420,8 @@ log(hex)
         if (!msg.selected) {return};
         let Tag = msg.content.split(";");
         let unitName = Tag[1];
+        let battalionNumber = Tag[2];
+
         let teamIDs = [];
         for (let i=0;i<msg.selected.length;i++) {
             teamIDs.push(msg.selected[i]._id);
@@ -2446,10 +2447,13 @@ log(hex)
 
         if (player === 1) {
             //NATO
-            let unit = new Unit(nation,stringGen(),unitName,unitNumber);
             for (let i=0;i<teamIDs.length;i++) {
+                let unit = new Unit(nation,stringGen(),unitName + "/Platoon " + rowLabels[i], unitNumber);
                 let team = new Team(teamIDs[i],unit.id);
                 if (!team) {continue};
+                if (team.special.includes("HQ")) {
+                    unit.name = unitName + "/HQ";
+                }
                 unit.add(team);
                 let name = NameAndRank(team,i);    
                 team.name = name;
