@@ -158,12 +158,12 @@ const TY = (() => {
 
     const TerrainInfo = {
         "#00ff00": {name: "Woods",height: 20,bp: false,type: 2,group: "Woods",dash: 2},
-        "#20124d": {name: "Ruins",height: 5,bp: true,type: 1,group: "Rough",dash: 2},
-        "#000000": {name: "Hill 1",height:25,bp: false,type: 0,group: "Hill",dash: 1},
-        "#434343": {name: "Hill 2",height:25,bp: false,type: 0,group: "Hill",dash: 1},
-        "#666666": {name: "Hill 3",height:25,bp: false,type: 0,group: "Hill",dash: 1},
-        "#c0c0c0": {name: "Hill 4",height:25,bp: false,type: 0,group: "Hill",dash: 1},
-        "#d9d9d9": {name: "Hill 5",height:5,bp: false,type: 0,group: "Hill",dash: 1},
+        "#20124d": {name: "Ruins",height: 0,bp: true,type: 1,group: "Rough",dash: 2},
+        "#000000": {name: "Hill 1",height: 25,bp: false,type: 0,group: "Hill",dash: 1},
+        "#434343": {name: "Hill 2",height: 25,bp: false,type: 0,group: "Hill",dash: 1},
+        "#666666": {name: "Hill 3",height: 25,bp: false,type: 0,group: "Hill",dash: 1},
+        "#c0c0c0": {name: "Hill 4",height: 25,bp: false,type: 0,group: "Hill",dash: 1},
+        "#d9d9d9": {name: "Hill 5",height: 25,bp: false,type: 0,group: "Hill",dash: 1},
         "#00ffff": {name: "Stream",height: 0,bp: false,type: 0,group: "Water",dash: 2},
         "#b6d7a8": {name: "Scrub",height: 0,bp: false,type: 1,group: "Crops",dash: 2},
         "#980000": {name: "Low Embankment",height: 5,bp: false,type: 0,group: "Hill",dash: 2},
@@ -173,12 +173,11 @@ const TY = (() => {
 
     const MapTokenInfo = {
         "woods": {name: "Woods",height: 20,bp: false,type: 2,group: "Woods",dash: 2},
-        "ruins": {name: "Ruins",height: 5,bp: true,type: 1,group: "Rough",dash: 2},
-        //"wreck": {name: "Wreck",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
+        "ruins": {name: "Ruins",height: 0,bp: true,type: 1,group: "Rough",dash: 2},
         "building 1": {name: "Buildings - Height 1",height: 10,bp: true,type: 3,group: "Building",dash: 2},
         "building 2": {name: "Buildings - Height 2",height: 20,bp: true,type: 3,group: "Building",dash: 2},
         "building 3": {name: "Buildings - Height 3",height: 30,bp: true,type: 3,group: "Building",dash: 2},
-        "rubble": {name: "Rubble",height: 3,bp: true,type: 1,group: "Rough",dash: 2},
+        "rubble": {name: "Rubble",height: 0,bp: true,type: 1,group: "Rough",dash: 2},
         //"anti-tank ditch": {name: "Anti-Tank Ditch",height: 0,bp: true,type: 0,group: "Trench",dash: 3},
         //"wall": {name: "Wall",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
         "hedge": {name: "Hedge",height: 0,bp: false,type: 1,group: "Obstacle",dash: 2},
@@ -188,7 +187,7 @@ const TY = (() => {
         "crater": {name: "Craters",height: 0,bp: true,type: 0,group: "Rough",dash: 2},        
         "crops": {name: "Crops",height: 0,bp: false,type: 1,group: "Crops",dash: 2},
         "foxholes": {name: "Foxholes",height: 0,bp: false,type: 0,group: "Foxholes",dash: 2}, //bp tracked in LOS, and in hexMap
-        "smoke": {name: "Smoke",height: 10,bp: false,type: 0,group: "Smoke",dash: 1},
+        "smoke": {name: "Smoke",height: 0,bp: false,type: 0,group: "Smoke",dash: 1},
         "smokescreen": {name: "SmokeScreen",height: 30,bp:false,type: 0,group: "Smoke",dash: 1},
         "rangedin": {name: "rangedin",height: 0,bp:false,type: 0,group: "Marker",dash: 1},
         "scrub": {name: "Scrub",height: 0,bp: false,type: 1,group: "Crops",dash: 2},
@@ -1765,18 +1764,19 @@ log(hit)
     const teamHeight = (team) => {
         //height of token based on terrain, with additional based on type
         let hex = hexMap[team.hexLabel];
+log(hex)
         let height = parseInt(hex.elevation);
         if (team.type === "Infantry" && hex.terrain.includes("Building")) {
-            height = parseInt(hex.height) - 1;
+            height = parseInt(hex.height) - 5;
         } 
         if (team.type === "Aircraft") {
-            height += 10;
+            height += 300;
         }
         if (team.type === "Helicopter" && team.landed() === false) {
             if (team.special.includes("Hunter")) {
-                height = parseInt(hex.height) + .5;
+                height = parseInt(hex.height) + 100;
             } else {
-                height = parseInt(hex.height) + 1;
+                height = parseInt(hex.height) + 150;
             }
         }
         return height;
@@ -2198,10 +2198,12 @@ log(hit)
                             temp.dash = Math.max(temp.dash,polygon.dash);
 
                             if (polygon.name.includes("Hill")) {
-                                temp.elevation = temp.elevation + polygon.elevation;
+                                temp.elevation = temp.elevation + polygon.height;
                                 temp.height = temp.height + polygon.height;
                             } else {
-                                temp.height = Math.max(temp.height,polygon.height);
+                                let elev1 = parseInt(temp.elevation) + parseInt(polygon.height);
+                                let elev2 = parseInt(temp.height);
+                                temp.height = Math.max(elev1,elev2);
                                 temp.type = Math.max(temp.type,polygon.type);
                             };
                         };
@@ -2262,7 +2264,7 @@ log(hit)
                 id: id,
                 vertices: vertices,
                 centre: centre,
-                height: t.height,
+                height: parseInt(t.height),
                 bp: t.bp,
                 type: t.type,
                 group: t.group,
@@ -2301,7 +2303,7 @@ log(hit)
                 gmnotes: decodeURIComponent(token.get("gmnotes")),
                 vertices: vertices,
                 centre: centre,
-                height: t.height,
+                height: parseInt(t.height),
                 bp: t.bp,
                 type: t.type,
                 group: t.group,
@@ -2310,9 +2312,6 @@ log(hit)
                 dash: t.dash,
             };
             TerrainArray[id] = info;
-            if (t.name === "WRECK") {
-                WreckArray[id] = hex;
-            }
         });
     };
 
@@ -2612,7 +2611,7 @@ log(cm)
         if (h.bp === true || h.foxholes === true) {
             outputCard.body.push("(Bulletproof Cover)");
         }
-        outputCard.body.push("Elevation: " + (elevation * 50) + " Metres");
+        outputCard.body.push("Elevation: " + elevation + " Metres");
         outputCard.body.push("[hr]");
         if (team.inCommand === true) {
             outputCard.body.push("Team is In Command");
@@ -2647,8 +2646,7 @@ log(cm)
     }
 
     const LOS = (id1,id2,special) => {
-        if (!special || special === "") {special = " "}; //  overhead - ignores concealment/BP for Short and intervening units, Spotter
-        
+        if (!special) {special = " "};
         let team1 = TeamArray[id1];
         let team2 = TeamArray[id2];
         if (!team1) {
@@ -2704,8 +2702,8 @@ log(cm)
         let teamLevel = Math.min(team1Height,team2Height);
         team1Height -= teamLevel;
         team2Height -= teamLevel;
-    //log("Team1 H: " + team1Height)
-    //log("Team2 H: " + team2Height)
+    log("Team1 H: " + team1Height)
+    log("Team2 H: " + team2Height)
     
         let interHexes = team1.hex.linedraw(team2.hex); //hexes from shooter (hex 0) to target (hex at end)
         let team1Hex = hexMap[team1.hexLabel];
@@ -2776,7 +2774,7 @@ log(cm)
             bulletproof = true;
         }
     
-        if (team2Hex.terrain.includes("Ridgeline") && team1Hex.terrain.includes("Ridgeline") === false && team1Height < team2Height) {
+        if (team2Hex.terrain.includes("Ridgeline") && sameTerrain === false && team1Height < team2Height) {
             //on a ridgeline with shooter below, ie hulldown
             concealed = true;
             bulletproof = true;
@@ -2853,9 +2851,9 @@ log("Neither is Air")
                 let qrs = interHexes[i];
                 let qrsLabel = qrs.label();
                 let interHex = hexMap[qrsLabel];
-//log(i + ": " + qrsLabel)
-//log(interHex.terrain)
-//log("Type: " + interHex.type)
+log(i + ": " + qrsLabel)
+log(interHex.terrain)
+log("Type: " + interHex.type)
                 if (interHex.smoke === true || interHex.smokescreen === true) {smoke = true};
                 if (interHex.smokescreen === true && distanceT1T2 > 2) { ///6mm change
                     los = false;
@@ -2870,59 +2868,33 @@ log("Neither is Air")
                 } else if (team1Height <= team2Height) {
                     B = i * team2Height / distanceT1T2;
                 }
-    //log("InterHex Height: " + interHexHeight);
-    //log("InterHex Elevation: " + interHexElevation);
-    //log("Last Elevation: " + lastElevation);
-    //log("B: " + B)
+    log("InterHex Height: " + interHexHeight);
+    log("InterHex Elevation: " + interHexElevation);
+    log("Last Elevation: " + lastElevation);
+    log("B: " + B)
                 if (interHexElevation < lastElevation && lastElevation > team1Height && lastElevation > team2Height) {
                     los = false;
                     losReason = "Terrain Drops off at " + qrsLabel;
                     break;
                 }            
 
-                let friendlyFlag = false;
-                let friendlyHeight = 0;
-    
-                if (special !== "Overhead" && special !== "Spotter" && special !== "Defensive" && i> 1) {
-        //check for intervening friendlies in the way - can ignore if same unit
-                    //if find one, flag and note height (in case lower elevation)
-        //log("Friendlies")
-                    for (let t=0;t<fKeys.length;t++) {
-                        let fm = TeamArray[fKeys[t]];
-                        if (fm.id === team1.id || fm.id === team2.id || fm.player !== team1.player || fm.unitID === team1.unitID) {continue};
-                        if (fm.type === "Infantry" && fm.moved === false) {continue}; //ignore these infantry
-                        if (fm.hex === qrs) {
-        //log(fm.name)
-                            friendlyFlag = true;
-                            fmHeight = teamHeight(fm);
-                            friendlyHeight = Math.max(fmHeight,friendlyHeight);
-                            if (special === "Flamethrower") {friendlyHeight = 100}; //basically cant fire Flamethrower over heads of friendlies
-                        }
-                    }
-                }
-
                 lastElevation = interHexElevation;
 
-                if (interHexHeight + interHexElevation + friendlyHeight >= B) {
-                    if (friendlyFlag === true) {
-                        losReason = "Friendly at " + qrsLabel + " blocks LOS"
-                        los = false;
-                        break;
-                    }
-    //log("Terrain higher than B")
+                if (interHexHeight + interHexElevation >= B) {
+    log("Terrain higher than B")
                     //distances set to 1 for 6mm scale
-                    if (i>1) {
+                    if (i>0) {
                         if (interHex.type === 3) {
                             hexesWithBuild++;
                         }
                         if (hexesWithBuild > 1) {
                             los = false;
-                            losReason = "> 1 hexes into Building at " + qrsLabel;
+                            losReason = "> 1 hexes into Building";
                             break;
                         }
-                        if (hexesWithBuild > 1 && interHex.type < 3) {
+                        if (hexesWithBuild > 0 && interHex.type < 3) {
                             los = false;
-                            losReason = "Other side of Building at " + qrsLabel;
+                            losReason = "Other side of Building";
                             break;
                         }
 
@@ -2930,11 +2902,17 @@ log("Neither is Air")
                         if (interHex.type === 2) {
                             hexesWithTall++;
                         }
-                        if (hexesWithTall > 1 && distanceT1T2 > 3) {
+                        if (hexesWithTall > 1) {
                             los = false;
-                            losReason = "> 1 hexes through Tall terrain at " + qrsLabel; 
+                            losReason = "> 1 hexes through Tall terrain";
                             break;
                         }
+                        if (hexesWithTall > 0 && interHex.type < 2) {
+                            los = false;
+                            losReason = "Other side of Tall Terrain";
+                            break;
+                        }
+
                         if (interHex.type > 1) {
                             concealed = true;
                         }
@@ -2946,13 +2924,13 @@ log("Neither is Air")
                         }
                     }
                 } else {
-    //log("Terrain less than B")
+    log("Terrain less than B")
 
                 }
             }
             if (team2.type === "Infantry" && team2.moved === false) {
                 concealed = true //infantry teams that didnt move are concealed to all but Aircraft
-        //log("Infantry didnt move = Concealed")
+        log("Infantry didnt move = Concealed")
             }
         }
 
