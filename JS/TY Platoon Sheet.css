@@ -287,7 +287,7 @@ input[type="hidden"][name="attr_nation"]:is([value="Canada"]) ~ .header :is(h1,h
   grid-area: weaponinfo;
   display: grid;
   grid-gap: 2px;
-  grid-template-columns: 3fr 1fr 2fr 1fr 1fr 3fr;
+  grid-template-columns: 3fr 1fr 1fr 1fr 1fr 1fr 3fr;
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   background-color: white;
   text-align: center;
