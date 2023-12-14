@@ -750,7 +750,7 @@ const TY = (() => {
 
             //create array of weapon info
             let weaponArray = [];
-            let atWeapons = [];
+            let atWeapon;
             let artilleryWpn;
             let artilleryTeam = false;
 
@@ -826,27 +826,33 @@ const TY = (() => {
                     artilleryTeam = true;
                 };
 
-                if (at > 0 && art === false && minRange <= 1) {
-                    for (let a=0;a<weapon.halted;a++) {
-                        atWeapons.push(weapon);
-                    }
+                if (weapon.type === "LAW/MAW") {
+                    atWeapon = weapon;
                 }
-
                 weaponArray.push(weapon);
                 
             }
 
-            atWeapons.sort(function (a,b) {
-                if (a.at > b.at) {return -1};
-                if (a.at < b.at) {return 1};
-                if (a.at === b.at && a.fp > b.fp) {return -1};
-                if (a.at === b.at && a.fp < b.fp) {return 1};
-                return 0;
-            });
-            atWeapons.length = starthp;
-log("AT Weapons")
-log(atWeapons)
-            
+            if (atWeapon === undefined) {
+                atWeapon = {
+                    name: "Improvised AT Weapon",
+                    minRange: 1,
+                    maxRange: 1,
+                    halted: 1,
+                    moving: 1,
+                    at: 2,
+                    fp: 1,
+                    notes: "Top Attack",
+                    type: "LAW/MAW"
+                }
+            }
+
+if (type === "Infantry") {
+    log(charName)
+    log("AT Weapon")
+    log(atWeapon)
+}
+
             
             //update sheet with info
             let specials = attributeArray.special || " "
@@ -973,7 +979,7 @@ log("Special Text: " + specialText)
             this.special = special;
 
             this.weaponArray = weaponArray;
-            this.assaultWpns = atWeapons;
+            this.atWeapon = atWeapon;
             this.hitArray = [];
             this.eta = [];
             this.shooterIDs = [];
@@ -1794,7 +1800,6 @@ log(hex)
             nations: [[],[]],
             players: {},
             playerInfo: [[],[]],
-            lineArray: [],
             labmode: false,
             darkness: false,
             visibility: 70, //change if darkness etc
@@ -2485,7 +2490,7 @@ log("Unit Name: " + unitName)
             if (companyArray.length > 0) {
                 sortedArray.push(companyArray);
             }
-            
+
             for (let i=0;i<sortedArray.length;i++) {
                 let companyArray = sortedArray[i];
                 let unit = new Unit(nation,stringGen(),unitName + "/" + plts[i] + " Co",i);
@@ -3072,7 +3077,6 @@ log("Type: " + interHex.type)
     }
 
     const ActivateUnit = (msg) => {
-        RemoveLines();
         RemoveBarrageToken();
         if (!msg.selected) {
             sendChat("","No Token Selected");
@@ -3486,7 +3490,6 @@ log("Type: " + interHex.type)
     }
 
     const SpecialOrders = (msg) => {
-        RemoveLines();
         let Tag = msg.content.split(";");
         let teamID = msg.selected[0]._id;
         let specialorder = Tag[1];
@@ -3815,7 +3818,6 @@ log("Same had 2")
 
 
     const AdvanceStep = () => {
-        RemoveLines();
         RemoveBarrageToken();
         if (state.TY.nations[0].length === 0 && state.TY.nations[1].length === 0) {
             sendChat("","No Units Created Yet");
@@ -5033,7 +5035,6 @@ log("Roll: " + roll)
         let observerID = msg.selected[0]._id;
 log("In Create Barrages")        
         RemoveBarrageToken();
-        RemoveLines();
         let observerTeam = TeamArray[observerID];
         SetupCard(observerTeam.name,"Artillery",observerTeam.nation);
         if (state.TY.step !== "Artillery and Air" && observerTeam.type !== "Helicopter") {
@@ -5694,22 +5695,6 @@ log(weapon)
         }
         PrintCard();
         ProcessSaves("Artillery");
-    }
-
-    const RemoveLines = () => {
-        let lineIDArray = state.TY.LOSLines;
-        if (!lineIDArray) {
-            state.TY.LOSLines = [];
-            return;
-        }
-        for (let i=0;i<lineIDArray.length;i++) {
-            let id = lineIDArray[i];
-            let path = findObjs({_type: "path", id: id})[0];
-            if (path) {
-                path.remove();
-            }
-        }
-        state.TY.LOSLines = [];  
     }
 
     const PlaceRangedInMarker = (artilleryUnit,targetHex) => {
@@ -6622,7 +6607,6 @@ log("Charge Dist: " + chargeDist)
 
     const changeGraphic = (tok,prev) => {
         if (tok.get('subtype') === "token" && tok.get("layer") !== "map") {
-            RemoveLines();
             log(tok.get("name") + " moving");
             if ((tok.get("left") !== prev.left) || (tok.get("top") !== prev.top) || tok.get("rotation") !== prev.rotation) {
                 let team = TeamArray[tok.id];
