@@ -2544,22 +2544,7 @@ log(hex)
                     } 
 
                 }
-
-
-
-
-
-            }
-
-
-
-
-
-
-
-
-
-            
+            }            
         }
 
         if (state.TY.nations[player].includes(nation) === false) {
@@ -2600,7 +2585,6 @@ log(hex)
         name = newRank + Name(Nations[team.nation].names);
         return name;
     }
-
 
     const TokenInfo = (msg) => {
         if (!msg.selected) {
@@ -3387,12 +3371,12 @@ log("Type: " + interHex.type)
         } else if (type === "Gun") {
             specOrders = "!SpecialOrders;?{Special Order|Dig In"
         } else if (type === "Tank") {
-            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Shoot and Scoot";
+            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Shoot and Scoot|Follow Me|Cross Here";
             if (special.includes("Mine")) {
                 specOrders += "|Clear Minefield";
             }
         } else if (type === "Unarmoured Tank") {
-            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Shoot and Scoot";
+            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Shoot and Scoot|Follow Me|Cross Here";
         } else if (type === "Helicopter") {
             specOrders = "!SpecialOrders;?{Special Order|";
             if (special.includes("Passengers")) {
@@ -3421,10 +3405,6 @@ log("Type: " + interHex.type)
             abilityName = "Call Artillery";
             AddAbility(abilityName,"!CreateBarrages",char.id);
         }
-
-
-
-
 
         let types = {
             "Small Arms and Light Weapons": [],
@@ -3458,7 +3438,6 @@ log("Type: " + interHex.type)
                 smoke = true;
             }
         }
-        
 
         let weaponNum = 1;
         let weaponTypes = Object.keys(types);
@@ -3490,8 +3469,6 @@ log("Type: " + interHex.type)
                 }
             }
         }
-
-
     }
 
     const AddAbility = (abilityName,action,charID) => {
