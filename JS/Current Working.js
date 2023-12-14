@@ -2939,18 +2939,12 @@ log("Type: " + interHex.type)
         log("Infantry didnt move = Concealed")
             }
         }
-
-
     
         if (special.includes("Defensive")) {
             bulletproof = false
             facing = "Side/Rear"
         };
 
-        if (team2.special.includes("Redemption")) {
-            bulletproof = false;
-        }
-    
         let result = {
             los: los,
             losReason: losReason,
