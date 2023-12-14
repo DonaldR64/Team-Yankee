@@ -586,7 +586,6 @@ const TY = (() => {
             this.teamIDs = [];
             this.number = number;
             this.inReserve = false;
-            this.company = -1;
 
             if (!state.TY.units[id]) {
                 state.TY.units[id] = {
@@ -618,16 +617,14 @@ const TY = (() => {
             if (teamIDs.length === 0) {
                 delete state.TY.units[this.id];
                 delete UnitArray[this.id];
-            } else if (index === 0) {
-                //let auraC = team.token.get("aura1_color");
+            } else if (teamIDs.length > 0 && index === 0) {
+                let auraC = team.token.get("aura1_color");
                 let newLeader = this.teamIDs[0];
-                let newName = NameAndRank(newLeader,0,"Promote");
                 newLeader.token.set({
-                    name: newName,
                     tint_color: "transparent",
+                    aura1_color: auraC,
                 })
                 newLeader.inCommand = true;
-                newLeader.name = newName;
             } 
         }
 
@@ -657,7 +654,8 @@ const TY = (() => {
                 }
             } 
 
-            _.forEach(this.teamIDs,id => {
+            for (let i=0;i<this.teamIDs.length;i++) {
+                let id = this.teamIDs[i];
                 let team = TeamArray[id];
                 if (state.TY.conditions[id]) {
                     for (let c=0;c<conditions.length;c++) {
@@ -690,18 +688,15 @@ const TY = (() => {
                 } else if (this.player === 1) {
                     team.token.set("aura1_color",Colours.green);
                 }
-            });
+            }
         }
 
         IC() {
             if (this.type === "System Unit") {return};
             let unitLeader = TeamArray[this.teamIDs[0]];
-            unitLeader.IC(true);
-            if (this.teamIDs.length === 1) {return};
-            if (unitLeader.player === 1) {
-                _.forEach(this.teamIDs,id => {
-                    TeamArray[id].IC(true);
-                })
+            unitLeader.inCommand = true;
+            if (this.teamIDs.length === 1) {
+                return
             } else {
                 let array = this.teamIDs.map(id => {
                     let team2 = TeamArray[id];
@@ -722,9 +717,9 @@ const TY = (() => {
                     let team2 = TeamArray[a2.id];
                     let d12 = a2.dist - a1.dist;
                     if (team1.inCommand === true && d12 < 3) {
-                        team2.IC(true);
+                        team2.inCommand = true;
                     } else {
-                        team2.IC(false);
+                        team2.inCommand = false;
                     }
                 }
             }
@@ -848,8 +843,11 @@ const TY = (() => {
                 if (a.at === b.at && a.fp < b.fp) {return 1};
                 return 0;
             });
-
             atWeapons.length = starthp;
+log("AT Weapons")
+log(atWeapons)
+            
+            
             //update sheet with info
             let specials = attributeArray.special || " "
 log("Specials: " + specials)
@@ -920,13 +918,9 @@ log("Special Text: " + specialText)
                 AttributeSet(char.id,"specialText",specialText);
             }
 
-            let rank = parseInt(attributeArray.rank) || 0;
-
-            //armour
-            let front = parseInt(attributeArray.armourF);
-            let side = parseInt(attributeArray.armourS) || 0;
-            let top = parseInt(attributeArray.armourT) || 0;
-
+            if (special.includes("Team")) {
+                starthp = 1;
+            }
 
             this.id = tokenID;
             this.token = token;
@@ -936,6 +930,7 @@ log("Special Text: " + specialText)
             this.characterName = charName;
             this.characterID = char.id;
             this.unitID = unitID;
+            this.rank = parseInt(attributeArray.rank) || 0;
 
             this.type = type;    
             this.location = location;
@@ -945,7 +940,7 @@ log("Special Text: " + specialText)
 
             this.order = "";
             this.specialorder = "";
-            this.inCommand = true;
+            this.inCommand = (token.get("aura1_color") === Colours.lightblue) ? false:true;
 
             this.tactical = parseInt(attributeArray.tactical);
             this.terraindash = parseInt(attributeArray.terrain);
@@ -955,9 +950,9 @@ log("Special Text: " + specialText)
 
             this.airmove = parseInt(attributeArray.airmove) || "Unlimited";
 
-            this.armourF = front;
-            this.armourS = side;
-            this.armourT = top;
+            this.armourF = parseInt(attributeArray.armourF);
+            this.armourS = parseInt(attributeArray.armourS) || 0;
+            this.armourT = parseInt(attributeArray.armourT) || 0;
 
             this.courage = parseStat(attributeArray.courage);
             this.remount = parseStat(attributeArray.remount);
@@ -1134,23 +1129,8 @@ log("Special Text: " + specialText)
         }
 
         rally() {
-            if (this.inCommand === true) {
-                this.token.set("tint_color","transparent");
-            } else {
-                this.token.set("tint_color",Colours.black);
-            }
+            this.token.set("tint_color","transparent");
             this.suppressed = false;
-        }
-
-        IC(ic) {
-            this.inCommand = ic;
-            let colour = "transparent";
-            if (this.suppressed === true) {
-                colour = Colours.red;
-            } else if (ic === false) {
-                colour = Colours.black;
-            }
-            this.token.set("tint_color",colour);
         }
 
         landed() {
@@ -1195,10 +1175,6 @@ log(hit)
                 if (hexMap[this.hexLabel].foxholes === true && this.type === "Infantry") {bp = true};
             } 
             if (bp === "Passenger") {
-                bp = false;
-            }
-
-            if (this.special.includes("Redemption")) {
                 bp = false;
             }
 
@@ -1255,7 +1231,7 @@ log(hit)
                     if (fpRoll < weapon.fp) {
                         save.result = "minor"
                     } else {
-                        let result = this.BailOut();
+                        let result = this.Suppress();
                         PlaySound("Hit");
                         save.result = result.result;
                         save.tip += result.tip;
@@ -1264,7 +1240,7 @@ log(hit)
                 } else {
                     save.tip += "<br>Firepower Roll: " + fpRoll + " vs. " + weapon.fp + "+"; 
                     if (fpRoll < weapon.fp) {
-                        let result = this.BailOut();
+                        let result = this.Suppress();
                         save.result = result.result;
                         save.tip += result.tip;
                         if (result.result === "flees" && save.tip.charAt(0) != "💀") {
@@ -2438,8 +2414,12 @@ log(hex)
         SetupCard("Unit Creation","",nation);
 
         let player = (WarsawPact.includes(nation)) ? 0:1;
-        state.TY.companyNames[player][companyNumber] = unitName;
-
+        if (!state.TY.companyNames[player][companyNumber]) {
+            state.TY.companyNames[player][companyNumber] = unitName;
+        } else {
+            unitName = state.TY.companyNames[player][companyNumber];
+        }
+log("Unit Name: " + unitName)
         let unitMarker = Nations[nation].unitmarkers[companyNumber];
 
         //NATO - Unit is the Company, each token a Platoon and commandable
@@ -2502,6 +2482,10 @@ log(hex)
                     companyArray = [];
                 }
             }
+            if (companyArray.length > 0) {
+                sortedArray.push(companyArray);
+            }
+            
             for (let i=0;i<sortedArray.length;i++) {
                 let companyArray = sortedArray[i];
                 let unit = new Unit(nation,stringGen(),unitName + "/" + plts[i] + " Co",i);
@@ -5899,7 +5883,7 @@ log(marker);
         let closestDist = Infinity;
         for (let i=1;i<unit.teamIDs.length;i++) {
             let team2 = TeamArray[unit.teamIDs[i]];
-            if (team2.inCommand === false || team2.characterID !== team1.characterID || team2.suppressed === true) {continue};
+            if (team2.inCommand === false || team2.suppressed === true) {continue};
             let dist = oldLeader.hex.distance(team2.hex);
             if (dist < closestDist) {
                 newLeader = team2;
