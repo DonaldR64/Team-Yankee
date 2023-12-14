@@ -3553,7 +3553,7 @@ log("Type: " + interHex.type)
         }
 
         if (targetTeam.specialorder !== "") {
-            errorMsg.push("Teams can only have one Special Order per turn");
+            errorMsg.push("Only one Special Order per turn");
         }
         
         if (specialorder === "Blitz Move" || specialorder === "Dig In" || specialorder === "Clear Minefield" || specialorder === "Cross Here") {
@@ -3563,7 +3563,7 @@ log("Type: " + interHex.type)
         }
         if (specialorder === "Dig In") {
             if (targetTeam.queryCondition("Spot") === true && noun === "Team") {
-                errorMsg.push("This Team Called in Artillery and so cannot Dig In");
+                errorMsg.push("This Platoon Called in Artillery and so cannot Dig In");
             }
         }
 
@@ -3607,18 +3607,28 @@ log("Type: " + interHex.type)
         
         let condition;
         outputCard.body.push(line);
+        
         switch (specialorder) {
             case "Blitz Move":
                 if (roll >= stat) {
-                    outputCard.body.push("The Unit Leader and any Teams that are In Command may immediately Move up to 2 hexes");
-                    outputCard.body.push("Teams may make a normal Tactical Move, but if Hold are not considered to have Moved and can shoot at a Halted ROF");
+                    if (team.player === 1) {
+                        outputCard.body.push("The Platoon may immediately Move up to 2 hexes");
+                        outputCard.body.push("It may make a normal Tactical Move, but if Hold are not considered to have Moved and can shoot at a Halted ROF");
+                    } else {
+                        outputCard.body.push("The Platoon Leader and any Platoons that are In Command may immediately Move up to 2 hexes");
+                        outputCard.body.push("Platoons may make a normal Tactical Move, but if Hold are not considered to have Moved and can shoot at a Halted ROF");
+                    }
                 } else {    
-                    outputCard.body.push("Teams from the Unit cannot Dash and automatically suffer a +1 to hit penalty as if they had Moved Out of Command");
+                    outputCard.body.push("Platoon(s) cannot Dash and automatically suffer a +1 to hit penalty as if they had Moved Out of Command");
                     specialorder = "Failed Blitz";
                 }
                 break;
             case "Cross Here":
-                outputCard.body.push("Any Teams (including the Unit Leader) from the Unit rolling to Cross Difficult Terrain within 3 hexes of where the Unit Leader crosses improve their chance of crossing safely, reducing the score they need to pass a Cross Test by 1.");
+                if (team.player === 1) {
+                    outputCard.body.push("Any Platoons (including the Unit Leader) from the Unit rolling to Cross Difficult Terrain within 3 hexes of where the Unit Leader crosses improve their chance of crossing safely, reducing the score they need to pass a Cross Test by 1.");
+                } else {
+                    outputCard.body.push("The Platoon improves its chance of crossing safely, reducing the score needed to pass a Cross Test by 1.");
+                }
                 break;
             case "Dig In":
                 let line;
@@ -3639,36 +3649,50 @@ log("Type: " + interHex.type)
                 break;
             case "Follow Me":
                 if (roll >= stat) {
-                    outputCard.body.push("In Command Teams may immediately Move directly forward up to an additional 2 hexes, remaining In Command.")
+                    if (team.player === 0) {
+                        outputCard.body.push("In Command Platoons may immediately Move directly forward up to an additional 2 hexes, remaining In Command.")
+                    } else {
+                        outputCard.body.push("The Platoon may immediately Move directly forward up to an additional 2 hexes")
+                    }
                 } else {
-                    outputCard.body.push("Teams remain where they are")
+                    outputCard.body.push("Platoon(s) remain where they are")
                     specialorder = "Failed Follow Me";
                 }
-                outputCard.body.push("Teams may not fire");
+                outputCard.body.push("Platoon(s) may not fire");
                 break;
             case "Shoot and Scoot":
                 if (roll >= stat) {
-                    outputCard.body.push("The Leader and any Teams that are In Command and did not Move in the Movement Step may immediately Move up to 2 hexes");
+                    if (team.player === 0) {
+                        outputCard.body.push("The Leader and any Platoons that are In Command and did not Move in the Movement Step may immediately Move up to 2 hexes");
+                    } else {
+                        outputCard.body.push("The Platoon may immediately Move up to 2 hexes");
+                    }
                 } else {
                     outputCard.body.push("Teams remain where they are")
                 }
                 break;
             case "Clear Minefield":
-                outputCard.body.push('The Team is ordered to clear a Minefield within 2 Hexes');
-                outputCard.body.push("That Team counts as having Dashed, and cannot Shoot or Assault");
-                outputCard.body.push("The Minefield can be removed immediately");
-                outputCard.body.push("Other Teams may be given the same order");   
+                if (team.player === 0) {
+                    outputCard.body.push('The Platoon is ordered to clear a Minefield within 2 Hexes');
+                    outputCard.body.push("That Platoon counts as having Dashed, and cannot Shoot or Assault");
+                    outputCard.body.push("The Minefield can be removed immediately");
+                    outputCard.body.push("Other Platoons may be given the same order");   
+                } else {
+                    outputCard.body.push('The Platoon clears a Minefield within 2 Hexes');
+                    outputCard.body.push("That Platoon counts as having Dashed, and cannot Shoot or Assault");
+                    outputCard.body.push("The Minefield can be removed immediately");
+                }
                 condition = "Dash";
                 targetTeam.moved = true;
                 break;
             case "Land/Take Off":
                 if (targetTeam.landed() === true) {
-                    outputCard.body.push("The Helicopter(s) Take Off and may now move");
+                    outputCard.body.push("The Helicopters Take Off and may now move");
                     _.forEach(targetArray,team => {
                         team.removeCondition("Land/Take Off");
                     })
                 } else {
-                    outputCard.body.push('The Helicopter(s) land. They may not land within 4 hexes of an enemy team');
+                    outputCard.body.push('The Helicopters land. They may not land within 4 hexes of an enemy team');
                     outputCard.body.push('Passengers may embark/disembark the following turn');
                     condition = "Land/Take Off";
                 }
