@@ -2444,11 +2444,12 @@ log(hex)
 
         //NATO - Unit is the Company, each token a Platoon and commandable
         //WARPACT - Unit is the Company, but only lead token in Co is Commandable, larger unit is formation, not tracked in game
+        plts = ["1st","2nd","3rd","4th","5th"];
 
         if (player === 1) {
             //NATO
             for (let i=0;i<teamIDs.length;i++) {
-                let unit = new Unit(nation,stringGen(),unitName + "/Platoon " + rowLabels[i], companyNumber);
+                let unit = new Unit(nation,stringGen(),unitName + "/" + plts[i] + " Plt", companyNumber);
                 let team = new Team(teamIDs[i],unit.id);
                 if (!team) {continue};
                 if (team.special.includes("HQ")) {
@@ -2502,7 +2503,7 @@ log(hex)
             }
             for (let i=0;i<sortedArray.length;i++) {
                 let companyArray = sortedArray[i];
-                let unit = new Unit(nation,stringGen(),unitName + "/Co " + rowLabels[i],i);
+                let unit = new Unit(nation,stringGen(),unitName + "/" + plts[i] + " Co",i);
                 let num = 0
                 for (let j=0;j<companyArray.length;j++) {
                     let id = companyArray[j];
