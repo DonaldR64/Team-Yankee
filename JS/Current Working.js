@@ -3367,7 +3367,7 @@ log("Type: " + interHex.type)
 
         let specOrders;
         if (type === "Infantry") {
-             specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Dig In|Shoot and Scoot|Clear Minefield"
+             specOrders = "!SpecialOrders;?{Special Order|Mount|Blitz Move|Dig In|Shoot and Scoot|Clear Minefield"
         } else if (type === "Gun") {
             specOrders = "!SpecialOrders;?{Special Order|Dig In"
         } else if (type === "Tank") {
@@ -3375,8 +3375,14 @@ log("Type: " + interHex.type)
             if (special.includes("Mine")) {
                 specOrders += "|Clear Minefield";
             }
+            if (special.includes("Passengers")) {
+                specOrders += "|Dismount";
+            }
         } else if (type === "Unarmoured Tank") {
             specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Shoot and Scoot|Follow Me|Cross Here";
+            if (special.includes("Passengers")) {
+                specOrders += "|Dismount";
+            }
         } else if (type === "Helicopter") {
             specOrders = "!SpecialOrders;?{Special Order|";
             if (special.includes("Passengers")) {
@@ -3384,16 +3390,12 @@ log("Type: " + interHex.type)
             }
             specOrders += "Blitz Move|Shoot and Scoot";
         }
+
         specOrders += "}";
 
         if (type !== "Aircraft" && type !== "System Unit") {
             abilityName = "Special Order";
             AddAbility(abilityName,specOrders,char.id);
-        }
-
-        if (type === "Infantry") {
-            abilityName = "Mount";
-            AddAbility(abilityName,"!Mount;@{selected|token_id};@{target|Transport|token_id}",char.id);
         }
 
         if (team.cross > 1) {
