@@ -2454,6 +2454,9 @@ log(hex)
                 if (!team) {continue};
                 if (team.special.includes("HQ")) {
                     unit.name = unitName + "/HQ";
+                    cm = Nations[nation].flag
+                } else {
+                    cm = "status_" + companyMarkers[i];
                 }
                 unit.add(team);
                 let name = NameAndRank(team,i);    
@@ -2469,9 +2472,7 @@ log(hex)
                     showname: true,
                     statusmarkers: unitMarker,
                 });
-                if (team.special.includes("HQ")) {
-                    team.token.set(Nations[nation].flag,true);
-                }
+                team.token.set(cm,true);
                 if (team.type === "Infantry" && hp > 1) {
                     team.token.set({
                         bar1_value: hp,
