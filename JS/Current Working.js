@@ -1833,7 +1833,7 @@ log(hex)
             minelets: [[],[]],
             conditions: {},
             teams: {}, //teamIDs -> unit and formation IDs
-            unitNumbers: [0,0], //unit #s for each player
+            companyNames: [{},{}],
             units: {},//unitIDs -> name
             passengers: {},//keyed on IDs of transports, arrays of passengerIDs
             currentUnitID: "",
@@ -2420,7 +2420,7 @@ log(hex)
         if (!msg.selected) {return};
         let Tag = msg.content.split(";");
         let unitName = Tag[1];
-        let battalionNumber = Tag[2];
+        let companyNumber = Tag[2];
 
         let teamIDs = [];
         for (let i=0;i<msg.selected.length;i++) {
@@ -2438,9 +2438,9 @@ log(hex)
         SetupCard("Unit Creation","",nation);
 
         let player = (WarsawPact.includes(nation)) ? 0:1;
-        let unitNumber = state.TY.unitNumbers[player];
-        state.TY.unitNumbers[player]++;
-        let unitMarker = Nations[nation].unitmarkers[unitNumber];
+        state.TY.companyNames[player][companyNumber] = unitName;
+
+        let unitMarker = Nations[nation].unitmarkers[companyNumber];
 
         //NATO - Unit is the Company, each token a Platoon and commandable
         //WARPACT - Unit is the Company, but only lead token in Co is Commandable, larger unit is formation, not tracked in game
@@ -2448,7 +2448,7 @@ log(hex)
         if (player === 1) {
             //NATO
             for (let i=0;i<teamIDs.length;i++) {
-                let unit = new Unit(nation,stringGen(),unitName + "/Platoon " + rowLabels[i], unitNumber);
+                let unit = new Unit(nation,stringGen(),unitName + "/Platoon " + rowLabels[i], companyNumber);
                 let team = new Team(teamIDs[i],unit.id);
                 if (!team) {continue};
                 if (team.special.includes("HQ")) {
@@ -2468,6 +2468,9 @@ log(hex)
                     showname: true,
                     statusmarkers: unitMarker,
                 });
+                if (team.special.includes("HQ")) {
+                    team.token.set(Nations[nation].flag,true);
+                }
                 if (team.type === "Infantry" && hp > 1) {
                     team.token.set({
                         bar1_value: hp,
@@ -2481,53 +2484,53 @@ log(hex)
         } else if (player === 0) {
             //organize tokens into units
             //HQ for battalion HQ, then main (tank or infantry) organized into co of 3, then non in singles
-            let batName = unitName;
-            let idArray = [];
-            let company = 0;
+            //unitName is now Battalion Name and companyNumber is really Battalion Number
+
+            //sorts large battalion into companys of tokens
+            let sortedArray = [];
+            let companyArray = [];
             for (let i=0;i<teamIDs.length;i++) {
                 let id = teamIDs[i];
                 let token = findObjs({_type:"graphic", id: id})[0];
                 let char = getObj("character", token.get("represents")); 
-                if (!char) {sendChat("","No Character?"); return}
-                idArray.push(id);
-                let charName = char.get("name");
-log(charName)
-                let cm = "";
-                if (Attribute(char,"special").includes("HQ")) {
-                    unitName = batName + " HQ";
-                } else if (teamIDs.length > 1) {
-                    unitName = batName + " Co " + (company+1);
-                    cm = companyMarkers[company];
-                    company++;
-                } else {
-                    unitName = char.get("name").replace(Attribute(char,"nation") + " ","");
-                    company++;
+                if (!char) {sendChat("","No Character?"); return};
+                companyArray.push(id);
+                if (Attribute(char,"special").includes("HQ") || companyArray.length >= 3) {
+                    sortedArray.push(companyArray);
+                    companyArray = [];
                 }
-log(unitName)
-log(cm)
-                let unit = new Unit(nation,stringGen(),unitName,unitNumber);
-                for (let j=0;j<idArray.length;j++) {
-                    let team = new Team(idArray[j],unit.id);
+            }
+            for (let i=0;i<sortedArray.length;i++) {
+                let companyArray = sortedArray[i];
+                let unit = new Unit(nation,stringGen(),unitName + "/Co " + rowLabels[i],i);
+                let num = 0
+                for (let j=0;j<companyArray.length;j++) {
+                    let id = companyArray[j];
+                    let team = new Team(id,unit.id);
+                    if (!team) {continue};
+                    if (team.special.includes("HQ")) {
+                        unit.name = unitName + "/HQ";
+                        cm = Nations[nation].flag
+                    } else {
+                        cm = "status_" + companyMarkers[i];
+                    }
                     unit.add(team);
-                    unit.company = Math.max(company-1,0);
+                    let name = NameAndRank(team,num);    
+                    num++;
+                    team.name = name;
                     let hp = parseInt(team.starthp);
                     let r = (team.type === "Infantry") ? 20:0.1;
-                    let aura = (team.special.includes("HQ") || j === 0) ? Colours.green:"transparent";
-                    let name = (team.special.includes("HQ") || (j === 0 && teamIDs.length > 1)) ? NameAndRank(team,j,"Promoted"):NameAndRank(team,j);
-                  
-                    team.name = name;
+                    let colour = (j===0) ? Colours.green:"transparent";
                     team.token.set({
                         name: name,
                         tint_color: "transparent",
-                        aura1_color: aura,
+                        aura1_color: colour,
                         aura1_radius: r,
                         showplayers_aura1: true,
                         showname: true,
                         statusmarkers: unitMarker,
                     });
-                    if (cm !== "") {
-                        team.token.set("status_" + cm,true);
-                    }
+                    team.token.set(cm,true);
                     if (team.type === "Infantry" && hp > 1) {
                         team.token.set({
                             bar1_value: hp,
@@ -2537,9 +2540,24 @@ log(cm)
                             playersedit_bar1: true,
                         });
                     } 
+
                 }
-                idArray = [];
+
+
+
+
+
             }
+
+
+
+
+
+
+
+
+
+            
         }
 
         if (state.TY.nations[player].includes(nation) === false) {
@@ -2552,10 +2570,7 @@ log(cm)
     const NameAndRank = (team,i,note) => {
         let name = team.characterName.replace(team.nation + " ","");
         let unit = UnitArray[team.unitID];
-        let un = unit.number;
-        if (unit.player === 0) {
-            un = unit.company;
-        }
+        let un = parseInt(unit.number);
         let letter = rowLabels[un];
         if (team.type.includes("Tank")) {
             name = name.replace(team.nation + " ","");
