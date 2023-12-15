@@ -5,94 +5,54 @@
 	"notes": ["For any OP Must Field Artillery Unit"],
 	"sections": [
 		{"name": "Core Brigade Formations", "formations": [
-			{"id": 501, "name": "T-72M Tank Battalion","pts": 0,"upgrades": [1,10,11,12,13,14,15,16,17,18,115,116,117,118,65,66,67,68,75,76,77,78,79]},
-			{"id": 502, "name": "T-62 Tank Battalion","pts": 0,"upgrades": [21,25,26,27,28,29,30,115,116,117,118,65,66,67,68,75,76,77,78,79]},
-            {"id": 503, "name": "T-55 Tank Battalion","pts": 0,"upgrades": [41,42,45,46,47,48,49,50,51,115,116,117,118,65,66,67,68,75,76,77,78,79]},
-            {"id": 504, "name": "BMP-1 Mech Battalion","pts": 0,"upgrades": [61,65,66,67,68,115,116,117,118,120,121,10,11,12,13,14,15,16,17,18,21,25,26,27,28,29,30,41,42,45,46,47,48,49,50,51]},
-            {"id": 505, "name": "BTR Mech Battalion","pts": 0,"upgrades": [71,75,76,77,78,79,115,116,117,118,120,121,125,126,10,11,12,13,14,15,16,17,18,21,25,26,27,28,29,30,41,42,45,46,47,48,49,50,51]}
+			{"id": 501, "name": "T-72M Tank Battalion","units": "1 HQ Platoon, 2x T-72M Companies (3 Platoons each)","pts": 67,"upgrades": [11,12,41,51,61,71]},
+			{"id": 502, "name": "T-62 Tank Battalion","units": "1 HQ Platoon, 2x T-62 Companies (3 Platoons each)","pts": 32,"upgrades": [21,41,51,61,71]},
+      {"id": 503, "name": "T-55A Tank Battalion","units": "1 HQ Platoon, 2x T-55A Companies (3 Platoons each)","pts": 26,"upgrades": [31,41,51,61,71]},
+      {"id": 504, "name": "BMP-1 Mech Battalion","units": "1 HQ Platoon w/ BMP-1, 2x BMP-1 Companies (3 Mech. Inf. Platoons w/ BMP-1s)","pts": 30,"upgrades": [41,11,12,21,31,61,71,120,121]},
+      {"id": 505, "name": "BTR Mech Battalion","units": "1 HQ Platoon w/ BTR-60, 2x BTR Mech Companies (3 Mech. Inf. Platoons w/ BTR-60s)","pts": 22,"upgrades": [51,52,11,12,21,31,61,71,120,121,125]}
 		]},
 
 		{"name": "Divisional Level Support", "formations": [
-			{"id": 520, "name": "T72M Tank Company","pts": 0,"upgrades": [10,11,12,13,14,15,16,17,18]},
-            {"id": 521, "name": "T62 Tank Company","pts": 0,"upgrades": [25,26,27,28,29,30]},
-			{"id": 522, "name": "T55 Tank Company","pts": 0,"upgrades": [45,46,47,48,49,50,51]},
-			{"id": 523, "name": "BMP-1 Mech Company","pts": 0,"upgrades": [65,66,67,68]},
-			{"id": 524, "name": "BTR Mech Company","pts": 0,"upgrades": [75,76,77,78,79]}
+			{"id": 520, "name": "T72M Tank Company (3 Platoons)","pts": 28},
+      {"id": 521, "name": "T62 Tank Company (3 Platoons)","pts": 13},
+			{"id": 522, "name": "T55A Tank Company (3 Platoons)","pts": 11},
+			{"id": 523, "name": "BMP-1 Mech Company (3 Mech Inf. Platoons with BMP-1s)", "pts": 14},
+			{"id": 524, "name": "BTR Mech Company (3 Mech Inf. Platoons with BTR-60s)", "pts": 10}
 		]},
 
 	    {"name": "Corps Level Support","formations":[
-            {"id": 530, "name": "2S1 Carnation Battery","pts": 0,"upgrades": [120,121]},
-            {"id": 531, "name": "BM-21 Hail Rocket Battery","pts": 0,"upgrades": [150,151]},
-            {"id": 532, "name": "2S3 Acacia Battery","pts": 0,"upgrades": [140,141]},
-            {"id": 533, "name": "BTR-60 OP","pts": 1},
-            {"id": 534, "name": "Spandrel AT Platoon","pts": 0,"upgrades": [125,126]},
-            {"id": 535, "name": "BRDM-2 Scout Platoon","pts": 0,"upgrades": [130,131]},
-            {"id": 536, "name": "AA Platoon","pts": 0,"upgrades": [160,161,165,166,170,171]},
-            {"id": 537, "name": "Helicopter Company","pts": 0,"upgrades": [180,181,190,191]},
-            {"id": 538, "name": "SU-25 Frogfoot Company","pts": 0,"upgrades": [200,201,202]}
+        {"id": 530, "name": "2S1 Carnation Battery","pts": 0,"upgrades": [120,121]},
+        {"id": 531, "name": "BM-21 Hail Rocket Battery","pts": 0,"upgrades": [150,151]},
+        {"id": 532, "name": "2S3 Acacia Battery","pts": 0,"upgrades": [140,141]},
+        {"id": 533, "name": "BTR-60 OP","pts": 1},
+        {"id": 534, "name": "Spandrel AT Platoon","pts": 0,"upgrades": [125,126]},
+        {"id": 535, "name": "BRDM-2 Scout Platoon","pts": 0,"upgrades": [130,131]},
+        {"id": 536, "name": "AA Platoon","pts": 0,"upgrades": [160,161,165,166,170,171]},
+        {"id": 537, "name": "Helicopter Company","pts": 0,"upgrades": [180,181,190,191]},
+        {"id": 538, "name": "SU-25 Frogfoot Company","pts": 0,"upgrades": [200,201,202]}
 	    ]}
 
 	],
 
 	"upgrades": [
+      	{"id": 11, "name": "T-72M Tank Company (3 Platoons)", "pts": 28},
+      	{"id": 12, "name": "Any T-72M Company: Fit one Platoon with Mine Clearing Devices", "pts": 1},
+      	{"id": 21, "name": "T-62 Tank Company (3 Platoons)", "pts": 13},
+        {"id": 31, "name": "T-55 Tank Company (3 Platoons)", "pts": 11},
 
-      	{"id": 1, "name": "HQ - 1 T-72M", "pts": 3},
-
-      	{"id": 10, "name": "Company: 3x T-72M", "pts": 7},
-      	{"id": 11, "name": "Company: 4x T-72M", "pts": 10},
-      	{"id": 12, "name": "Company: 5x T-72M", "pts": 13},
-      	{"id": 13, "name": "Company: 6x T-72M", "pts": 16},
-      	{"id": 14, "name": "Company: 7x T-72M", "pts": 20},
-      	{"id": 15, "name": "Company: 8x T-72M", "pts": 24},
-      	{"id": 16, "name": "Company: 9x T-72M", "pts": 28},
-      	{"id": 17, "name": "Company: 10x T-72M", "pts": 32},
-      	{"id": 18, "name": "Any T-72M Company: Fit up to 3 T-72Ms with Mine Clearing Devices for +1 point", "pts": 1},
-
-        {"id": 21, "name": "HQ - 1 T-62", "pts": 2},
-
-      	{"id": 25, "name": "Company: 5x T-62", "pts": 7},
-      	{"id": 26, "name": "Company: 6x T-62", "pts": 8},
-      	{"id": 27, "name": "Company: 7x T-62", "pts": 9},
-      	{"id": 28, "name": "Company: 8x T-62", "pts": 11},
-      	{"id": 29, "name": "Company: 9x T-62", "pts": 13},
-      	{"id": 30, "name": "Company: 10x T-62", "pts": 15},
+        {"id": 41, "name": "BMP-1 Mech Company (3 Mech Inf. Platoons with BMP-1s)", "pts": 14},
     
-        {"id": 41, "name": "HQ - 1 T-55", "pts": 1},
-        {"id": 42, "name": "Fit Skirts to HQ", "pts": 1},
+        {"id": 51, "name": "BTR Mech Company (3 Mech Inf. Platoons with BTR-60s)", "pts": 14},
+        {"id": 52, "name": "Sagger Missile Team w/ BTR-60", "pts": 2},
 
-      	{"id": 45, "name": "Company: 5x T-55", "pts": 5},
-      	{"id": 46, "name": "Company: 6x T-55", "pts": 6},
-      	{"id": 47, "name": "Company: 7x T-55", "pts": 7},
-      	{"id": 48, "name": "Company: 8x T-55", "pts": 9},
-      	{"id": 49, "name": "Company: 9x T-55", "pts": 10},
-      	{"id": 50, "name": "Company: 10x T-55", "pts": 11},
-        {"id": 51, "name": "Fit Skirts to all T-55s in a Company", "pts": 1},
 
-        {"id": 61, "name": "HQ - AK-74 Team & BMP-1", "pts": 1},
+        {"id": 61, "name": "AA Company: ZSU-23-4 Shilka", "pts": 3},
+        {"id": 71, "name": "AA Company: ZSU-57-2", "pts": 2},
 
-        {"id": 65, "name": "Company: 10x AK-47 Rifle Teams, 9x RPG-7 Teams, 2x LMG Teams, 12x BMP-1s", "pts": 14},
-        {"id": 66, "name": "Company: 7x AK-47 Rifle Teams, 6x RPG-7 Teams, 2x LMG Teams, 9x BMP-1s", "pts": 10},
-        {"id": 67, "name": "Company: 4x AK-47 Rifle Teams, 3x RPG-7 Teams, 4x BMP-1s", "pts": 5},
-        {"id": 68, "name": "Add 1 SA-7 AA Team and Transport to a Company", "pts": 1},
+        {"id": 120, "name": "2S1 Carnation Battery: (3 2S1s)", "pts": 4},
+        {"id": 121, "name": "2S1 Carnation Battery: (6 2S1s)", "pts": 8},
 
-        {"id": 71, "name": "HQ - AK-74 Team & BTR60", "pts": 1},
-
-        {"id": 75, "name": "Company: 19x AK-47 Rifle Teams, 3x RPG-7 Teams, 2x LMG Teams, 12x BTR-60s", "pts": 10},
-        {"id": 76, "name": "Company: 13x AK-47 Rifle Teams, 2x RPG-7 Teams, 2x LMG Teams, 9x BTR-60s", "pts": 7},
-        {"id": 77, "name": "Company: 7x AK-47 Rifle Teams, 1x RPG-7 Teams, 4x BTR-60s", "pts": 4},
-        {"id": 78, "name": "Add 1 SA-7 AA Team and Transport to a Company", "pts": 1},
-        {"id": 79, "name": "Add 1 AT-3 Sagger Team and Transport to a BTR Company", "pts": 1},
-
-        {"id": 115, "name": "AA Company: 2x ZSU-23-4 Shilka", "pts": 2},
-        {"id": 116, "name": "AA Company: 4x ZSU-23-4 Shilka", "pts": 4},
-        {"id": 117, "name": "AA Company: 2x ZSU-57-2", "pts": 1},
-        {"id": 118, "name": "AA Company: 4x ZSU-57-2", "pts": 2},
-
-        {"id": 120, "name": "Howitzer Battery: 3x 2S1 Carnations", "pts": 4},
-        {"id": 121, "name": "Howitzer Battery: 6x 2S1 Carnations", "pts": 8},
-
-        {"id": 125, "name": "AT Platoon: 2x Spandrel", "pts": 1},
-        {"id": 126, "name": "AT Platoon: 3x Spandrel", "pts": 2},
+        {"id": 125, "name": "Spandrel AT Platoon", "pts": 2},
 
         {"id": 130, "name": "2x BRDM Scouts", "pts": 1},
         {"id": 131, "name": "4x BRDM Scouts", "pts": 2},
