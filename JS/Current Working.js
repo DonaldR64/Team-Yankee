@@ -49,11 +49,7 @@ const TY = (() => {
         "2nd Gen Thermal Imaging": 40,
     }
 
-    const blast = {
-        mortar: 0,
-        artillery: 1,
-        salvo: 3,
-    }
+    const blastR = [0,1,2]; //Blast sizes for Mortar,Normal Art, Salvo
 
     const artilleryTypes = ["Artillery","Salvo","Mortar"];
 
@@ -703,6 +699,12 @@ const TY = (() => {
         IC() {
             if (this.type === "System Unit") {return};
             let unitLeader = TeamArray[this.teamIDs[0]];
+            if (!unitLeader) {
+                log("No unit Leader?")
+                log(this.name)
+                return;
+            }
+
             unitLeader.inCommand = true;
             if (this.teamIDs.length === 1) {
                 return
@@ -981,6 +983,7 @@ log("Special Text: " + specialText)
             this.artilleryWpn = artilleryWpn;
             this.spotAttempts = 0;
             this.rangedInHex = {};
+            this.inReserve = false;
 
             this.hex = hex; //axial
             this.hexLabel = hexLabel; //doubled
@@ -5026,7 +5029,6 @@ log("In Create Barrages")
             return;
         }
 
-
         let img = Nations[observerTeam.nation].barrageimage;
         img = getCleanImgSrc(img);
         let represents = "-NMza8uwbYRMNnvLa-VU";
@@ -5058,7 +5060,7 @@ log("In Create Barrages")
         state.TY.barrageID = newToken.id;
 
         let num = 100 + parseInt(observerTeam.player);
-        let barrageTeam = new Team(newToken.id,num,num);
+        let barrageTeam = new Team(newToken.id,num);
 
         let ai = ArtilleryInfo(newToken.id,observerTeam,represents);//adds artillery options to barrage token
 log("Artillery Info")
@@ -5073,6 +5075,9 @@ log(ai)
         }
         if (two === "Salvo Only") {
             newToken.set("aura1_radius",200);
+        }
+        if (two === "Mortar Only") {
+            newToken.set("aura1_radius",0);
         }
         if (unitIDs.length === 0) {
             outputCard.body.push("No Available Weapons");
@@ -5093,6 +5098,7 @@ log(ai)
         log("Spotter")
         log(spotter)
         let unitIDs = [];
+        let mortar = false;
         let normal = false;
         let salvo = false;
         let artUnits = [];
@@ -5104,14 +5110,15 @@ log(ai)
         if (spotter.type === "Aircraft" || spotter.type === "Helicopter") {
             artUnits.push(UnitArray[spotter.unitID]);
         } else {
-        log("Units")
-            _.each(UnitArray,unit => {
-                log(unit)
-                if (unit.player === spotter.player && unit.artillery === true && unit.pinned() === false && unit.specialorder !== "Failed Blitz" && unit.specialorder.includes("Dig In") === false && unit.type !== "Aircraft" && unit.type !== "Helicopter" && unit.inReserve === false) {
+            _.each(TeamArray,team => {
+                let unit = UnitArray[team.unitID];
+                if (team.player === spotter.player && team.artillery === true && team.suppressed === false && team.specialorder !== "Failed Blitz" && team.specialorder.includes("Dig In") === false && team.type !== "Aircraft" && team.type !== "Helicopter" && team.inReserve === false) {
                     artUnits.push(unit);
                 }
             });
         }
+
+        artUnits = [...new Set(artUnits)];
 
 log ("Art Units")
 log(artUnits)
@@ -5119,7 +5126,7 @@ log(artUnits)
             let unit = artUnits[i];
             for (let j=0;j<unit.teamIDs.length;j++) {
                 let team = TeamArray[unit.teamIDs[j]];
-                if (team.special.includes("Artillery") === false || team.fired === true || team.aaFired === true || team.suppressed === true) {continue};
+                if (team.artillery === false || team.fired === true || team.aaFired === true || team.suppressed === true) {continue};
                 if (team.type !== "Aircraft" && team.type !== "Helicopter") {
                     if (hexMap[team.hexLabel].terrain.includes("Building") || team.moved === true) {
                         continue; //moved or in building
@@ -5130,6 +5137,9 @@ log(weapon)
                 if (!weapon) {continue}
                 if ((weapon.notes.includes("One Shot") || weapon.notes.includes("One-Shot")) && team.token.get(SM.oneshot) === true) {continue};
 
+                if (weapon.moving === "Mortar" || weapon.halted === "Mortar") {
+                    mortar = true;
+                }
                 if (weapon.moving === "Artillery" || weapon.halted === "Artillery") {
                     normal = true;
                 }
@@ -5175,10 +5185,13 @@ log(weapon)
         }
 
         let two = false;
+        if (mortar === true && normal === false && salvo === false) {
+            two = "Mortar Only";
+        }
         if (salvo === true && normal === true) {
             two = true;
         }
-        if (salvo === true && normal === false) {
+        if (salvo === true && normal === false && mortar === false) {
             two = "Salvo Only";
         }
         let res = {
@@ -5217,14 +5230,15 @@ log(weapon)
         for (let i=0;i<artUnitIDs.length;i++) {
             let unitID = artUnitIDs[i];
             let unit = UnitArray[unitID];
-            if (unit.type === "Aircraft" || unit.type === "Helicopter") {
+            let uL = TeamArray[unit.teamIDs[0]];
+            if (uL.type === "Aircraft" || uL.type === "Helicopter") {
                 air = true;
             }
             artUnits.push(unit);
         }
         SetupCard("Barrage Check","",observerTeam.nation);
         //check LOS to Observer
-        let observerLOS = LOS(observerID,barrageID,"Spotter");
+        let observerLOS = LOS(observerID,barrageID);
         if (observerLOS.los === false) {
             outputCard.body.push("Observer does not have LOS to this point");
             outputCard.body.push("Only Ranged In Artillery can be called in");
@@ -5233,7 +5247,7 @@ log(weapon)
         } 
         //check "Danger Close" - template within 2"  or 3" of edge if Salvo Template (6mm)
         let keys = Object.keys(TeamArray);
-        let tooClose = [false,false];
+        let tooClose = [false,false,false]; //mortar/normal/salvo
 
         for (let i=0;i<keys.length;i++) {
             let team2 = TeamArray[keys[i]];
@@ -5242,12 +5256,14 @@ log(weapon)
             let distance2 = team2.hex.distance(barrageTeam.hex);
             if (air === true) {
                 //4" from edge of template 6mm
-                if (distance2 < (2+4)) {tooClose[0] = true};
-                if (distance2 < (4+4)) {tooClose[1] = true};
+                for (let i=0;i<3;i++) {
+                    if (distance2 < (blastR[i] + 4)) {tooClose[i] = true};
+                }
             } else {
                 //2" from edge of template or 3" for Salvo 6mm
-                if (distance2 < (2+2)) {tooClose[0] = true};
-                if (distance2 < (4+3)) {tooClose[1] = true};
+                for (let i=0;i<3;i++) {
+                    if (distance2 < (blastR[i] + Math.max(i+1,2))) {tooClose[i] = true};
+                }
             }
         }
         outputCard.body.push("[U]Units[/u]");
@@ -5264,18 +5280,22 @@ log(weapon)
             if (artTeam.artilleryWpn.moving === "Salvo" || artTeam.artilleryWpn.halted === "Salvo") {
                 salvo = true;
             }
+            let mortar = false;
+            if (artTeam.artilleryWpn.moving === "Mortar" || artTeam.artilleryWpn.halted === "Mortar") {
+                mortar = true;
+            }
 
             let smoke = false;
             if (artTeam.artilleryWpn.notes.includes("Smoke Bombardment") && state.TY.smokeScreens[artUnit.player].includes(artUnit.id) === false) {
                 smoke = true;
             }
-            if (tooClose[0] === true) {
+            if ((tooClose[0] === true && mortar === true) || tooClose[1] === true) {
                 if (smoke === true) {
                     outputCard.body.push("[#FF0000]Too Close except for Smoke[/#]");
                 } else {
                     outputCard.body.push("[#FF0000]Too Close to Friendlies[/#]");
                 }
-            } else if (tooClose[1] === true && salvo === true) {
+            } else if (tooClose[2] === true && salvo === true) {
                 outputCard.body.push(name + ": [#FF0000]Too Close to Friendlies[/#]");
             }
 
@@ -5287,10 +5307,8 @@ log(weapon)
                 artTeam = TeamArray[artIDs[j]];
                 let dist = artTeam.hex.distance(barrageTeam.hex);
                 if (hexMap[artTeam.hexLabel].terrain.includes("Offboard") ){
-                    dist += 100; //5km off map
+                    dist += 50; //5km off map
                 }
-
-
                 if (dist > artTeam.artilleryWpn.maxRange || dist < artTeam.artilleryWpn.minRange) {
                     oor = true;
                     continue;
@@ -6052,6 +6070,9 @@ log(results)
     
 
     const InCC = (team1,newHex) => {
+        return false
+
+
 log(team1.name + " is Moving")
         if (team1.token.get("layer") === "walls" || state.TY.step !== "Assault" ) {return};
         let unit = UnitArray[team1.unitID];
@@ -6651,7 +6672,7 @@ log("Charge Dist: " + chargeDist)
                 //tok.set("rotation",theta);
                 FlipGraphic(tok.get("rotation"),tok,team);
                 MovementSound(team);
-
+/*
                 if (state.TY.passengers[tok.id]) {
                     //carrying passengers
                     let passengers = state.TY.passengers[tok.id];
@@ -6671,7 +6692,7 @@ log("Charge Dist: " + chargeDist)
                         hexMap[newHexLabel].teamIDs.push(passengerTeam.id);
                     }
                 }
-
+*/
                 if (state.TY.turn > 0) {
                     if (team.hexLabel !== team.prevHexLabel) {
                         if (team.moved === false) {
