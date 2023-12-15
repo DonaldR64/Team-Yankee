@@ -9,7 +9,7 @@
 			{"id": 502, "name": "T-62 Tank Battalion","units": "1 HQ Platoon, 2x T-62 Companies (3 Platoons each)","pts": 32,"upgrades": [21,41,51,61,71]},
       {"id": 503, "name": "T-55A Tank Battalion","units": "1 HQ Platoon, 2x T-55A Companies (3 Platoons each)","pts": 26,"upgrades": [31,41,51,61,71]},
       {"id": 504, "name": "BMP-1 Mech Battalion","units": "1 HQ Platoon w/ BMP-1, 2x BMP-1 Companies (3 Mech. Inf. Platoons w/ BMP-1s)","pts": 30,"upgrades": [41,11,12,21,31,61,71,120,121]},
-      {"id": 505, "name": "BTR Mech Battalion","units": "1 HQ Platoon w/ BTR-60, 2x BTR Mech Companies (3 Mech. Inf. Platoons w/ BTR-60s)","pts": 22,"upgrades": [51,52,11,12,21,31,61,71,120,121,125]}
+      {"id": 505, "name": "BTR Mech Battalion","units": "1 HQ Platoon w/ BTR-60, 2x BTR Mech Companies (3 Mech Inf. Platoons with BTR-60s, 1x Sagger Missile Team w/ BTR-60)","pts": 25,"upgrades": [51,11,12,21,31,61,71,120,121,125]}
 		]},
 
 		{"name": "Divisional Level Support", "formations": [
@@ -17,7 +17,7 @@
       {"id": 521, "name": "T62 Tank Company (3 Platoons)","pts": 13},
 			{"id": 522, "name": "T55A Tank Company (3 Platoons)","pts": 11},
 			{"id": 523, "name": "BMP-1 Mech Company (3 Mech Inf. Platoons with BMP-1s)", "pts": 14},
-			{"id": 524, "name": "BTR Mech Company (3 Mech Inf. Platoons with BTR-60s)", "pts": 10}
+			{"id": 524, "name": "BTR Mech Company (3 Mech Inf. Platoons with BTR-60s, 1x Sagger Missile Team w/ BTR-60)", "pts": 12}
 		]},
 
     {"name": "Corps Level Support","formations":[
@@ -42,8 +42,7 @@
 
         {"id": 41, "name": "BMP-1 Mech Company (3 Mech Inf. Platoons with BMP-1s)", "pts": 14},
     
-        {"id": 51, "name": "BTR Mech Company (3 Mech Inf. Platoons with BTR-60s)", "pts": 14},
-        {"id": 52, "name": "Sagger Missile Team w/ BTR-60", "pts": 2},
+        {"id": 51, "name": "BTR Mech Company (3 Mech Inf. Platoons with BTR-60s, 1x Sagger Missile Team w/ BTR-60)", "pts": 12},
 
 
         {"id": 61, "name": "AA Platoon: ZSU-23-4 Shilka", "pts": 3},
@@ -97,71 +96,31 @@
 
 
    "upgradeConstraints": [      
-        {"max": 1, "min": 1, "from": [1], "appliesTo": [501]},
-        {"max": 3, "min": 2, "from": [10,11,12,13,14,15,16,17], "appliesTo": [501]},
-        {"max": 3, "min": 0, "from": [18], "appliesTo": [501]},
-        {"max": 1, "min": 0, "from": [115,116,117,118], "appliesTo": [501]},
-        {"max": 1, "min": 0, "from": [65,66,67,75,76,77], "appliesTo": [501]},
-        {"max": 1, "min": 0, "from": [68], "appliesTo": [501]},
-        {"max": 1, "min": 0, "from": [79], "appliesTo": [501]},
+        {"max": 1, "min": 0, "from": [11], "appliesTo": [501]},
+        {"max": 1, "min": 0, "from": [12], "appliesTo": [501]},
+        {"max": 1, "min": 0, "from": [41,51], "appliesTo": [501,502,503]},
+        {"max": 1, "min": 0, "from": [61,71], "appliesTo": [501,502,503,504]},
 
-        {"max": 1, "min": 1, "from": [21], "appliesTo": [502]},
-        {"max": 3, "min": 2, "from": [25,26,27,28,29,30], "appliesTo": [502]},
-        {"max": 1, "min": 0, "from": [115,116,117,118], "appliesTo": [502]},
-        {"max": 1, "min": 0, "from": [65,66,67,75,76,77], "appliesTo": [502]},
-        {"max": 1, "min": 0, "from": [68], "appliesTo": [502]},
-        {"max": 1, "min": 0, "from": [79], "appliesTo": [502]},
+        {"max": 1, "min": 0, "from": [21], "appliesTo": [502]},
+        
+        {"max": 1, "min": 0, "from": [31], "appliesTo": [503]},
 
 
-        {"max": 1, "min": 1, "from": [41], "appliesTo": [503]},
-        {"max": 1, "min": 0, "from": [42], "appliesTo": [503]},
-        {"max": 3, "min": 2, "from": [45,46,47,48,49,50], "appliesTo": [503]},
-        {"max": 3, "min": 0, "from": [51], "appliesTo": [503]},
-        {"max": 1, "min": 0, "from": [115,116,117,118], "appliesTo": [503]},
-        {"max": 1, "min": 0, "from": [], "appliesTo": [503]},
-        {"max": 1, "min": 0, "from": [65,66,67,75,76,77], "appliesTo": [503]},
-        {"max": 1, "min": 0, "from": [68], "appliesTo": [503]},
-        {"max": 1, "min": 0, "from": [79], "appliesTo": [503]},
-
-
-        {"max": 1, "min": 1, "from": [61], "appliesTo": [504]},
-        {"max": 3, "min": 2, "from": [65,66,67], "appliesTo": [504]},
-        {"max": 3, "min": 0, "from": [68], "appliesTo": [504]},
-        {"max": 1, "min": 0, "from": [115,116,117,118], "appliesTo": [504]},
-        {"max": 1, "min": 0, "from": [10,11,12,13,14,15,16,17,18,25,26,27,28,29,30,45,46,47,48,49,50], "appliesTo": [504]},
-        {"max": 1, "min": 0, "from": [18], "appliesTo": [504]},
-        {"max": 1, "min": 0, "from": [51], "appliesTo": [504]},
+        {"max": 1, "min": 0, "from": [41], "appliesTo": [504]},
+        {"max": 1, "min": 0, "from": [11,21,31], "appliesTo": [504]},
         {"max": 1, "min": 0, "from": [120,121], "appliesTo": [504]},
 
-
-        {"max": 1, "min": 1, "from": [71], "appliesTo": [505]},
-        {"max": 3, "min": 2, "from": [75,76,77], "appliesTo": [505]},
-        {"max": 3, "min": 0, "from": [78], "appliesTo": [505]},
-        {"max": 3, "min": 0, "from": [79], "appliesTo": [505]},
-        {"max": 1, "min": 0, "from": [115,116,117,118], "appliesTo": [505]},
-        {"max": 1, "min": 0, "from": [10,11,12,13,14,15,16,17,18,25,26,27,28,29,30,45,46,47,48,49,50], "appliesTo": [505]},
-        {"max": 1, "min": 0, "from": [18], "appliesTo": [505]},
         {"max": 1, "min": 0, "from": [51], "appliesTo": [505]},
+        {"max": 1, "min": 0, "from": [11,21,31], "appliesTo": [505]},
         {"max": 1, "min": 0, "from": [120,121], "appliesTo": [505]},
-        {"max": 1, "min": 0, "from": [125,126], "appliesTo": [505]},
-
-        {"max": 1, "min": 1, "from": [10,11,12,13,14,15,16,17], "appliesTo": [520]},
-        {"max": 1, "min": 1, "from": [25,26,27,28,29,30], "appliesTo": [521]},
-        {"max": 1, "min": 1, "from": [45,46,47,48,49,50], "appliesTo": [522]},
-        {"max": 1, "min": 1, "from": [65,66,67], "appliesTo": [523]},
-        {"max": 1, "min": 0, "from": [68], "appliesTo": [523]},
-        {"max": 1, "min": 1, "from": [75,76,77], "appliesTo": [524]},
-        {"max": 1, "min": 0, "from": [78], "appliesTo": [524]},
-        {"max": 1, "min": 0, "from": [79], "appliesTo": [524]},
+        {"max": 1, "min": 0, "from": [125], "appliesTo": [505]},
 
         {"max": 1, "min": 1, "from": [120,121], "appliesTo": [530]},
         {"max": 1, "min": 1, "from": [150,151], "appliesTo": [531]},
         {"max": 1, "min": 1, "from": [140,141], "appliesTo": [532]},
-        {"max": 1, "min": 1, "from": [125,126], "appliesTo": [534]},
-        {"max": 1, "min": 1, "from": [130,131], "appliesTo": [535]},
-        {"max": 1, "min": 1, "from": [160,161,165,166,170,171], "appliesTo": [536]},
-        {"max": 2, "min": 1, "from": [180,181,190,191], "appliesTo": [537]},
-        {"max": 1, "min": 1, "from": [200,201,202], "appliesTo": [538]}
+        {"max": 1, "min": 1, "from": [160,165,170], "appliesTo": [536]},
+        {"max": 2, "min": 1, "from": [180,190], "appliesTo": [537]},
+        {"max": 1, "min": 1, "from": [200,201], "appliesTo": [538]}
 
    ]
 }
