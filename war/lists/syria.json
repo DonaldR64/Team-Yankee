@@ -4,7 +4,7 @@
 	"by": "DR",
 	"notes": ["For any OP Must Field Artillery Unit"],
 	"sections": [
-		{"name": "Core Brigade Formations", "formations": [
+		{"name": "Core Brigade Formations (up to 3 each)", "formations": [
 			{"id": 501, "name": "T-72M Tank Battalion","units": "1 HQ Platoon, 2x T-72M Companies (3 Platoons each)","pts": 67,"upgrades": [11,12,41,51,61,71]},
 			{"id": 502, "name": "T-62 Tank Battalion","units": "1 HQ Platoon, 2x T-62 Companies (3 Platoons each)","pts": 32,"upgrades": [21,41,51,61,71]},
       {"id": 503, "name": "T-55A Tank Battalion","units": "1 HQ Platoon, 2x T-55A Companies (3 Platoons each)","pts": 26,"upgrades": [31,41,51,61,71]},
@@ -12,7 +12,7 @@
       {"id": 505, "name": "BTR Mech Battalion","units": "1 HQ Platoon w/ BTR-60, 2x BTR Mech Companies (3 Mech Inf. Platoons with BTR-60s, 1x Sagger Missile Team w/ BTR-60)","pts": 25,"upgrades": [51,11,12,21,31,61,71,120,121,125]}
 		]},
 
-		{"name": "Divisional Level Support", "formations": [
+		{"name": "Divisional Level Support (1 Company Only)", "formations": [
 			{"id": 520, "name": "T72M Tank Company (3 Platoons)","pts": 28},
       {"id": 521, "name": "T62 Tank Company (3 Platoons)","pts": 13},
 			{"id": 522, "name": "T55A Tank Company (3 Platoons)","pts": 11},
