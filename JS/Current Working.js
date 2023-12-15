@@ -3101,6 +3101,11 @@ log("Type: " + interHex.type)
         let spottedFlag = false;
         let extraLine = "";
         let roadFlag = false;
+        let noun = (team.special.includes("Team")) ? "Team":"Platoon";
+        let verb = " has ";
+        let noun2 = "It";
+        let tactical = parseInt(team.tactical);
+
 
         _.each(unit.teamIDs,id => {
             let team2 = TeamArray[id];
@@ -3132,12 +3137,17 @@ log("Type: " + interHex.type)
             if (team.token.inCommand === true) {
                 teamID = unit.teamIDs[0];
                 team = TeamArray[teamID];
+                if (unit.teamIDs.length > 1) {
+                    noun = "Platoons";
+                    verb = " have ";
+                    noun2 = "They";
+                }
             } else {
                 unitActivation = false;
                 targetArray = [team];
                 targetName = team.name;
                 suppressionFlag = team.suppressed;
-                outputCard.body.push("Out of Command Platoon");
+                outputCard.body.push("Out of Command " + noun);
                 outputCard.body.push("[hr]");
                 if (order === "Assault") {
                     errorMsg = "Out of Command Platoons cannot Assault";
@@ -3146,23 +3156,22 @@ log("Type: " + interHex.type)
                     extraLine = "Firing suffers an additional +1 Penalty";
                 };
                 if (order === "Dash") {
-                    if (team.queryCondition("Spot") === false) {
-                        extraLine = "Platoon must move towards the Unit Leader";
-                    } else if (spotted === true) {
-                        errorMsg = "Platoon Called Artillery and Cannot Dash";
-                    };
+                    if (spottedFlag === false) {
+                        extraLine = noun + " must move towards the Unit Leader";
+                    } 
                 };
             };
         };
 
-        if (order === "Dash" && team.specialorder.includes("Blitz")) {errorMsg = "Cannot Dash due to Blitz"};
-        if (order !== "Hold" && team.specialorder.includes("Dig In")) {errorMsg = "Cannot due to Dig In Special Order"};
+        if (order === "Dash" && team.specialorder.includes("Blitz")) {errorMsg = noun + " cannot Dash due to Blitz"};
+        if (order !== "Hold" && team.specialorder.includes("Dig In")) {errorMsg = noun + " cannot execute " + order + " due to Dig In Special Order"};
+        if ((order === "Tactical" || order === "Dash" || order === "Assault") && spottedFlag === true && noun !== "Platoons") {errorMsg = "The " + noun + " Spotted and so must take a Hold Order"};
 
         if (team.activated() === true) {
-            errorMsg = "Unit has already been activated";
+            errorMsg = noun + verb + "already been activated";
         }    
         if (order === "Assault" && team.suppressed === true && (team.type === "Infantry" || team.type === "Gun")) {
-            errorMsg = "Unit is Suppressed, cannot Assault";
+            errorMsg = noun + verb + "Suppressed, cannot Assault";
         }
 
         SetupCard(targetName,"",team.nation);
@@ -3175,58 +3184,71 @@ log("Type: " + interHex.type)
 
         if (order.includes("Tactical")) {
             if (team.type === "Helicopter") {
-                outputCard.body.push("The Helicopter can move up to " + team.airmove + " hexes, and may fire at its Moving ROF");
+                outputCard.body.push("The Helicopter can move up to " + team.airmove + " hexes, and may fire at a Moving ROF");
                 outputCard.body.push("Alternately the Helicopter can move off table and Loiter");
             } else {
-                outputCard.body.push("Platoons can move up to " + team.tactical + " hexes, and may fire at a Moving ROF");
+                outputCard.body.push("The " + noun + " can move up to " + tactical + " hexes, and may fire at a Moving ROF");
                 outputCard.body.push('They may not move into contact with enemy units');
                 if (suppressionFlag === true) {
                     if (team.type === "Infantry" || team.type === "Gun") {
-                        outputCard.body.push("They cannot move closer to enemy teams");
+                        outputCard.body.push(noun2 + " cannot move closer to enemy teams");
                     } else {
-                        outputCard.body.push("Any suppressed Platoons cannot move closer to enemy teams");
+                        if (noun = "Platoons") {
+                            outputCard.body.push("Any suppressed Platoons cannot move closer to [U]visible[/u] enemy teams");
+                        } else {
+                            outputCard.body.push("It cannot move closer to [U]visible[/u] enemy teams");
+                        }
                     }
                 } 
                 if (spottedFlag === true) {
-                    outputCard.body.push("Teams that Called Artillery must remain Stationary");
+                    outputCard.body.push(noun + " that Called Artillery must remain Stationary");
                 }
             }    
         } else if (order.includes("Dash")) {
             if (state.TY.darkness === true) {
                 outputCard.body.push("Darkness limits speed to Terrain Dash Speed of " + team.terraindash + " Hexes");
             } else {
-                outputCard.body.push('Platoons can move at Dash Speed, but may not fire');
+                outputCard.body.push("The " + noun + ' can move at Dash Speed, but may not fire');
                 outputCard.body.push("Terrain Dash - " + team.terraindash + " Hexes");
                 outputCard.body.push("Country Dash - " + team.countrydash + " Hexes");
                 if (roadFlag === true) {
                     outputCard.body.push("Road Dash - " + team.roaddash + " Hexes");
                 }
             }
-            outputCard.body.push('They cannot move within 4 hexes of visible enemies');
+            outputCard.body.push(noun2 + ' cannot move within 4 hexes of [U]visible[/u] enemies');
             if (suppressionFlag === true) {
                 if (team.type === "Infantry" || team.type === "Gun") {
-                    outputCard.body.push("They cannot move closer to enemy teams");
+                    outputCard.body.push(noun2 + " cannot move closer to [U]visible[/u] enemy teams");
                 } else {
-                    outputCard.body.push("Any suppressed Platoons cannot move closer to enemy teams");
+                    if (noun === "Platoons") {
+                        outputCard.body.push("Any suppressed Platoons cannot move closer to [U]visible[/u] enemy teams");
+                    } else {
+                        outputCard.body.push("The " + noun + " cannot move closer to [U]visible[/u] enemy teams");
+                    }
                 }
             } 
             if (spottedFlag === true) {
                 outputCard.body.push("Teams that Called Artillery must remain Stationary");
             }
         } else if (order.includes("Hold")) {
-            outputCard.body.push("Platoons stay in place. They are Gone to Ground if not Firing");
-            outputCard.body.push("If not firing they will go on Overwatch");
+            outputCard.body.push("The " + noun + " stay in place. " + noun2 + verb + "Gone to Ground if not Firing");
+            outputCard.body.push("If not firing " + noun2.toLowerCase() + " will go on Overwatch");
             if (suppressionFlag === true) {
                 if (team.type === "Infantry" || team.type === "Gun") {
-                    outputCard.body.push("They will fire at a Moving ROF");
+                    outputCard.body.push(noun2 + " will fire at a Moving ROF");
                 } else {
-                    outputCard.body.push("Any suppressed Platoons will fire at a Moving ROF");
+                    if (noun === "Platoons") {
+                        outputCard.body.push("Any suppressed Platoons will fire at a Moving ROF");
+                    } else {
+                        outputCard.body.push("The " + noun + " will fire at a Moving ROF");
+                    }
                 }
             } 
         } else if (order === "Assault") {
-            outputCard.body.push('Platoons can move at Tactical Speed to a Max of 5 hexes, and may fire at their Moving ROF');
-            outputCard.body.push('For Firing:  Platoons must target an enemy within 4 hexes of the Platoon it will charge into');
-            outputCard.body.push("Eligible Platoons can complete the charge during the Assault Step");
+            let assaultMove = Math.min(5,tactical);
+            outputCard.body.push(noun + ' can move up to ' + assaultMove + ' hexes, and may fire at a Moving ROF');
+            outputCard.body.push('For Firing: ' + noun +  ' must target an enemy within 4 hexes of the Platoon it will charge into');
+            outputCard.body.push("(Charges are done during the Assault Step)");
             if (spottedFlag === true) {
                 outputCard.body.push("Platoons that Called Artillery must remain Stationary and cannot Assault");
             }
@@ -4018,7 +4040,6 @@ log("Same had 2")
             if (team.type === "System Unit" || team.type === "Aircraft") {continue};
             if (team.type === "Helicopter" && team.landed() === false && team.special.includes("Hunter-Killer") === false) {continue};
             let gtg = (team.moved === true || team.fired === true) ? false:true;
-
             let movexceptions = ["Hunter-Killer","Scout"];
             _.each(movexceptions,exception => {
                 if (team.special.includes(exception) && team.fired === false) {gtg = true};
@@ -4027,7 +4048,6 @@ log("Same had 2")
             _.each(fireexceptions,exception => {
                 if (team.special.includes(exception) && team.moved === false) {gtg = true};
             })
-
             if (gtg === false) {
                 team.removeCondition("GTG")
                 team.gonetoground = false;
