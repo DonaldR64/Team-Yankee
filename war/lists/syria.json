@@ -20,17 +20,17 @@
 			{"id": 524, "name": "BTR Mech Company (3 Mech Inf. Platoons with BTR-60s)", "pts": 10}
 		]},
 
-	    {"name": "Corps Level Support","formations":[
-        {"id": 530, "name": "2S1 Carnation Battery","pts": 0,"upgrades": [120,121]},
-        {"id": 531, "name": "BM-21 Hail Rocket Battery","pts": 0,"upgrades": [150,151]},
-        {"id": 532, "name": "2S3 Acacia Battery","pts": 0,"upgrades": [140,141]},
-        {"id": 533, "name": "BTR-60 OP","pts": 1},
-        {"id": 534, "name": "Spandrel AT Platoon","pts": 2},
-        {"id": 535, "name": "BRDM-2 Scout Platoon","pts": 2},
-        {"id": 536, "name": "AA Platoon","pts": 0,"upgrades": [160,165,170]},
-        {"id": 537, "name": "Helicopter Company","pts": 0,"upgrades": [180,190]},
-        {"id": 538, "name": "SU-25 Frogfoot Company","pts": 0,"upgrades": [200,201]}
-	    ]}
+    {"name": "Corps Level Support","formations":[
+      {"id": 530, "name": "2S1 Carnation Battery","pts": 0,"upgrades": [120,121]},
+      {"id": 531, "name": "BM-21 Hail Rocket Battery","pts": 0,"upgrades": [150,151]},
+      {"id": 532, "name": "2S3 Acacia Battery","pts": 0,"upgrades": [140,141]},
+      {"id": 533, "name": "BTR-60 OP","pts": 1},
+      {"id": 534, "name": "Spandrel AT Platoon","pts": 2},
+      {"id": 535, "name": "BRDM-2 Scout Platoon","pts": 2},
+      {"id": 536, "name": "AA Platoon","pts": 0,"upgrades": [160,165,170]},
+      {"id": 537, "name": "Helicopter Company","pts": 0,"upgrades": [180,190]},
+      {"id": 538, "name": "SU-25 Frogfoot Company","pts": 0,"upgrades": [200,201]}
+    ]}
 
 	],
 
@@ -80,11 +80,7 @@
     	{"max": 3, "min": 0, "from": [504]},
     	{"max": 3, "min": 0, "from": [505]},
 
-    	{"max": 1, "min": 0, "from": [520]},
-    	{"max": 1, "min": 0, "from": [521]},
-    	{"max": 1, "min": 0, "from": [522]},
-    	{"max": 1, "min": 0, "from": [523]},
-    	{"max": 1, "min": 0, "from": [524]},
+    	{"max": 1, "min": 0, "from": [520,521,522,523,524]},
 
     	{"max": 1, "min": 0, "from": [530]},
     	{"max": 1, "min": 0, "from": [531]},
