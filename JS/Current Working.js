@@ -4200,7 +4200,7 @@ log("Same had 2")
         let reroll = -1;
         let hqs = [];
         _.each(TeamArray,team2 => {
-            if (team2.player === team.player && team2.special.includes("HQ")) {
+            if (team2.nation === team.nation && team2.special.includes("HQ")) {
                 hqs.push(team2);
             };
         });
