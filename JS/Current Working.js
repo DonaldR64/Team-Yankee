@@ -49,6 +49,12 @@ const TY = (() => {
         "2nd Gen Thermal Imaging": 40,
     }
 
+    const blast = {
+        mortar: 0,
+        artillery: 1,
+        salvo: 3,
+    }
+
 
     let specialInfo = {
         "Air Assault": "An Air Assault Unit may only be held in Reserve if all the Units deployed on table are Air Assault Units",
