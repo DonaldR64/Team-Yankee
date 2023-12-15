@@ -3446,6 +3446,7 @@ log("Type: " + interHex.type)
             "Autocannon": [],
             "Handheld AT": [],
             "Vehicle Missile": [],
+            "Mortar": [],
             "Artillery": [],
             "LAW/MAW": [],
             "Infantry Missile": [],
@@ -3460,7 +3461,7 @@ log("Type: " + interHex.type)
             if (weapon.notes.includes("Close Combat")) {continue};
             if (weapon.type.includes("MG")) {
                 types["MG"].push(weapon.name);
-            } else if (weapon.type === "Artillery" || weapon.type === "Rockets"){
+            } else if (weapon.type === "Artillery" || weapon.type === "Rockets" || weapon.type === "Mortar") {
                 types["Artillery"].push(weapon.name);
             } else {
                 types[weapon.type].push(weapon.name); 
