@@ -25,11 +25,11 @@
         {"id": 531, "name": "BM-21 Hail Rocket Battery","pts": 0,"upgrades": [150,151]},
         {"id": 532, "name": "2S3 Acacia Battery","pts": 0,"upgrades": [140,141]},
         {"id": 533, "name": "BTR-60 OP","pts": 1},
-        {"id": 534, "name": "Spandrel AT Platoon","pts": 0,"upgrades": [125,126]},
-        {"id": 535, "name": "BRDM-2 Scout Platoon","pts": 0,"upgrades": [130,131]},
-        {"id": 536, "name": "AA Platoon","pts": 0,"upgrades": [160,161,165,166,170,171]},
-        {"id": 537, "name": "Helicopter Company","pts": 0,"upgrades": [180,181,190,191]},
-        {"id": 538, "name": "SU-25 Frogfoot Company","pts": 0,"upgrades": [200,201,202]}
+        {"id": 534, "name": "Spandrel AT Platoon","pts": 2},
+        {"id": 535, "name": "BRDM-2 Scout Platoon","pts": 2},
+        {"id": 536, "name": "AA Platoon","pts": 0,"upgrades": [160,165,170]},
+        {"id": 537, "name": "Helicopter Company","pts": 0,"upgrades": [180,190]},
+        {"id": 538, "name": "SU-25 Frogfoot Company","pts": 0,"upgrades": [200,201]}
 	    ]}
 
 	],
@@ -46,45 +46,30 @@
         {"id": 52, "name": "Sagger Missile Team w/ BTR-60", "pts": 2},
 
 
-        {"id": 61, "name": "AA Company: ZSU-23-4 Shilka", "pts": 3},
-        {"id": 71, "name": "AA Company: ZSU-57-2", "pts": 2},
+        {"id": 61, "name": "AA Platoon: ZSU-23-4 Shilka", "pts": 3},
+        {"id": 71, "name": "AA Platoon: ZSU-57-2", "pts": 2},
 
         {"id": 120, "name": "2S1 Carnation Battery: (3 2S1s)", "pts": 4},
         {"id": 121, "name": "2S1 Carnation Battery: (6 2S1s)", "pts": 8},
 
         {"id": 125, "name": "Spandrel AT Platoon", "pts": 2},
 
-        {"id": 130, "name": "2x BRDM Scouts", "pts": 1},
-        {"id": 131, "name": "4x BRDM Scouts", "pts": 2},
+        {"id": 140, "name": "2S3 Acacia Battery: (3x 2S3s)", "pts": 4},
+        {"id": 141, "name": "2S3 Acacia Battery: (6x 2S3s)", "pts": 9},
 
-        {"id": 140, "name": "Howitzer Battery: 3x 2S3 Acacia", "pts": 4},
-        {"id": 141, "name": "Howitzer Battery: 6x 2S3 Acacia", "pts": 9},
+        {"id": 150, "name": "BM-21 HAIL Battery: (3x BM-21s)", "pts": 3},
+        {"id": 151, "name": "BM-21 HAIL Battery: (6x BM-21s)", "pts": 6},
+ 
+        {"id": 160, "name": "SA-9 Gaskin Platoon", "pts": 2},
+        {"id": 165, "name": "SA-13 Gopher Platoon", "pts": 2},
+        {"id": 170, "name": "SA-8 Gecko Platoon", "pts": 5},
 
-        {"id": 150, "name": "3x BM-21 HAIL", "pts": 3},
-        {"id": 151, "name": "6x BM-21 HAIL", "pts": 6},
+        {"id": 180, "name": "Mi-24 Hind Company", "pts": 8},
 
-        {"id": 160, "name": "2x SA-9 Gaskin", "pts": 1},
-        {"id": 161, "name": "4x SA-9 Gaskin", "pts": 2},
+        {"id": 190, "name": "Gazelle HOT Company", "pts": 9},
 
-        {"id": 165, "name": "2x SA-13 Gopher", "pts": 2},
-        {"id": 166, "name": "4x SA-13 Gopher", "pts": 3},
-
-        {"id": 170, "name": "2x SA-8 Gecko", "pts": 3},
-        {"id": 171, "name": "4x SA-8 Gecko", "pts": 7},
-
-        {"id": 180, "name": "2x Mi-24 Hind", "pts": 5},
-        {"id": 181, "name": "4x Mi-24 Hind", "pts": 10},
-
-        {"id": 190, "name": "2x Gazelle HOT", "pts": 6},
-        {"id": 191, "name": "4x Gazelle HOT", "pts": 12},
-
-        {"id": 200, "name": "2x SU-25 Frogfoot", "pts": 7},
-        {"id": 201, "name": "4x SU-25 Frogfoot", "pts": 14},
-        {"id": 202, "name": "6x SU-25 Frogfoot", "pts": 21}
-
-
-
-
+        {"id": 200, "name": "1x SU-25 Frogfoot", "pts": 11},
+        {"id": 201, "name": "2x SU-25 Frogfoot", "pts": 21}
 	],
 
 
