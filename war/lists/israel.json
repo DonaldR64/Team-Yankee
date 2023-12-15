@@ -4,14 +4,14 @@
 	"by": "DR",
 	"notes": ["For any OP Must Field an Artillery Unit"],
 	"sections": [
-		{"name": "Core Battalion Formations", "formations": [
+		{"name": "Core Battalion Formations (3 of each)", "formations": [
 			{"id": 501, "name": "Merkava 1 Tank Company","pts": 54,"units": "1 HQ Platoon, 2x Merkava 1 Platoons","upgrades": [11,41,50,51]},
 			{"id": 502, "name": "Merkava 2 Tank Company","pts": 63,"units": "1 HQ Platoon, 2x Merkava 2 Platoons","upgrades": [21,41,50,51]},
             {"id": 503, "name": "Magach 6 Tank Company","pts": 33,"units": "1 HQ Platoon, 2x Magach 6 Platoons","upgrades": [31,41,50,51]},
             {"id": 504, "name": "M113 Mech Infantry Company","pts": 24,"units": "1 HQ Team w/ M113, 2x Mech. Infantry Platoons w/ M113","upgrades": [41,11,21,31,50,51,60,61]}
 		]},
 
-        {"name": "Battalion Support", "formations": [
+        {"name": "Battalion Support (1 Platoon Only)", "formations": [
             {"id": 506, "name": "Merkava 1 Tank Platoon","pts": 18},
             {"id": 507, "name": "Merkava 2 Tank Platoon","pts": 21},
             {"id": 508, "name": "Magach 6 Tank Platoon","pts": 11},
