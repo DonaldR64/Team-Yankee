@@ -55,6 +55,7 @@ const TY = (() => {
         salvo: 3,
     }
 
+    const artilleryTypes = ["Artillery","Salvo","Mortar"];
 
     let specialInfo = {
         "Air Assault": "An Air Assault Unit may only be held in Reserve if all the Units deployed on table are Air Assault Units",
@@ -783,11 +784,11 @@ const TY = (() => {
                 let halted = attributeArray["weapon"+i+"halted"];
                 let moving = attributeArray["weapon"+i+"moving"];
 
-                if (halted !== "Artillery" && halted !== "Salvo") {
+                if (artilleryTypes.includes(halted) === false) {
                     halted = parseInt(halted) || 0;
                 }
 
-                if (moving !== "Artillery" && moving !== "Salvo") {
+                if (artilleryTypes.includes(moving) === false) {
                     moving = parseInt(moving) || 0;
                 }
 
@@ -828,7 +829,7 @@ const TY = (() => {
                     }
                 }
 
-                if (weapon.halted === "Artillery" || weapon.halted === "Salvo" || weapon.moving === "Artillery" || weapon.moving === "Salvo") {
+                if (artilleryTypes.includes(halted) || artilleryTypes.includes(moving)) {
                     artilleryWpn = weapon;
                     art = true;
                     artilleryTeam = true;
