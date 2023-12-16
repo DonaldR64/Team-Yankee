@@ -3536,7 +3536,6 @@ log("Type: " + interHex.type)
         } else {
             outputCard.body.push("Failure!<br>The Team stops where it is");
         }
-//Leader Team Option to swap
         PrintCard();
     }
 
@@ -5350,8 +5349,6 @@ log(weapon)
         let barrageTeam = TeamArray[barrageID];
         let observerTeam = TeamArray[observerID];
         let artilleryUnit = UnitArray[artUnitID];
-    
-
 
         unitIDs4Saves = {};
         let rangedIn = false;
@@ -5369,7 +5366,7 @@ log(weapon)
         }
     
         //check LOS to Observer
-        let observerLOS = LOS(observerID,barrageID,"Spotter");
+        let observerLOS = LOS(observerID,barrageID);
         if (observerLOS.los === false && rangedIn === false) {
             outputCard.body.push("[#ff0000]Observer does not have LOS[/#]");
             PrintCard();
@@ -5385,7 +5382,7 @@ log(weapon)
 
                 let dist = team.hex.distance(barrageTeam.hex);
                 if (hexMap[team.hexLabel].terrain.includes("Offboard") ){
-                    dist += 100; //5km off map
+                    dist += 50; //5km off map
                 }  
                 if (dist > team.artilleryWpn.maxRange || dist < team.artilleryWpn.minRange) {
                     continue;
@@ -5408,15 +5405,18 @@ log(weapon)
             return;
         }
     
-        let templateRadius = 2;
-        let tooCloseDist = 4; //2" to template radius
-        if (weapon.moving === "Salvo" || weapon.halted === "Salvo") {
-            templateRadius = 4;
-            tooCloseDist = 7; //3" to template radius
+        if (weapon.moving === "Mortar" || weapon.halted === "Mortar") {
+            BR = 0;
+        } else if (weapon.moving === "Mortar" || weapon.halted === "Mortar") {
+            BR = 1;
+        } else {
+            BR = 2;
         }
-        if (artilleryTeams[0].type === "Aircraft" || artilleryTeams[0].type === "Helicopter") {
-            tooCloseDist = templateRadius + 4;
-        }
+
+        let templateRadius = blastR[BR];
+        let extraD = (artilleryTeams[0].type === "Aircraft" || artilleryTeams[0].type === "Helicopter") ? 4:Math.max(BR+1,2);
+
+        let tooCloseDist = templateRadius + extraD;
     
         if (ammoType !== "Smoke Bombardment" ) {
             //check "Danger Close"
