@@ -1014,6 +1014,8 @@ log("Special Text: " + specialText)
         addCondition(condition) {
             let imgSrc,charID;
             let size = 70;
+            let rotation = 0;
+
             switch (condition) {
                 case 'Dash':
                     imgSrc = "https://s3.amazonaws.com/files.d20.io/images/367732138/K6sIzwifj9tIXcgYPIaw6g/thumb.png?1700012748";
@@ -1043,6 +1045,10 @@ log("Special Text: " + specialText)
                     imgSrc = "https://s3.amazonaws.com/files.d20.io/images/364740777/TkNdbvE_My02jE0bkz1KzA/thumb.png?1698193655";
                     charID = "-NhnoOo2ydvrjTOFGMXW";
                     break;
+                case 'Spot':
+                    imgSrc = "https://s3.amazonaws.com/files.d20.io/images/364839305/-UanVemZgRrwTu3fVijGwA/thumb.png?1698268901";
+                    charID = "-NhnoS6WDdovvJrkTeHC";
+                    break;
                 case 'Passengers':
                     imgSrc = "https://s3.amazonaws.com/files.d20.io/images/365230932/HxeMNYtOiyWDnoyvoa8FCQ/thumb.png?1698516760";
                     charID = "-NhrUN0XxRco5XKwLdSM";
@@ -1055,7 +1061,13 @@ log("Special Text: " + specialText)
                 case 'Flare':
                     imgSrc = "https://s3.amazonaws.com/files.d20.io/images/366077896/UYxOO1P7P1wBDD75gtpsFA/thumb.png?1699038152";
                     charID = "-NiLYVaQvQOHD16lukjv";
+                    rotation = this.token.get("rotation");
+                    size = 130;
                     break;
+
+
+
+
             }
 
             let leftConditions = ["Tactical","Dash","Hold","Assault"];
@@ -1080,11 +1092,14 @@ log("Special Text: " + specialText)
                 state.TY.conditions[this.id] = {};
             }
 
+            imgSrc = getCleanImgSrc(imgSrc);
+
             let conditionToken = createObj("graphic", {   
                 left: this.location.x,
                 top: this.location.y,
                 width: size, 
                 height: size,
+                rotation: rotation,
                 isdrawing: true,
                 pageid: this.token.get("pageid"),
                 imgsrc: imgSrc,
@@ -4005,8 +4020,10 @@ log("Same had 2")
                 _.each(UnitArray,unit => {
                     _.each(unit.teamIDs,id => {
                         let team = TeamArray[id];
-                        if (team.suppressed === true && team.player === p) {
-                            CheckArray.push(team);
+                        if (team) {
+                            if (team.suppressed === true && team.player === p) {
+                                CheckArray.push(team);
+                            }
                         }
                     });
                 });
@@ -5406,7 +5423,9 @@ log(weapon)
             PrintCard();
             return;
         }
-    
+
+        let num = artilleryTeams.length;
+
         if (weapon.moving === "Mortar" || weapon.halted === "Mortar") {
             BR = 0;
         } else if (weapon.moving === "Mortar" || weapon.halted === "Mortar") {
@@ -5463,6 +5482,11 @@ log(weapon)
             artTeam.token.set("rotation",phi);
             artTeam.fired = true;
             artTeam.addCondition("Fired");
+            artTeam.addCondition("Hold");
+            artTeam.order = "Hold";
+            if (i === 0) {
+                artTeam.token.set("aura1_color",Colours.black);
+            }
             if ((weapon.notes.includes("One Shot") || weapon.notes.includes("One-Shot")) && artTeam.token.get(SM.oneshot) === false) {
                 artTeam.token.set(SM.oneshot,true);
             };
@@ -5470,7 +5494,7 @@ log(weapon)
                 shooterTeam.addCondition("Flare");
             }   
         }
-    
+        artilleryUnit.order = "Hold"
         let needed = Math.max(observerTeam.skill,artilleryTeams[0].skill);
 
         let success = false;
@@ -5479,7 +5503,7 @@ log(weapon)
         let targetArray = [];
     
         if (ammoType !== "Smoke Bombardment") {
-            //check if template over terrain and build array of any tokens in template
+            //check if template over terrain
             radiusHexes = targetHex.radius(templateRadius);
             for (let i=0;i<radiusHexes.length;i++) {
                 let hex = hexMap[radiusHexes[i].label()];
@@ -5620,6 +5644,7 @@ log(weapon)
         } else {
             let text = ["","1st","2nd","3rd"];
             let text2 = ["","","+1 to Roll Needed to Hit","+2 to Roll Needed to Hit"];
+
             if (observerTeam.type !== "Aircraft" && observerTeam.type !== "Helicopter" && rangedIn === false) {
                 PlaceRangedInMarker(artilleryUnit,targetHex);
             }
@@ -5636,7 +5661,7 @@ log(weapon)
             }
     
             if (ammoType !== "Smoke Bombardment") {
-                //check if template over terrain and build array of any tokens in template
+                //build array of any tokens in template
                 radiusHexes = targetHex.radius(templateRadius);
                 for (let i=0;i<radiusHexes.length;i++) {
                     let hex = hexMap[radiusHexes[i].label()];
@@ -5653,18 +5678,13 @@ log(weapon)
             }
 
             if (ammoType === "Smoke Bombardment") {
-                let num = 12;
-                if (artilleryTeams[0].special.includes("Large Battery")) {
-                    num = 24;
-                }
-                SmokeScreen(targetHex,num,direction,artilleryUnit.id);
+                SmokeScreen(targetHex,(num*6),direction,artilleryUnit.id);
                 state.TY.smokeScreens[artilleryUnit.player].push(artilleryUnit.id); //tracks that unit fired its one smoke bombardment
                 outputCard.body.push("Smoke Screen successfully placed");
                 RemoveBarrageToken();
                 PrintCard();
                 return;
             } else if (ammoType === "Minelets") {
-                let num = (artilleryTeams[0].special.includes("Large Battery")) ? 2:1;
                 let s = "";
                 if (num > 1) {s = "s"};
                 outputCard.body.push("Place " + num + ' Minefield Marker' + s + ' within 2 hexes of the Ranged In Target');
@@ -5681,7 +5701,7 @@ log(weapon)
                 }
                 if (artilleryTeams[0].special.includes("Small Battery")) {
                     outputCard.body.push("Hits Will be Rerolled Due to Size of Battery");
-                } else if (artilleryTeams[0].special.includes("Large Battery")) {
+                } else if (num > 1) {
                     outputCard.body.push("Misses Will be Rerolled Due to Size of Battery");
                 }
                 if (observerTeam.spotAttempts < 3 && observerTeam.unitID !== artilleryUnit.id) {
@@ -5700,7 +5720,8 @@ log(weapon)
             outputCard.body.push("No Targets Under Template");
         }
     
-        pinningUnits = [];
+        let pinningUnits = [];
+        let unitHits = {};
 
         for (let i=0;i<targetArray.length;i++) {
             let team = targetArray[i];
@@ -5708,16 +5729,26 @@ log(weapon)
             let unit = UnitArray[unitID];
             let neededToHit = parseInt(team.hit) + (spotAttempts - 1);
             if (observerLOS.los === false) {neededToHit += 1};//repeat bombardment, spotter doesnt have LOS
-            let roll = randomInteger(6);
-            if (gunNum < 3 && roll >= neededToHit) {
-                //reroll hits if only 1 or 2 guns
-                roll = randomInteger(6);
+
+            let totalTeams = parseInt(team.token.get("bar1_value")) || 1;            
+            let hits = 0;
+            let tip = "";
+            for (let j=0;j<totalTeams;j++) {
+                let roll = randomInteger(6);
+                if (artilleryTeams[0].special.includes("Small Battery") && roll >= neededToHit) {
+                    //reroll hits if only 1 or 2 guns
+                    roll = randomInteger(6);
+                }
+                if (num > 1 && roll < neededToHit) {
+                    //reroll misses if 5+ guns ie 2+ tokens
+                    roll = randomInteger(6);
+                }
+                tip +=  "To Hit: " + roll + " vs. " + neededToHit + "+";
+                if (totalTeams > 1) {tip += "<br>"};
+                if (roll >= neededToHit) {
+                    hits++;
+                }
             }
-            if (gunNum > 4 && roll < neededToHit) {
-                //reroll misses if 5+ guns
-                roll = randomInteger(6);
-            }
-            let tip =  "To Hit: " + roll + " vs. " + neededToHit + "+";
     
             if (ammoType === "Bomblets") {
                 weapon = {
@@ -5739,36 +5770,52 @@ log(weapon)
                 closeCombat: false,
             }
 
-            if (roll >= neededToHit) {
-                team.hitArray = [hit];
-                if (team.type === "Infantry" || team.type === "Unarmoured Tank" || team.type === "Gun") {
+            if (hits > 0) {
+                if (unitHits[unit.id]) {
+                    unitHits[unit.id] += hits;
+                } else {
+                    unitHits[unit.id] = hits;
+                }
+                for (let i=0;i<hits;i++) {
+                    team.hitArray.push(hit);
+                }
+                if (team.type.includes("Infantry") || team.type === "Unarmoured Tank" || team.type === "Gun") {
                     pinningUnits.push(unit);                             
                 }
                 if (!unitIDs4Saves[unitID]) {
                     unitIDs4Saves[unitID] = false; //no mistaken for artillery
-                }
-                outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + "[#ff0000]" + team.name + ": Hit[/#]");
+                }   
+                let s = (hits > 1) ? "s":"";
+                last = ": " + hits + " Hit" + s;
+                outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + "[#ff0000]" + team.name + last + "[/#]");
             } else {
                 outputCard.body.push('[🎲](#" class="showtip" title="' + tip + ')' + team.name + ": Missed");
             }
         }
+
+
         pinningUnits = [...new Set(pinningUnits)];
         if (pinningUnits.length > 0) {
             outputCard.body.push("[hr]");
             _.each(pinningUnits,unit => {
                 let courage = TeamArray[unit.teamIDs[0]].courage;
                 let roll = randomInteger(6);
-                let end = unit.name + ": Not Pinned";
-                if (roll < courage) {
-                    end = "[#ff0000]" + unit.name + ": Pinned";
-                    unit.pin();
+                let rollText = "Roll: " + roll + " vs. Courage " + courage + "+";
+                let end = unit.name + ": Not Suppressed";
+                if (roll < courage || unitHits[unit.id] >= 5) {
+                    end = "[#ff0000]" + unit.name + ": Suppressed[/#]";
+                    let unitLeader = TeamArray[unit.teamIDs[0]];
+                    unitLeader.suppress();
+                    if (unitHits[unit.id] >= 5) {
+                        rollText = "5+ Hits on Unit";
+                    }
                 } 
-                let line = '[🎲](#" class="showtip" title="Roll: ' + roll + " vs. " + courage +  '+)' + end;
+                let line = '[🎲](#" class="showtip" title="' + rollText + ')' + end;
                 outputCard.body.push(line);
             });
         }
         PrintCard();
-        ProcessSaves("Artillery");
+        //ProcessSaves("Artillery");
     }
 
     const ScatterBarrage = (barrageTeam) => {
