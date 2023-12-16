@@ -5353,6 +5353,7 @@ log(weapon)
         unitIDs4Saves = {};
         let rangedIn = false;
         let targetHex = barrageTeam.hex;
+        let offboard = false;
 
         SetupCard("Barrage","",observerTeam.nation);
         outputCard.body.push(artilleryUnit.name + " Firing");
@@ -5382,6 +5383,7 @@ log(weapon)
 
                 let dist = team.hex.distance(barrageTeam.hex);
                 if (hexMap[team.hexLabel].terrain.includes("Offboard") ){
+                    offboard = true;
                     dist += 50; //5km off map
                 }  
                 if (dist > team.artilleryWpn.maxRange || dist < team.artilleryWpn.minRange) {
@@ -5454,7 +5456,6 @@ log(weapon)
         }
 
         //in range,arc of at least one team; rotate to face, mark as fired - weapon will be the weapon info, gun num will be # of teams firing
-        let gunNum = artilleryTeams.length;
         for (let i=0;i<artilleryUnit.teamIDs.length;i++) {
             let artTeam = artilleryTeams[i]; //catch any art units that werent in facing, as they still rotate to fire
             if (artTeam.artilleryWpn === undefined) {continue};
@@ -5485,17 +5486,7 @@ log(weapon)
                 if (hex.type > 0 && artilleryUnit.type !== "Aircraft" && artilleryUnit.type !== "Helicopter") {
                     crossTerrainCheck = true;
                 }
-                if (hex.teamIDs.length !== 0) {
-                    for (let j=0;j<hex.teamIDs.length;j++) {
-                        let team = TeamArray[hex.teamIDs[j]];
-                        if (!team) {continue};
-                        if (team.type === "Aircraft" || team.type === "System Unit") {continue};
-                        if (team.token.get("layer") === "walls") {continue}; //passengers added if approp in process saves
-                        targetArray.push(team);
-                    }
-                }
             }
-            targetArray = [...new Set(targetArray)]; //eliminate duplicates
         }
     
         let tip2 = "";
@@ -5518,13 +5509,24 @@ log(weapon)
             neededText = "AUTO"
             tip2 = "<br>Automatic Due to Repeat Barrage";
         } else {
-            neededText = needed.toString() + "/" + (Math.max(needed - 1,2)).toString() + "/" + (Math.max(needed - 2,2)).toString() + "+";
+            neededText = needed.toString();
+            if (offboard === false) {
+                neededText += "/" + (Math.max(needed - 1,2)).toString() + "/" + (Math.max(needed - 2,2)).toString() + "+";
+            }
         }
     
+        let snafu = false;
         for (let i=0;i<spotAttempts;i++) {
             let roll = randomInteger(6);
+            if (offboard === true && roll === 1) {
+                snafu = true;
+            }
             spotRolls.push(roll);
-            if (roll >= (Math.max(needed - i,2))) {
+            let spotNeeded = needed;
+            if (offboard === false && needed !== 0) {
+                spotNeeded = (Math.max(needed - i,2))
+            }
+            if (roll >= spotNeeded) {
                 success = true;
                 break;
             }
@@ -5546,7 +5548,7 @@ log(weapon)
         spotAttempts = observerTeam.spotAttempts
     
         let sound;
-        if (weapon.type === "Small Arms") {
+        if (weapon.type === "Mortar") {
             sound = "Mortars";
         } else if (weapon.type === "Artillery") {
             sound = "Artillery";
@@ -5559,8 +5561,58 @@ log(weapon)
         }
         PlaySound(sound);
 
-        if (success === false) {
-            let fail = '[🎲](#" class="showtip" title="' + hittip + ')' + "Failed to Range In";
+        let add = " ";
+        let snafuRoll;
+        let offB = false;
+
+        let snafuText = "";
+        if (artilleryTeams.length > 1) {
+            add = " one of ";
+        }
+
+        if (snafu === true) {
+            snafuRoll = randomInteger(6) + randomInteger(6);
+            snafuText += '[🎲](#" class="showtip" title="' + snafuRoll + ')' + "[B][U]SNAFU[/u][/b]<br>";
+            if (snafuRoll === 2) {
+                snafuText += "Counterbattery Fire destroys" + add + "the Artillery Battery before it fires";
+                artilleryTeams[0].kill();
+                success = false;
+            } else if (snafuRoll === 3) {
+                snafuText += "Counterbattery Fire suppressed" + add + "the Artillery Battery before it fires";
+                artilleryTeams[0].Suppress();
+                success = false;
+            } else if (snafuRoll > 3 && snafuRoll < 6 && success === true) {
+                snafuText += "Target Coordinates Incorrect, Barrage Scatters";
+                targetHex = ScatterBarrage(barrageTeam);
+            } else if (snafuRoll > 5 && snafuRoll < 9) {
+                snafuText += "Artillery Battery Currently Unavailable";
+                success = false;
+            } else if (snafuRoll > 8 && snafuRoll < 11 && success === true) {
+                snafuText += "Target Coordinates Incorrect, Barrage Scatters";
+                targetHex = ScatterBarrage(barrageTeam);
+            } else if (snafuRoll === 11 && success === true) {
+                snafuText += "Counterbattery Fire suppressed" + add + "the Artillery Battery before it fires";
+                artilleryTeams[0].Suppress();
+            } else if (snafuRoll === 12 && success === true) {
+                snafuText += "Counterbattery Fire destroys" + add + "the Artillery Battery before it fires";
+                artilleryTeams[0].kill();
+            }
+        }
+
+        if (success === false || snafuText === "Target Coordinates Incorrect, Barrage Scatters") {
+            let fail;
+            if (observerTeam.spotAttempts < 3 && observerTeam.unitID !== artilleryUnit.id) {
+                    outputCard.body.push("The Spotting Unit can still Spot for other Artillery Units");
+                    outputCard.body.push((3 - observerTeam.spotAttempts) + " Spot Attempts Left");
+            }
+            if (snafuText === "Target Coordinates Incorrect, Barrage Scatters") {
+                fail = snafuText;
+                if (targetHex === "Offboard") {
+                    fail += "<br>The Barrage Scatters Offboard";
+                }
+            } else {
+                fail = '[🎲](#" class="showtip" title="' + hittip + ')' + "Failed to Range In";
+            }
             outputCard.body.push(fail);
             RemoveBarrageToken()
             PrintCard();
@@ -5583,8 +5635,28 @@ log(weapon)
                 outputCard.subtitle = "Repeat Bombardment";
             }
     
+            if (ammoType !== "Smoke Bombardment") {
+                //check if template over terrain and build array of any tokens in template
+                radiusHexes = targetHex.radius(templateRadius);
+                for (let i=0;i<radiusHexes.length;i++) {
+                    let hex = hexMap[radiusHexes[i].label()];
+                    if (hex.teamIDs.length !== 0) {
+                        for (let j=0;j<hex.teamIDs.length;j++) {
+                            let team = TeamArray[hex.teamIDs[j]];
+                            if (!team) {continue};
+                            if (team.type === "Aircraft" || team.type === "System Unit") {continue};
+                            targetArray.push(team);
+                        }
+                    }
+                }
+                targetArray = [...new Set(targetArray)]; //eliminate duplicates
+            }
+
             if (ammoType === "Smoke Bombardment") {
-                let num = gunNum * 4;
+                let num = 12;
+                if (artilleryTeams[0].special.includes("Large Battery")) {
+                    num = 24;
+                }
                 SmokeScreen(targetHex,num,direction,artilleryUnit.id);
                 state.TY.smokeScreens[artilleryUnit.player].push(artilleryUnit.id); //tracks that unit fired its one smoke bombardment
                 outputCard.body.push("Smoke Screen successfully placed");
@@ -5592,7 +5664,7 @@ log(weapon)
                 PrintCard();
                 return;
             } else if (ammoType === "Minelets") {
-                let num = Math.ceil(gunNum/3);
+                let num = (artilleryTeams[0].special.includes("Large Battery")) ? 2:1;
                 let s = "";
                 if (num > 1) {s = "s"};
                 outputCard.body.push("Place " + num + ' Minefield Marker' + s + ' within 2 hexes of the Ranged In Target');
@@ -5607,15 +5679,18 @@ log(weapon)
                 if (observerLOS.los === false) {
                     outputCard.body.push("+1 to Roll Needed to Hit due to Spotter LOS");
                 }
-                if (gunNum < 3) {
-                    outputCard.body.push("Hits Will be Rerolled Due to # of Guns");
-                } else if (gunNum > 4) {
-                    outputCard.body.push("Misses Will be Rerolled Due to # of Guns");
+                if (artilleryTeams[0].special.includes("Small Battery")) {
+                    outputCard.body.push("Hits Will be Rerolled Due to Size of Battery");
+                } else if (artilleryTeams[0].special.includes("Large Battery")) {
+                    outputCard.body.push("Misses Will be Rerolled Due to Size of Battery");
                 }
                 if (observerTeam.spotAttempts < 3 && observerTeam.unitID !== artilleryUnit.id) {
                     outputCard.body.push("The Spotting Unit can still Spot for other Artillery Units");
                     outputCard.body.push((3 - observerTeam.spotAttempts) + " Spot Attempts Left");
                 }
+            }
+            if (snafu === true) {
+                outputCard.body.push(snafuText);
             }
         }
         //roll hits and saves
@@ -5694,6 +5769,33 @@ log(weapon)
         }
         PrintCard();
         ProcessSaves("Artillery");
+    }
+
+    const ScatterBarrage = (barrageTeam) => {
+        let dist = (randomInteger(6) + randomInteger(6)) * 70;
+        let initialLocation = hexMap[barrageTeam.hexLabel].centre;
+        let dir = randomInteger(360) * (Math.PI/180)
+        let newX = Math.floor(dist * Math.cos(dir)) + initialLocation.x;
+        let newY = Math.floor(dist * Math.sin(dir)) + initialLocation.y;
+        let newPt = new pt(newX,newY);
+        let newHex = pointToHex(newPt);
+        newPt = hexToPoint(newHex); //centres it
+        let newHexLabel = newHex.label();
+        if (hexMap[newHexLabel]) {
+            if (hexMap[newHexLabel].terrain.includes("Offboard")) {
+                nexHex = "Offboard";
+                RemoveBarrageToken();
+            } else {
+                barrageTeam.hexLabel = newHexLabel;
+                barrageTeam.hex = newHex;
+                barrageTeam.location = newPt;
+                barrageTeam.token.set({
+                    left: newPt.x,
+                    top: newPt.y,
+                })
+            }
+        }
+        return newHex;
     }
 
     const PlaceRangedInMarker = (artilleryUnit,targetHex) => {
