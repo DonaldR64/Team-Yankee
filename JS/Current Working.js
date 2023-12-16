@@ -5603,7 +5603,7 @@ log("SNAFU: " + snafu)
             snafuRoll = randomInteger(6) + randomInteger(6);
 log("Snafu Roll: " + snafuRoll)
 
-            snafuText += '[🎲](#" class="showtip" title="' + snafuRoll + ')' + "[B][U]SNAFU[/u][/b]<br>";
+            snafuText += '[🎲](#" class="showtip" title="' + snafuRoll + ')' + " [B][U]SNAFU[/u][/b]<br>";
             if (snafuRoll === 2) {
                 snafuText += "Counterbattery Fire destroys" + add + "the Artillery Battery before it fires";
                 artilleryTeams[0].kill();
@@ -5616,7 +5616,7 @@ log("Snafu Roll: " + snafuRoll)
                 snafuText += "Unable to Coordinate Barrage, Scatters";
                 targetHex = ScatterBarrage(barrageTeam);
             } else if (snafuRoll > 5 && snafuRoll < 9) {
-                snafuText += "Artillery Battery Currently Unavailable";
+                snafuText += "Artillery Battery Unavailable This Turn";
                 success = false;
             } else if (snafuRoll > 8 && snafuRoll < 11 && success === true) {
                 snafuText += "Unable to Coordinate Barrage, Scatters";
