@@ -5511,8 +5511,6 @@ log(weapon)
             needed -=1;
             tip2 += "<br>Specialist Observer -1";
         }
-
-
     
         if (rangedIn) {needed = 0};
         let neededText;
