@@ -43,10 +43,10 @@ const TY = (() => {
         Good: 70,
         Moderate: 30,
         Bad: 15,
-        Night: 8,
-        "Infra-Red": 20,
-        "Thermal Imaging": 20,
-        "2nd Gen Thermal Imaging": 40,
+        Night: 4,
+        "Infra-Red": 8,
+        "Thermal Imaging": 10,
+        "2nd Gen Thermal Imaging": 30,
     }
 
     const blastR = [0,1,2]; //Blast sizes for Mortar,Normal Art, Salvo
@@ -79,7 +79,7 @@ const TY = (() => {
         "HQ": "Always In Command and ignores Morale Checks",
         "Hunter-Killer": "Hunter-Killer Helicopters can use terrain for Concealment and are Gone to Ground unless they Shoot",
         "Independent": "Independent Teams can use the Mistaken Target rule to reassign hits to nearby Units, but cannot Charge into Contact or take an Objective",        
-        "Infra-Red": "Can see out to a distance of 1000m (20 hexes) at night",
+        "Infra-Red": "Can see out to a distance of 800m (8 hexes) at night",
         "Jump Jet": "Enters the table on a score of 3+",
         "Large Gun": 'Cannot be placed in Buildings and cannot be placed from Ambush within 4 hexes of enemy',
         "Laser Rangefinder": 'No Penalties for Long Range',
@@ -111,8 +111,8 @@ const TY = (() => {
         "Stabiliser": 'Tank can move 7 hexes at Tactical, gaining a +1 penalty To Hit. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 5 hexes',
         "Swingfire": "Team firing Swingfire Missiles can remain Gone to Ground",
         "Tandem Warhead": "Tandem Warhead HEAT weapons are unaffected by ERA Armour",
-        "Thermal Imaging": "Visibility to 1000m (20 hexes) at night. No To Hit penalties for Night and Smoke",
-        "2nd Gen Thermal Imaging": "Visibility to 2000m (40 hexes) at night. No To Hit penalties for Night and Smoke",
+        "Thermal Imaging": "Visibility to (10 hexes) at night. No To Hit penalties for Night and Smoke",
+        "2nd Gen Thermal Imaging": "Visibility to 3km (30 hexes) at night. No To Hit penalties for Night and Smoke",
         "Tractor": "A Tractor Team can tow a single Gun Team as a Passenger, placing the Gun Team behind it",
         "Unarmoured": "An Unarmoured Tank Team cannot Charge into Contact and must Break Off if Assaulted",
     };
