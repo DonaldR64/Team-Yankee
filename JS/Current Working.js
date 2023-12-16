@@ -5544,7 +5544,10 @@ log(weapon)
             let roll = randomInteger(6);
 if (i===0) {roll = 1};
             if (offboard === true && roll === 1) {
-                snafu = true;
+                let midRoll = randomInteger(6);
+                if (midRoll > 3) {
+                    snafu = true;
+                }
             }
             spotRolls.push(roll);
             let spotNeeded = needed;
