@@ -51,8 +51,8 @@
 
         {"id": 101, "name": "M106 Mortar Battery", "pts": 3},
 
-        {"id": 110, "name": "M109 Battery: (3 M109s)", "pts": 7},
-        {"id": 111, "name": "M109 Battery: (6 M109s)", "pts": 14},
+        {"id": 110, "name": "M109 Battery: 1x M109 Platoon", "pts": 7},
+        {"id": 111, "name": "M109 Battery: 2x M109 Platoons", "pts": 14},
 
         {"id": 145, "name": "1x Skyhawks", "pts": 5},
         {"id": 146, "name": "2x Skyhawks", "pts": 10},
