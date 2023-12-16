@@ -5610,13 +5610,13 @@ log("Snafu Roll: " + snafuRoll)
                 artilleryTeams[0].Suppress();
                 success = false;
             } else if (snafuRoll > 3 && snafuRoll < 6 && success === true) {
-                snafuText += "Target Coordinates Incorrect, Barrage Scatters";
+                snafuText += "Target Coordinates Incorrect";
                 targetHex = ScatterBarrage(barrageTeam);
             } else if (snafuRoll > 5 && snafuRoll < 9) {
                 snafuText += "Artillery Battery Currently Unavailable";
                 success = false;
             } else if (snafuRoll > 8 && snafuRoll < 11 && success === true) {
-                snafuText += "Target Coordinates Incorrect, Barrage Scatters";
+                snafuText += "Target Coordinates Incorrect";
                 targetHex = ScatterBarrage(barrageTeam);
             } else if (snafuRoll === 11 && success === true) {
                 snafuText += "Counterbattery Fire suppressed" + add + "the Artillery Battery before it fires";
