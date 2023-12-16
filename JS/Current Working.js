@@ -5428,7 +5428,7 @@ log(weapon)
 
         if (weapon.moving === "Mortar" || weapon.halted === "Mortar") {
             BR = 0;
-        } else if (weapon.moving === "Mortar" || weapon.halted === "Mortar") {
+        } else if (weapon.moving === "Artillery" || weapon.halted === "Artillery") {
             BR = 1;
         } else {
             BR = 2;
@@ -5542,6 +5542,7 @@ log(weapon)
         let snafu = false;
         for (let i=0;i<spotAttempts;i++) {
             let roll = randomInteger(6);
+if (i===0) {roll = 1};
             if (offboard === true && roll === 1) {
                 snafu = true;
             }
@@ -5555,7 +5556,9 @@ log(weapon)
                 break;
             }
         }
-    
+
+log("SNAFU: " + snafu)
+
         weaponName = weapon.name;
         let extra = "";
         if (ammoType === "Bomblets") {extra = "DPICM Rounds with "};
@@ -5587,7 +5590,6 @@ log(weapon)
 
         let add = " ";
         let snafuRoll;
-        let offB = false;
 
         let snafuText = "";
         if (artilleryTeams.length > 1) {
@@ -5596,6 +5598,8 @@ log(weapon)
 
         if (snafu === true) {
             snafuRoll = randomInteger(6) + randomInteger(6);
+log("Snafu Roll: " + snafuRoll)
+
             snafuText += '[🎲](#" class="showtip" title="' + snafuRoll + ')' + "[B][U]SNAFU[/u][/b]<br>";
             if (snafuRoll === 2) {
                 snafuText += "Counterbattery Fire destroys" + add + "the Artillery Battery before it fires";
@@ -5623,13 +5627,13 @@ log(weapon)
             }
         }
 
-        if (success === false || snafuText === "Target Coordinates Incorrect, Barrage Scatters") {
+        if (success === false || targetHex === "Offboard") {
             let fail;
             if (observerTeam.spotAttempts < 3 && observerTeam.unitID !== artilleryUnit.id) {
                     outputCard.body.push("The Spotting Unit can still Spot for other Artillery Units");
                     outputCard.body.push((3 - observerTeam.spotAttempts) + " Spot Attempts Left");
             }
-            if (snafuText === "Target Coordinates Incorrect, Barrage Scatters") {
+            if (snafu === true) {
                 fail = snafuText;
                 if (targetHex === "Offboard") {
                     fail += "<br>The Barrage Scatters Offboard";
@@ -5644,7 +5648,7 @@ log(weapon)
         } else {
             let text = ["","1st","2nd","3rd"];
             let text2 = ["","","+1 to Roll Needed to Hit","+2 to Roll Needed to Hit"];
-
+        
             if (observerTeam.type !== "Aircraft" && observerTeam.type !== "Helicopter" && rangedIn === false) {
                 PlaceRangedInMarker(artilleryUnit,targetHex);
             }
@@ -5819,12 +5823,12 @@ log(weapon)
     }
 
     const ScatterBarrage = (barrageTeam) => {
-        let dist = (randomInteger(6) + randomInteger(6)) * 70;
+        let dist = randomInteger(6) * 70;
         let initialLocation = hexMap[barrageTeam.hexLabel].centre;
         let dir = randomInteger(360) * (Math.PI/180)
         let newX = Math.floor(dist * Math.cos(dir)) + initialLocation.x;
         let newY = Math.floor(dist * Math.sin(dir)) + initialLocation.y;
-        let newPt = new pt(newX,newY);
+        let newPt = new Point(newX,newY);
         let newHex = pointToHex(newPt);
         newPt = hexToPoint(newHex); //centres it
         let newHexLabel = newHex.label();
