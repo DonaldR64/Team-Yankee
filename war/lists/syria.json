@@ -48,16 +48,16 @@
         {"id": 61, "name": "AA Platoon: ZSU-23-4 Shilka", "pts": 3},
         {"id": 71, "name": "AA Platoon: ZSU-57-2", "pts": 2},
 
-        {"id": 120, "name": "2S1 Carnation Battery: (3 2S1s)", "pts": 4},
-        {"id": 121, "name": "2S1 Carnation Battery: (6 2S1s)", "pts": 8},
+        {"id": 120, "name": "2S1 Carnation Battery: 1x 2S1 Platoon", "pts": 4},
+        {"id": 121, "name": "2S1 Carnation Battery: 2x 2S1 Platoons", "pts": 8},
 
         {"id": 125, "name": "Spandrel AT Platoon", "pts": 2},
 
-        {"id": 140, "name": "2S3 Acacia Battery: (3x 2S3s)", "pts": 4},
-        {"id": 141, "name": "2S3 Acacia Battery: (6x 2S3s)", "pts": 9},
+        {"id": 140, "name": "2S3 Acacia Battery: 1x 2S3 Platoon", "pts": 4},
+        {"id": 141, "name": "2S3 Acacia Battery: 2x 2S1 Platoons", "pts": 9},
 
-        {"id": 150, "name": "BM-21 HAIL Battery: (3x BM-21s)", "pts": 3},
-        {"id": 151, "name": "BM-21 HAIL Battery: (6x BM-21s)", "pts": 6},
+        {"id": 150, "name": "BM-21 HAIL Battery: 1x BM-21 Platoon", "pts": 3},
+        {"id": 151, "name": "BM-21 HAIL Battery: 2x BM-21 Platoons", "pts": 6},
  
         {"id": 160, "name": "SA-9 Gaskin Platoon", "pts": 2},
         {"id": 165, "name": "SA-13 Gopher Platoon", "pts": 2},
