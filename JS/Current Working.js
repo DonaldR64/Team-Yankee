@@ -633,7 +633,7 @@ const TY = (() => {
 
         resetflags() {
             let newTeamIDs = [];
-            let conditions = ["Dash","Tactical","Hold","Assault","Fired","AAFire"];
+            let conditions = ["Dash","Tactical","Hold","Assault","Fired","AAFire","Spot"];
 
             for (let i=0;i<this.teamIDs.length;i++) {
                 let id = this.teamIDs[i];
@@ -653,7 +653,7 @@ const TY = (() => {
             if (this.player === 0) {
                 let unitLeader = TeamArray[this.teamIDs[0]];
                 if (unitLeader) {
-                    if (unitLeader.suppressed === true) {
+                    if (unitLeader.suppressed === true && (unitLeader.type === "Tank" || unitLeader.type === "Unarmoured Tank")) {
                         SwapLeader(this);
                     }
                 }
@@ -4084,7 +4084,7 @@ log("Same had 2")
             } else {
                 team.addCondition("GTG")
                 team.gonetoground = true;
-                if (i===0 && state.TY.turn > 0) {
+                if (i===0 && state.TY.turn > 0 && team.queryCondition("Spot") === false) {
                     team.token.set("aura1_color",Colours.lightpurple)
                 }
             }
@@ -6009,7 +6009,6 @@ log(marker);
 
 
     const SwapLeader = (unit) => {
-        let text = "";
         if (unit.teamIDs.length < 2) {return text}; 
         let oldLeader = TeamArray[unit.teamIDs[0]];
         let newLeader;
@@ -6033,9 +6032,8 @@ log(marker);
             });
             let old_index = unit.teamIDs.indexOf(newLeader.id);
             unit.teamIDs.splice(0, 0, unit.teamIDs.splice(old_index, 1)[0]);
-            text = newLeader.name + " takes command of the Unit";
+            outputCard.body.push(newLeader.name + " takes command of its Unit");
         }
-        return text;
     }
 
     const EndFire = (msg) => {
