@@ -701,7 +701,7 @@ const TY = (() => {
             if (this.player === 0) {
                 let unitLeader = TeamArray[this.teamIDs[0]];
                 if (unitLeader) {
-                    if (unitLeader.suppressed === true && (unitLeader.type === "Tank" || unitLeader.type === "Unarmoured Tank")) {
+                    if (unitLeader.suppressed === true && unitLeader.type === "Tank") {
                         SwapLeader(this);
                     }
                 }
@@ -743,6 +743,21 @@ const TY = (() => {
                 }
             }
         }
+
+        suppress() {
+            _.each(this.teamIDs,teamID => {
+                let team = TeamArray[teamID];
+                team.suppress();
+            });
+        }
+
+        rally() {
+            _.each(this.teamIDs,teamID => {
+                let team = TeamArray[teamID];
+                team.rally();
+            });
+        }
+
 
         IC() {
             if (this.type === "System Unit") {return};
@@ -2752,11 +2767,7 @@ log(formation)
             outputCard.body.push("Team is NOT In Command");
         }
         if (team.suppressed === true) {
-            let noun = "Suppressed";
-            if (team.type === "Infantry" || team.type === "Gun") {
-                noun = "Pinned";
-            }
-            outputCard.body.push("[#ff0000]Team is " + noun + "[/#]");
+            outputCard.body.push("[#ff0000]Team is Suppressed[/#]");
         }
         if (team.order === "") {
             outputCard.body.push("No Order this Turn");
@@ -3998,7 +4009,7 @@ log("Same had 2")
                     let unit = UnitArray[keys[i]];
                     let unitLeader = TeamArray[unit.teamIDs[0]];
                     if (!unitLeader) {continue};
-                    if (unitLeader.suppressed === true) {
+                    if (unitLeader.suppressed === true && unitLeader.type === "Tank") {
                         let text = SwapLeader(unit);
                         if (text !== "") {
                             sendChat("",text);
@@ -4136,8 +4147,14 @@ log("Same had 2")
                     _.each(unit.teamIDs,id => {
                         let team = TeamArray[id];
                         if (team) {
-                            if (team.suppressed === true && team.player === p) {
-                                CheckArray.push(team);
+                            if (team.type === "Tank") {
+                                if (team.suppressed === true && team.player === p) {
+                                    CheckArray.push(team);
+                                }
+                            } else {
+                                if (id === unit.teamIDs[0] && team.suppressed === true && team.player === p) {
+                                    CheckArray.push(team);
+                                }
                             }
                         }
                     });
@@ -4269,22 +4286,33 @@ log("Same had 2")
                     neededText = "Auto"
                 }
                 let unit = UnitArray[team.unitID];
+
+                let noun = "Unit";
+                let disp = unit.name;
+                if (team.type === "Tank") {
+                    noun = "Platoon"
+                    disp = team.name;
+                }
                 let roll = randomInteger(6);
                 let reroll = CommandReroll(team);
-                SetupCard(team.name,"Needing: " + neededText,team.nation);
-                outputCard.body.push("Team: " + DisplayDice(roll,team.nation,24));
+                SetupCard(disp,"Needing: " + neededText,team.nation);
+                outputCard.body.push(noun + ": " + DisplayDice(roll,team.nation,24));
                 if (roll < needed && reroll > -1) {
                     outputCard.body.push("Commander Reroll: " + DisplayDice(reroll,team.nation,24));
                 }
                 if (roll >= needed || reroll >= needed) {
                     outputCard.body.push("Success!");
-                    team.rally();
+                    if (team.type === "Tank") {
+                        team.rally();
+                    } else {
+                        unit.rally();
+                    }
                 } else {
-                    outputCard.body.push("Failure! Team remains Suppressed");
+                    outputCard.body.push("Failure! " + noun + " remains Suppressed");
                 }
                 let part1 = "Done";
                 if (CheckArray.length > 0) {
-                    part1 = "Next Team";
+                    part1 = "Next Team/Unit";
                 } 
                 ButtonInfo(part1,"!MoraleChecks");
                 PrintCard();
@@ -4363,7 +4391,9 @@ log("Same had 2")
         let hqs = [];
         _.each(TeamArray,team2 => {
             if (team2.nation === team.nation && team2.special.includes("HQ")) {
-                hqs.push(team2);
+                if (formationID === state.TY.supportID || formationID === team2.formationID) {
+                    hqs.push(team2);
+                } 
             };
         });
         for (let i=0;i<hqs.length;i++) {
@@ -5657,7 +5687,6 @@ log(weapon)
         let snafu = false;
         for (let i=0;i<spotAttempts;i++) {
             let roll = randomInteger(6);
-if (i===0) {roll = 1};
             if (offboard === true && roll === 1) {
                 let midRoll = randomInteger(6);
                 if (midRoll > 3) {
@@ -5926,8 +5955,7 @@ log("Snafu Roll: " + snafuRoll)
                 let end = unit.name + ": Not Suppressed";
                 if (roll < courage || unitHits[unit.id] >= 5) {
                     end = "[#ff0000]" + unit.name + ": Suppressed[/#]";
-                    let unitLeader = TeamArray[unit.teamIDs[0]];
-                    unitLeader.suppress();
+                    unit.suppress();
                     if (unitHits[unit.id] >= 5) {
                         rollText = "5+ Hits on Unit";
                     }
@@ -6902,7 +6930,7 @@ log("Charge Dist: " + chargeDist)
 
                 let oldHexLabel = team.hexLabel;
 
-                let moveBack = team.suppressed;
+                let moveBack = false;
                 if ((team.type === "Tank" || team.type === "Unarmoured Tank") && hexMap[newHexLabel].dash === 3) {
                     moveBack = true;
                 }
