@@ -9,10 +9,13 @@ const TY = (() => {
     let TerrainArray = {};
     let TeamArray = {}; //Individual Platoons or Squads
     let UnitArray = {}; //Units of Teams - Company or Battery
+    let FormationArray = {};
     let SmokeArray = [];
     let FoxholeArray = [];
     let CheckArray = []; //used by Remount, Rally and Morale checks
     let RangedInArray = {};
+    let unitCreationInfo = {};
+
 
     let unitIDs4Saves = {}; //used during shooting routines
     let AssaultIDs = [[],[]]; //array of teams (IDs) in a CC, updated when charge/move
@@ -585,12 +588,19 @@ const TY = (() => {
             this.unitIDs = [];  
             this.nation = nation;
             this.player = (WarsawPact.includes(nation)) ? 0:1;
+            state.TY.formations[id] = name;
         }
 
         add(unit) {
             if (this.unitIDs.includes(unit.id) === false) {
                 this.unitIDs.push(unit.id);
                 unit.formationID = this.id;
+                if (!state.TY.units[unit.id]) {
+                    state.TY.units[unit.id] = {
+                        name: unit.name,
+                        formationID: this.id,
+                    };
+                }
             }
         }
 
@@ -609,7 +619,7 @@ const TY = (() => {
 
 
     class Unit {
-        constructor(nation,id,name,formationID){
+        constructor(nation,id,name){
             if (!name) {name = id};
             if (!id) {
                 id = stringGen();
@@ -621,15 +631,8 @@ const TY = (() => {
             this.nation = nation;
             this.player = (WarsawPact.includes(nation)) ? 0:1;
             this.teamIDs = [];
-            this.formationID = formationID;
+            this.formationID = "";
             this.inReserve = false;
-
-            if (!state.TY.units[id]) {
-                state.TY.units[id] = {
-                    name: name,
-                    formationID: formationID,
-                };
-            }
             UnitArray[id] = this;
         }
 
@@ -637,7 +640,15 @@ const TY = (() => {
             if (this.teamIDs.includes(team.id) === false) {
                 this.teamIDs.push(team.id);
                 team.unitID = this.id;
+                team.formationID = this.formationID;
             }
+
+            if (!state.TY.teams[team.id]) {
+                state.TY.teams[team.id] = this.id;
+            }
+
+
+
         }
 
         remove(team) {
@@ -980,6 +991,7 @@ log("Special Text: " + specialText)
             this.characterName = charName;
             this.characterID = char.id;
             this.unitID = unitID;
+            this.formationID = "";
             this.rank = parseInt(attributeArray.rank) || 0;
 
             this.type = type;    
@@ -1035,10 +1047,6 @@ log("Special Text: " + specialText)
             this.aaFired = this.queryCondition("AA Fire");
             this.moved = ((this.queryCondition("Tactical") || this.queryCondition("Dash")) === true) ? true:false;
             this.gonetoground = this.queryCondition("GTG");
-
-            if (!state.TY.teams[this.id]) {
-                state.TY.teams[this.id] = unitID;
-            }
 
             TeamArray[tokenID] = this;
             hexMap[hexLabel].teamIDs.push(tokenID);
@@ -1827,7 +1835,7 @@ log(hex)
         //clear arrays
         UnitArray = {};
         TeamArray = {};
-
+        FormationArray = {};
         SmokeArray = {};
         FoxholeArray = [];
         
@@ -1873,13 +1881,14 @@ log(hex)
             smokeScreens: [[],[]],
             minelets: [[],[]],
             conditions: {},
-            teams: {}, //teamIDs -> unit and formation IDs
-            units: {},//unitIDs -> name
+            teams: {}, //teamIDs -> unit IDs
+            units: {},//unitIDs -> name and formation IDs
+            formations: {},//formationIDs -> name
             passengers: {},//keyed on IDs of transports, arrays of passengerIDs
             currentUnitID: "",
             turnMarkerIDs: ["",""],
             playerSteps: [],
-            supportID: ["",""];
+            supportID: ["",""],
         }
 
         BuildMap();
@@ -2410,13 +2419,21 @@ log(hex)
             let unitID = state.TY.teams[id];
 
             let unitName = state.TY.units[unitID].name;
-            let unitNumber =  state.TY.units[unitID].number;
-            let unit,team;
+            let formationID = state.TY.units[unitID].formationID;
+            let formationName = state.TY.formations[formationID];
+            let formation,unit,team;
+
+            if (!FormationArray[formationID]) {
+                formation = new Formation(nation,formationID,formationName);
+            } else {
+                formation = FormationArray[formationID];
+            }
             if (!UnitArray[unitID]) {
-                unit = new Unit(nation,unitID,unitName,unitNumber);
+                unit = new Unit(nation,unitID,unitName);
             } else {
                 unit = UnitArray[unitID];
             }
+            formation.add(unit);
             team = new Team(id,unitID);
             unit.add(team);
             add++;
@@ -2474,7 +2491,6 @@ log(hex)
         let nation = Attribute(refChar,"nation");
         let player = (WarsawPact.includes(nation)) ? 0:1;
         let unitType = Attribute(refChar,"unittype"); //Core, Support or nil
-        let formationID;
 
         let formationKeys = Object.keys(FormationArray);
 
@@ -2485,12 +2501,8 @@ log(hex)
 
         SetupCard("Unit Creation","",nation);
 
-
-
         if (unitType === "Support") {
-            formationID = state.TY.supportID[player];
-            ButtonInfo("Add to Support","!UnitCreation2;" + formationID + ";Support");
-
+            ButtonInfo("Add to Support","!UnitCreation2;" + state.TY.supportID[player] + ";Support");
         } else {
             let newID = stringGen();
             outputCard.body.push("Select Existing Formation or New");
@@ -2507,45 +2519,34 @@ log(hex)
 
         unitCreationInfo = {
             nation: nation,
-            newID: newID,
             teamIDs: teamIDs,
             unitName: unitName,
         }
     }
 
 
-//////
 
 
-    const UnitCreationOrig = (msg) => {
-        if (!msg.selected) {return};
+
+    const UnitCreation2 = (msg) => {
+
         let Tag = msg.content.split(";");
-        let unitName = Tag[1];
-        let companyNumber = Tag[2];
-
-        let teamIDs = [];
-        for (let i=0;i<msg.selected.length;i++) {
-            teamIDs.push(msg.selected[i]._id);
-        }
-        let refToken = findObjs({_type:"graphic", id: teamIDs[0]})[0];
-        let refChar = getObj("character", refToken.get("represents")); 
-        if (!refChar) {
-            sendChat("","Error, NonCharacter Token");
-            return;
+        let unitName = unitCreationInfo.unitName;
+        let nation = unitCreationInfo.nation;
+        let player = (WarsawPact.includes(nation)) ? 0:1;
+        let teamIDs = unitCreationInfo.teamIDs;
+        let formationID = Tag[1];
+        let formation = FormationArray[formationID];
+    
+        if (!formation) {
+            formation = new Formation(nation,formationID,Tag[2]);
         }
 
-        let nation = Attribute(refChar,"nation");
+        let unitNumber = formation.unitIDs.length;
 
         SetupCard("Unit Creation","",nation);
 
-        let player = (WarsawPact.includes(nation)) ? 0:1;
-        if (!state.TY.companyNames[player][companyNumber]) {
-            state.TY.companyNames[player][companyNumber] = unitName;
-        } else {
-            unitName = state.TY.companyNames[player][companyNumber];
-        }
-log("Unit Name: " + unitName)
-        let unitMarker = Nations[nation].unitmarkers[companyNumber];
+        let unitMarker = Nations[nation].unitmarkers[unitNumber];
 
         //NATO - Unit is the Company, each token a Platoon and commandable
         //WARPACT - Unit is the Company, but only lead token in Co is Commandable, larger unit is formation, not tracked in game
@@ -2554,13 +2555,14 @@ log("Unit Name: " + unitName)
         if (player === 1) {
             //NATO
             for (let i=0;i<teamIDs.length;i++) {
-                let unit = new Unit(nation,stringGen(),unitName + "/" + plts[i] + " Plt", companyNumber);
+                let unit = new Unit(nation,stringGen(),unitName + "/" + plts[i] + " Plt");
+                formation.add(unit);
                 let team = new Team(teamIDs[i],unit.id);
                 if (!team) {continue};
                 if (team.special.includes("HQ")) {
                     unit.name = unitName + "/HQ";
                     cm = Nations[nation].flag
-                } else {
+                } else if (formation.name !== "Support") {
                     cm = "status_" + companyMarkers[i];
                 }
                 unit.add(team);
@@ -2613,7 +2615,8 @@ log("Unit Name: " + unitName)
 
             for (let i=0;i<sortedArray.length;i++) {
                 let companyArray = sortedArray[i];
-                let unit = new Unit(nation,stringGen(),unitName + "/" + plts[i] + " Co",i);
+                let unit = new Unit(nation,stringGen(),unitName + "/" + plts[i] + " Co");
+                formation.add(unit);
                 let num = 0
                 for (let j=0;j<companyArray.length;j++) {
                     let id = companyArray[j];
@@ -2666,7 +2669,14 @@ log("Unit Name: " + unitName)
     const NameAndRank = (team,i,note) => {
         let name = team.characterName.replace(team.nation + " ","");
         let unit = UnitArray[team.unitID];
-        let un = parseInt(unit.number);
+        let formation = FormationArray[team.formationID];
+log(team)
+log(unit)
+log(formation)
+return "A"
+
+
+        let un = formation.unitIDs.length;
         let letter = rowLabels[un];
         if (team.type.includes("Tank")) {
             name = name.replace(team.nation + " ","");
@@ -7001,6 +7011,8 @@ log("Charge Dist: " + chargeDist)
                 log(TeamArray);
                 log("Unit Array");
                 log(UnitArray);
+                log("Formation Array");
+                log(FormationArray);
                 log("Ranged In Array");
                 log(RangedInArray)
                 break;
@@ -7015,6 +7027,9 @@ log("Charge Dist: " + chargeDist)
                 break;
             case '!UnitCreation':
                 UnitCreation(msg);
+                break;
+            case '!UnitCreation2':
+                UnitCreation2(msg);
                 break;
             case '!TestLOS':
                 TestLOS(msg);
