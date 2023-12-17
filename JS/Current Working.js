@@ -5199,6 +5199,11 @@ log("In Create Barrages")
             PrintCard();
             return;
         }
+        if (observerTeam.spotAttempts < 1) {
+            outputCard.body.push("This Platoon has no further Spot Attempts remaining");
+            PrintCard();
+            return;
+        }
 
         let img = Nations[observerTeam.nation].barrageimage;
         img = getCleanImgSrc(img);
@@ -5520,6 +5525,7 @@ log(weapon)
         let direction = Tag[5]; //in Smoke Bombardment
         let barrageTeam = TeamArray[barrageID];
         let observerTeam = TeamArray[observerID];
+        let observerUnit = UnitArray[observerTeam.unitID];
         let artilleryUnit = UnitArray[artUnitID];
 
         unitIDs4Saves = {};
@@ -5731,6 +5737,13 @@ log("SNAFU: " + snafu)
         observerTeam.spotAttempts += spotRolls.length;
         spotAttempts = observerTeam.spotAttempts
     
+        if (observerUnit.teamIDs.length === 1) {
+            outputCard.body.push("(" + observerTeam.name + " given a Hold Order)");
+            observerTeam.addCondition("Hold");
+            observerTeam.order = "Hold";
+            observerTeam.token.set("aura1_color",Colours.black);
+        }
+
         let sound;
         if (weapon.type === "Mortar") {
             sound = "Mortars";
@@ -5975,6 +5988,10 @@ log("Snafu Roll: " + snafuRoll)
             });
         }
         PrintCard();
+
+
+
+
         //ProcessSaves("Artillery");
     }
 
