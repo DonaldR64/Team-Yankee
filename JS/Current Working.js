@@ -574,8 +574,42 @@ const TY = (() => {
     }
 
     //core classes
+    class Formation {
+        constructor(nation,id,name) {
+            if (!name) {name = id};
+            if (!id) {
+                id = stringGen();
+            }
+            this.id = id;
+            this.name = name;
+            this.unitIDs = [];  
+            this.nation = nation;
+            this.player = (WarsawPact.includes(nation)) ? 0:1;
+        }
+
+        add(unit) {
+            if (this.unitIDs.includes(unit.id) === false) {
+                this.unitIDs.push(unit.id);
+                unit.formationID = this.id;
+            }
+        }
+
+        remove(unit) {
+            let unitIDs = this.unitIDs;
+            let index = unitIDs.indexOf(unit.id);
+            log("In Formation.remove")
+            log("Index of Unit ID: " + index)
+            if (index > -1) {
+                unitIDs.splice(index,1);
+            }
+            this.unitIDs = unitIDs;
+        }
+    }
+
+
+
     class Unit {
-        constructor(nation,id,name,number){
+        constructor(nation,id,name,formationID){
             if (!name) {name = id};
             if (!id) {
                 id = stringGen();
@@ -587,16 +621,15 @@ const TY = (() => {
             this.nation = nation;
             this.player = (WarsawPact.includes(nation)) ? 0:1;
             this.teamIDs = [];
-            this.number = number;
+            this.formationID = formationID;
             this.inReserve = false;
 
             if (!state.TY.units[id]) {
                 state.TY.units[id] = {
                     name: name,
-                    number: number,
+                    formationID: formationID,
                 };
             }
-
             UnitArray[id] = this;
         }
 
@@ -1846,6 +1879,7 @@ log(hex)
             currentUnitID: "",
             turnMarkerIDs: ["",""],
             playerSteps: [],
+            supportID: ["",""];
         }
 
         BuildMap();
@@ -2438,38 +2472,37 @@ log(hex)
             return;
         }
         let nation = Attribute(refChar,"nation");
+        let player = (WarsawPact.includes(nation)) ? 0:1;
+        let unitType = Attribute(refChar,"unittype"); //Core, Support or nil
+        let formationID;
 
         let formationKeys = Object.keys(FormationArray);
-        let supportFlag = false;
-        if (formationKeys.length > 0) {
+
+        if (!state.TY.supportID[player]) {
+            support = new Formation(nation,stringGen(),"Support");
+            state.TY.supportID[player] = support.id;
+        }
+
+        SetupCard("Unit Creation","",nation);
+
+
+
+        if (unitType === "Support") {
+            formationID = state.TY.supportID[player];
+            ButtonInfo("Add to Support","!UnitCreation2;" + formationID + ";Support");
+
+        } else {
+            let newID = stringGen();
+            outputCard.body.push("Select Existing Formation or New");
+            ButtonInfo("New","!UnitCreation2;" + newID + ";?{Formation Name}");
             for (let i=0;i<formationKeys.length;i++) {
                 let formation = FormationArray[formationKeys[i]];
-                if (formation.nation !== nation) {continue}
-                if (formation.name === "Support") {
-                    supportFlag = true;
-                    break;
-                }
+                if (formation.nation !== nation) {continue};
+                let action = "!UnitCreation2;" + formation.id;
+                ButtonInfo(formation.name,action);
             }
+
         }
-
-        if (supportFlag === false) {
-            support = new Formation(nation,stringGen(),"Support");
-        }
-
-        let newID = stringGen();
-        SetupCard("Unit Creation","",nation);
-        outputCard.body.push("Select Existing Formation or New");
-
-        ButtonInfo("New","!UnitCreation2;" + newID + ";?{Formation Name}");
-        formationKeys = Object.keys(FormationArray); //redone as Support may have been added
-
-        for (let i=0;i<formationKeys.length;i++) {
-            let formation = FormationArray[formationKeys[i]];
-            if (formation.nation !== nation) {continue};
-            let action = "!UnitCreation2;" + formation.id;
-            ButtonInfo(formation.name,action);
-        }
-
         PrintCard();
 
         unitCreationInfo = {
@@ -2481,7 +2514,7 @@ log(hex)
     }
 
 
-
+//////
 
 
     const UnitCreationOrig = (msg) => {
