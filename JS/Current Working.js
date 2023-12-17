@@ -2680,10 +2680,14 @@ log("Unit Name: " + unitName)
     
         let distanceT1T2 = team1.hex.distance(team2.hex);
         let losReason = "";
-        let visibility = state.TY.visibility;
+        let baseVisibility = state.TY.visibility;
+        if (team1.type === "Aircraft" || team1.type === "Helicopter") {
+            baseVisibility = 500;
+        }
+        let visibility = baseVisibility;
         if (state.TY.darkness === true) {visibility = Visibility["Night"]};
         if (team2.queryCondition("Flare") === true) {
-            visibility = state.TY.visibility;
+            visibility = baseVisibility;
         }
         let conds = ["Infra-Red","Thermal Imaging","2nd Gen Thermal Imaging"];
         for (let i=0;i<conds.length;i++) {
@@ -2691,7 +2695,7 @@ log("Unit Name: " + unitName)
                 if (state.TY.visibility === 15 && conds[i] === "Infra-Red") {
                     visibility = 15;
                 } else {
-                    visibility = Math.max(visibility,Visibility[conds[i]]);
+                    visibility = Math.max(baseVisibility,Visibility[conds[i]]);
                 }
             }
         }
