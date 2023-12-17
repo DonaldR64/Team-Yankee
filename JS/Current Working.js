@@ -2494,7 +2494,7 @@ log(hex)
         }
         let nation = Attribute(refChar,"nation");
         let player = (WarsawPact.includes(nation)) ? 0:1;
-        let unitType = Attribute(refChar,"unittype"); //Core, Support or nil
+        let unitType = Attribute(refChar,"unittype"); //Core, Support or Core/Support
 
         let formationKeys = Object.keys(FormationArray);
 
@@ -2505,10 +2505,10 @@ log(hex)
 
         SetupCard("Unit Creation","",nation);
 
-        if (unitType === "Support" || unitType === "") {
+        if (unitType.includes("Support")) {
             ButtonInfo("Add to Support","!UnitCreation2;" + state.TY.supportID[player] + ";Support");
         } 
-        if (unitType === "Core" || unitType === "") {
+        if (unitType.includes("Core")) {
             let newID = stringGen();
             outputCard.body.push("Select Existing Formation or New");
             ButtonInfo("New","!UnitCreation2;" + newID + ";?{Formation Name}");
