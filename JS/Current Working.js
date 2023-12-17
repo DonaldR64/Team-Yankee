@@ -2510,6 +2510,11 @@ log(hex)
         let nation = Attribute(refChar,"nation");
         let player = (WarsawPact.includes(nation)) ? 0:1;
         let unitType = Attribute(refChar,"unittype"); //Core, Support or Core/Support
+        if (!unitType || unitType === "") {
+            unitType = "Core";
+            AttributeSet(refChar,"unittype",unitType);
+        }
+
 
         let formationKeys = Object.keys(FormationArray);
 
@@ -3333,24 +3338,28 @@ log("Type: " + interHex.type)
             return;
         }
 
+        let two = ""
+
         if (order.includes("Tactical")) {
+            
             if (team.type === "Helicopter") {
                 outputCard.body.push("The Helicopter can move up to " + team.airmove + " hexes, and may fire at a Moving ROF");
                 outputCard.body.push("Alternately the Helicopter can move off table and Loiter");
             } else {
                 outputCard.body.push("The " + noun + " can move up to " + tactical + " hexes, and may fire at a Moving ROF");
-                outputCard.body.push('They may not move into contact with enemy units');
+                two = noun2 +  ' may not move into contact with enemy units';
                 if (suppressionFlag === true) {
                     if (team.type === "Infantry" || team.type === "Gun") {
-                        outputCard.body.push(noun2 + " cannot move closer to enemy teams");
+                        two = noun2 + " cannot move closer to enemy teams";
                     } else {
                         if (noun = "Platoons") {
-                            outputCard.body.push("Any suppressed Platoons cannot move closer to [U]visible[/u] enemy teams");
+                            two = "Any suppressed Platoons cannot move closer to [U]visible[/u] enemy teams";
                         } else {
-                            outputCard.body.push("It cannot move closer to [U]visible[/u] enemy teams");
+                            two = "It cannot move closer to [U]visible[/u] enemy teams";
                         }
                     }
                 } 
+                outputCard.body.push(two);
                 if (spottedFlag === true) {
                     outputCard.body.push(noun + " that Called Artillery must remain Stationary");
                 }
@@ -3366,18 +3375,19 @@ log("Type: " + interHex.type)
                     outputCard.body.push("Road Dash - " + team.roaddash + " Hexes");
                 }
             }
-            outputCard.body.push(noun2 + ' cannot move within 4 hexes of [U]visible[/u] enemies');
+            two = noun2 + ' cannot move within 4 hexes of [U]visible[/u] enemies';
             if (suppressionFlag === true) {
                 if (team.type === "Infantry" || team.type === "Gun") {
-                    outputCard.body.push(noun2 + " cannot move closer to [U]visible[/u] enemy teams");
+                    two = noun2 + " cannot move closer to [U]visible[/u] enemy teams";
                 } else {
                     if (noun === "Platoons") {
-                        outputCard.body.push("Any suppressed Platoons cannot move closer to [U]visible[/u] enemy teams");
+                        two = "Any suppressed Platoons cannot move closer to [U]visible[/u] enemy teams";
                     } else {
-                        outputCard.body.push("The " + noun + " cannot move closer to [U]visible[/u] enemy teams");
+                        two = "The " + noun + " cannot move closer to [U]visible[/u] enemy teams";
                     }
                 }
             } 
+            outputCard.body.push(two);
             if (spottedFlag === true) {
                 outputCard.body.push("Teams that Called Artillery must remain Stationary");
             }
@@ -4391,13 +4401,13 @@ log("Same had 2")
         let hqs = [];
         _.each(TeamArray,team2 => {
             if (team2.nation === team.nation && team2.special.includes("HQ")) {
-                if (formationID === state.TY.supportID || formationID === team2.formationID) {
+                if (team.formationID === state.TY.supportID || team.formationID === team2.formationID) {
                     hqs.push(team2);
                 } 
             };
         });
         for (let i=0;i<hqs.length;i++) {
-            let leader = hq[i];
+            let leader = hqs[i];
             let losCheck = LOS(team.id,leader.id);
             if (losCheck.los === true && losCheck.distance <= 8) {
                 reroll = randomInteger(6);
