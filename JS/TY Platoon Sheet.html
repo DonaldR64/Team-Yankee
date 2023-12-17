@@ -44,7 +44,17 @@
                 <option value="2">Independent</option>
                 <option value="3">HQ</option>
             </select>  
+            <label for="attr_unittype">Unit Type:</label>
+            <select name="attr_unittype">
+                <option value="Core">Core</option>
+                <option value="Support">Support</option>
+                <option value="">Either</option>
+            </select>  
         </div>
+
+
+
+
         <div class="col">
             <h3>Attributes</h3>
             <label for="attr_courage">Courage:</label>
@@ -479,7 +489,7 @@
         <input type="hidden" name="attr_nation"/>
           <section class="header f-center">
             <h1><span name="attr_character_name"></span></h1>
-            <h3><span>&#8226; </span><span name="attr_type"></span><span> Platoon &#8226;</span></h3>
+            <h3><span>&#8226; </span><span name="attr_unittype"></span><span> </span><span name="attr_type"></span><span> Platoon &#8226;</span></h3>
             <h3><span name="attr_specialText"></span></h3>
           </section>
 

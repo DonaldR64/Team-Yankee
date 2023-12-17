@@ -1841,7 +1841,6 @@ log(hex)
             minelets: [[],[]],
             conditions: {},
             teams: {}, //teamIDs -> unit and formation IDs
-            companyNames: [{},{}],
             units: {},//unitIDs -> name
             passengers: {},//keyed on IDs of transports, arrays of passengerIDs
             currentUnitID: "",
@@ -2425,6 +2424,67 @@ log(hex)
     }
 
     const UnitCreation = (msg) => {
+        if (!msg.selected) {return};
+        let Tag = msg.content.split(";");
+        let unitName = Tag[1];
+        let teamIDs = [];
+        for (let i=0;i<msg.selected.length;i++) {
+            teamIDs.push(msg.selected[i]._id);
+        }
+        let refToken = findObjs({_type:"graphic", id: teamIDs[0]})[0];
+        let refChar = getObj("character", refToken.get("represents")); 
+        if (!refChar) {
+            sendChat("","Error, NonCharacter Token");
+            return;
+        }
+        let nation = Attribute(refChar,"nation");
+
+        let formationKeys = Object.keys(FormationArray);
+        let supportFlag = false;
+        if (formationKeys.length > 0) {
+            for (let i=0;i<formationKeys.length;i++) {
+                let formation = FormationArray[formationKeys[i]];
+                if (formation.nation !== nation) {continue}
+                if (formation.name === "Support") {
+                    supportFlag = true;
+                    break;
+                }
+            }
+        }
+
+        if (supportFlag === false) {
+            support = new Formation(nation,stringGen(),"Support");
+        }
+
+        let newID = stringGen();
+        SetupCard("Unit Creation","",nation);
+        outputCard.body.push("Select Existing Formation or New");
+
+        ButtonInfo("New","!UnitCreation2;" + newID + ";?{Formation Name}");
+        formationKeys = Object.keys(FormationArray); //redone as Support may have been added
+
+        for (let i=0;i<formationKeys.length;i++) {
+            let formation = FormationArray[formationKeys[i]];
+            if (formation.nation !== nation) {continue};
+            let action = "!UnitCreation2;" + formation.id;
+            ButtonInfo(formation.name,action);
+        }
+
+        PrintCard();
+
+        unitCreationInfo = {
+            nation: nation,
+            newID: newID,
+            teamIDs: teamIDs,
+            unitName: unitName,
+        }
+    }
+
+
+
+
+
+    const UnitCreationOrig = (msg) => {
         if (!msg.selected) {return};
         let Tag = msg.content.split(";");
         let unitName = Tag[1];
