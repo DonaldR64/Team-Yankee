@@ -360,7 +360,9 @@ const TY = (() => {
             "pinnedCharID": "",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/327891446/xsAVVJ0Ft-xZW92JUtZBdw/thumb.png?1676321000",
             "unitmarkers": ["letters_and_numbers0148::4815284","letters_and_numbers0149::4815285","letters_and_numbers0150::4815286","letters_and_numbers0151::4815287","letters_and_numbers0152::4815288","letters_and_numbers0153::4815289","letters_and_numbers0154::4815290","letters_and_numbers0155::4815291","letters_and_numbers0156::4815292","letters_and_numbers0157::4815293","letters_and_numbers0158::4815294","letters_and_numbers0159::4815295","letters_and_numbers0160::4815296","letters_and_numbers0161::4815297","letters_and_numbers0162::4815298","letters_and_numbers0163::4815299","letters_and_numbers0164::4815300","letters_and_numbers0165::4815301","letters_and_numbers0166::4815302","letters_and_numbers0167::4815303","letters_and_numbers0168::4815304","letters_and_numbers0169::4815305","letters_and_numbers0170::4815306","letters_and_numbers0171::4815307","letters_and_numbers0172::4815308","letters_and_numbers0173::4815309"],
-            "flag": "status_Israel::6433717"
+            "flag": "status_Israel::6433717",
+            "supportmarker": "status_IDF::6481826",
+
         },
         "Syria": {
             "image": "https://s3.amazonaws.com/files.d20.io/images/366073450/MaE7Hz3ruNZ-2LrDfZQicA/thumb.png?1699036295",
@@ -378,7 +380,8 @@ const TY = (() => {
             "pinnedCharID": "",
             "barrageimage": "https://s3.amazonaws.com/files.d20.io/images/319032004/qf3aHgIiFnJ0aYoPOFR-TA/thumb.png?1671325647",
             "unitmarkers": ["letters_and_numbers0197::4815333","letters_and_numbers0198::4815334","letters_and_numbers0199::4815335","letters_and_numbers0200::4815336","letters_and_numbers0201::4815337","letters_and_numbers0202::4815338","letters_and_numbers0203::4815339","letters_and_numbers0204::4815340","letters_and_numbers0205::4815341","letters_and_numbers0206::4815342","letters_and_numbers0207::4815343","letters_and_numbers0208::4815344","letters_and_numbers0209::4815345","letters_and_numbers0210::4815346","letters_and_numbers0211::4815347","letters_and_numbers0212::4815348","letters_and_numbers0213::4815349","letters_and_numbers0214::4815350","letters_and_numbers0215::4815351","letters_and_numbers0216::4815352","letters_and_numbers0217::4815353","letters_and_numbers0218::4815354","letters_and_numbers0219::4815355","letters_and_numbers0220::4815356","letters_and_numbers0221::4815357","letters_and_numbers0222::4815358"],
-            "flag": "status_Syria::6433718"
+            "flag": "status_Syria::6433718",
+            "supportmarker": "status_SDF::6481827",
         },
 
 
@@ -589,6 +592,7 @@ const TY = (() => {
             this.nation = nation;
             this.player = (WarsawPact.includes(nation)) ? 0:1;
             state.TY.formations[id] = name;
+            FormationArray[id] = this;
         }
 
         add(unit) {
@@ -2501,9 +2505,10 @@ log(hex)
 
         SetupCard("Unit Creation","",nation);
 
-        if (unitType === "Support") {
+        if (unitType === "Support" || unitType === "") {
             ButtonInfo("Add to Support","!UnitCreation2;" + state.TY.supportID[player] + ";Support");
-        } else {
+        } 
+        if (unitType === "Core" || unitType === "") {
             let newID = stringGen();
             outputCard.body.push("Select Existing Formation or New");
             ButtonInfo("New","!UnitCreation2;" + newID + ";?{Formation Name}");
@@ -2541,7 +2546,7 @@ log(hex)
         if (!formation) {
             formation = new Formation(nation,formationID,Tag[2]);
         }
-
+log(formation)
         let unitNumber = formation.unitIDs.length;
 
         SetupCard("Unit Creation","",nation);
@@ -2557,14 +2562,18 @@ log(hex)
             for (let i=0;i<teamIDs.length;i++) {
                 let unit = new Unit(nation,stringGen(),unitName + "/" + plts[i] + " Plt");
                 formation.add(unit);
+
                 let team = new Team(teamIDs[i],unit.id);
                 if (!team) {continue};
+                let cm = "status_" + companyMarkers[i];
                 if (team.special.includes("HQ")) {
                     unit.name = unitName + "/HQ";
                     cm = Nations[nation].flag
-                } else if (formation.name !== "Support") {
-                    cm = "status_" + companyMarkers[i];
+                } else if (formation.id === state.TY.supportID[player]) {
+                    cm = "";
+                    unitMarker = Nations[nation].supportmarker;
                 }
+
                 unit.add(team);
                 let name = NameAndRank(team,i);    
                 team.name = name;
@@ -2580,6 +2589,8 @@ log(hex)
                     statusmarkers: unitMarker,
                 });
                 team.token.set(cm,true);
+
+
                 if (team.type === "Infantry" && hp > 1) {
                     team.token.set({
                         bar1_value: hp,
@@ -2622,12 +2633,15 @@ log(hex)
                     let id = companyArray[j];
                     let team = new Team(id,unit.id);
                     if (!team) {continue};
+                    let cm = "status_" + companyMarkers[i];
                     if (team.special.includes("HQ")) {
                         unit.name = unitName + "/HQ";
                         cm = Nations[nation].flag
-                    } else {
-                        cm = "status_" + companyMarkers[i];
+                    } else if (formation.id === state.TY.supportID[player]) {
+                        cm = "";
+                        unitMarker = Nations[nation].supportmarker;
                     }
+    
                     unit.add(team);
                     let name = NameAndRank(team,num);    
                     num++;
@@ -2670,13 +2684,7 @@ log(hex)
         let name = team.characterName.replace(team.nation + " ","");
         let unit = UnitArray[team.unitID];
         let formation = FormationArray[team.formationID];
-log(team)
-log(unit)
-log(formation)
-return "A"
-
-
-        let un = formation.unitIDs.length;
+        let un = formation.unitIDs.length - 1;
         let letter = rowLabels[un];
         if (team.type.includes("Tank")) {
             name = name.replace(team.nation + " ","");
