@@ -637,6 +637,8 @@ const TY = (() => {
             this.teamIDs = [];
             this.formationID = "";
             this.inReserve = false;
+            this.linkedUnitID = "";
+            this.limited = 0;
             UnitArray[id] = this;
         }
 
@@ -2762,9 +2764,9 @@ log(formation)
         let elevation = teamHeight(team);
         let unit = UnitArray[team.unitID];
         outputCard.body.push("Terrain: " + terrain);
-        let covers = ["Flat Terrain","Short Terrain","Tall Terrain","a Building"];
-        outputCard.body.push(team.name + " is in " + covers[h.type]);
-        if (h.bp === true || h.foxholes === true) {
+        let covers = ["in Flat Terrain","in Short Terrain","in Tall Terrain","amongst or in Buildings"];
+        outputCard.body.push(team.name + " is " + covers[h.type]);
+        if ((h.bp === true || h.foxholes === true) && (team.type === "Infantry" || team.type === "Gun")) {
             outputCard.body.push("(Bulletproof Cover)");
         }
         outputCard.body.push("Elevation: " + elevation + " Metres");
@@ -4477,9 +4479,8 @@ log("Same had 2")
         let weapons = [];
         let shooterTeamArray = [];
         let targetTeamArray = BuildTargetTeamArray(target,shooter);
-
         let mistaken = true;
-        if ((shooter.hex.distance(target.hex) <= 8 && target.type.includes("Tank")) || shooter.hex.distance(target.hex) <= 4) {
+        if ((shooter.hex.distance(target.hex) <= 10 && target.type.includes("Tank")) || shooter.hex.distance(target.hex) <= 5) {
             mistaken = false;
         }
         if (defensive === true) {mistaken = false};
@@ -4508,9 +4509,7 @@ log("Mistaken: " + mistaken)
             if (st.spotAttempts > 0) {
                 excluded = " Spotted for Artillery";
             }
-            if (st.type === "Tank" && st.suppressed === true) {
-                excluded = " is Bailed Out";
-            }
+
             if (excluded === undefined) {
                 let weaponExclusion;
                 let flag = false;
@@ -4536,6 +4535,7 @@ log("Mistaken: " + mistaken)
                             continue;
                         } else (limited++);
                     }
+                    /*
                     if (weapon.notes.includes("Mounted") && state.TY.passengers[st.id]) {
                         //check if passenger has weapon with name eg Dragon
                         let check = false;
@@ -4556,6 +4556,7 @@ log("Mistaken: " + mistaken)
                         }
                         if (check === false) {continue};
                     }
+                    */
 
                     if (weapon.notes.includes("Overhead")) {special += ",Overhead"};
                     if (weapon.notes.includes("NLOS")) {special += ",NLOS"};
@@ -4570,7 +4571,7 @@ log("Mistaken: " + mistaken)
                         }
                     }
 
-                    if (target.type === "Aircraft" && weapon.notes.includes("Guided AA") === false && weapon.notes.includes("Dedicated AA") === false && weapon.type !== "AA MG") {
+                    if (target.type === "Aircraft" && weapon.notes.includes("Guided AA") === false && weapon.notes.includes("Dedicated AA") === false && weapon.name.includes("AA") === false) {
                         weaponExclusion = " cannot fire at Aircraft";
                     }
                     
@@ -4579,12 +4580,12 @@ log("Mistaken: " + mistaken)
                             weaponExclusion = " cannot fire at Helicopters";
                         }
                         if (st.type === "Infantry" && (st.special.includes("Heavy Weapon") || weapon.notes.includes("Heavy"))) {
-                            if (weapon.notes.includes("Guided") === false && weapon.notes.includes("Dedicated AA") === false && weapon.type !== "AA MG" && weapon.notes.includes("Anti-Helicopter") === false) {
+                            if (weapon.notes.includes("Guided") === false && weapon.notes.includes("Dedicated AA") === false && weapon.name.includes("AA") === false && weapon.notes.includes("Anti-Helicopter") === false) {
                                 weaponExclusion = " cannot fire at Helicopters";
                             }
                         }
                         if (st.type.includes("Tank") || st.type.includes("Gun")) {
-                            if (weapon.notes.includes("Guided") === false && weapon.notes.includes("Dedicated AA") === false && weapon.notes.includes("Anti-Helicopter") === false && weapon.type !== "AA MG") {}
+                            if (weapon.notes.includes("Guided") === false && weapon.notes.includes("Dedicated AA") === false && weapon.notes.includes("Anti-Helicopter") === false && weapon.name.includes("AA") === false) {}
                             weaponExclusion = " cannot fire at Helicopters";
                         }
                     }
@@ -4618,7 +4619,7 @@ log("Mistaken: " + mistaken)
                         st.eta = [eta];
                         shooterTeamArray.push(st);
                         flag = true;
-                        if (weapon.type !== "AA MG") {
+                        if (weapon.type !== "MG") {
                             let phi = Angle(st.hex.angle(TeamArray[tID].hex));
                             st.token.set("rotation",phi);
                         }
@@ -4749,6 +4750,10 @@ log(weapons)
                     toHit++;
                     toHitTips += "<br>Not in Command +1";
                 }
+                if (sTeam.suppressed === true) {
+                    toHit++;
+                    toHitTips += "<br>Suppressed +1";
+                }
                 if (state.TY.darkness === true && sTeam.special.includes("Thermal Imaging") === false) {
                     toHitTips += "<br>Darkness +1";
                     toHit++;
@@ -4786,7 +4791,7 @@ log(weapons)
                 if (sTeam.moved === true) {
                     rof = weapon.moving;
                 }
-                if (shooterUnit.pinned() === true) {
+                if (sTeam.suppressed === true) {
                     if (weapon.notes.includes("Pinned ROF")) {
                         let substring = weapon.notes.split(",");
                         substring = substring.filter((string) => string.includes("Pinned ROF"));
@@ -4952,13 +4957,7 @@ log(weapons)
                 }
             }
             //place markers on shooter
-            /*
-            sTeam.addCondition("Fired");
-            if (sTeam.token.get("aura1_color") === Colours.lightpurple) {
-                sTeam.token.set("aura1_color",Colours.black);
-            }
-            sTeam.fired = true;
-            */
+
             if (sTeam.token.get("aura1_color") === Colours.lightpurple) {
                 sTeam.token.set("aura1_color",Colours.black);
             }
@@ -4990,24 +4989,8 @@ log(weapons)
         outputCard.body.push("[hr]");
         outputCard.body.push("Total Hits: " + totalHits);
 
-        let allFired = true;
-        for (let i=0;i<shooterUnit.teamIDs.length;i++) {
-            let team = TeamArray[shooterUnit.teamIDs[i]];
-            if (team.fired === false && team.aaFired === false && team.suppressed === false) {
-                allFired = false;
-                break;
-            }
-        }
-
-        if (allFired === false) {
-            outputCard.body.push("[hr]");
-            outputCard.body.push("Not all Teams have fired");
-            ButtonInfo("End Unit Fire","!EndFire;" + shootingType);
-        }    
         PrintCard();
-        if (allFired === true) {
-            ProcessSaves(shootingType);
-        } 
+        //ProcessSaves(shootingType);
     }
 
     const CompareHits = (ta1,ta2) => {
@@ -5052,10 +5035,11 @@ log(weapons)
         let array = [];
         let shooterUnit = UnitArray[shooterTeam.unitID];
         let targetUnit = UnitArray[targetTeam.unitID];
+        targetUnit.linkedUnitID = "";
         let ids = targetUnit.teamIDs;
 
         //if HQ or independent, can add nearby formation in
-        if (targetTeam.special.includes("HQ") || targetTeam.special.includes("Independent") || targetTeam.token.get(SM.HQ) === true) {
+        if (targetTeam.special.includes("HQ") || targetTeam.special.includes("Independent")) {
             let keys = Object.keys(UnitArray);
             btaLoop1:
             for (let j=0;j<keys.length;j++) {
@@ -5063,7 +5047,7 @@ log(weapons)
                 if (unit.id === targetUnit.id || unit.player !== targetUnit.player || unit.type !== targetUnit.type) {continue};
                 for (let k=0;k<unit.teamIDs.length;k++) {
                     let team3 = TeamArray[unit.teamIDs[k]];
-                    if (team3.hex.distance(targetTeam.hex) <= 6) {
+                    if (team3.hex.distance(targetTeam.hex) < 4) {
                         //a valid team - add its unit IDs, rest will get sorted in/out below
                         ids = ids.concat(unit.teamIDs);
                         targetUnit.linkedUnitID = unit.id;
@@ -5076,7 +5060,7 @@ log(weapons)
         for (let i=0;i<ids.length;i++) {
             let team = TeamArray[ids[i]];
             let refDistance = targetTeam.hex.distance(team.hex);//distance from targeted team to this team
-            if (refDistance > 6 || team.type !== targetTeam.type) {continue}; //too far or not same type
+            if (refDistance > 3 || team.type !== targetTeam.type) {continue}; //too far or not same type
             if (team.token.get("layer") === "walls") {continue}; //is a passenger
             if (shooterTeam.type === "Aircraft") {
                 let keys = Object.keys(TeamArray);
@@ -5091,7 +5075,7 @@ log(weapons)
             }
 
             for (let j=0;j<shooterUnit.teamIDs.length;j++) {
-                let ttLOS = LOS(team.id,shooterUnit.teamIDs[j],"Overhead");
+                let ttLOS = LOS(team.id,shooterUnit.teamIDs[j]);
                 if (ttLOS.los === true) {
                     team.shooterIDs.push(shooterUnit.teamIDs[j]);
                 }
@@ -5202,7 +5186,7 @@ log("In Create Barrages")
             PrintCard();
             return;
         }
-        if (observerTeam.spotAttempts < 1) {
+        if (observerTeam.spotAttempts > 2) {
             outputCard.body.push("This Platoon has no further Spot Attempts remaining");
             PrintCard();
             return;
@@ -5704,15 +5688,16 @@ log(weapon)
         }
     
         let snafu = false;
+        let snafuRoll = randomInteger(6) + randomInteger(6);
         for (let i=0;i<spotAttempts;i++) {
             let roll = randomInteger(6);
-            if (offboard === true && roll === 1) {
-                let midRoll = randomInteger(6);
-                if (midRoll > 3) {
-                    snafu = true;
-                }
-            }
             spotRolls.push(roll);
+            if (offboard === true && roll === 1 && i===0) {
+            	snafu = true;
+                spotRolls.push(snafuRoll);
+                spotRolls.push(snafuRoll)
+            	break;
+            }
             let spotNeeded = needed;
             if (offboard === false && needed !== 0) {
                 spotNeeded = (Math.max(needed - i,2))
@@ -5722,8 +5707,6 @@ log(weapon)
                 break;
             }
         }
-
-log("SNAFU: " + snafu)
 
         weaponName = weapon.name;
         let extra = "";
@@ -5735,10 +5718,14 @@ log("SNAFU: " + snafu)
         if (observerTeam.type !== "Aircraft" && observerTeam.type !== "Helicopter") {
             observerTeam.addCondition("Spot");
         }
-        let hittip = "Ranging In Rolls: " + spotRolls.toString() + " vs. " + neededText + tip2;
+        let hittip = "Ranging In Rolls: " + spotRolls.toString() + " vs. " +      neededText + tip2;
     
+        if (snafu === true) {
+            hittip = "SNAFU: Total of " + snafuRoll;
+        }
+
         observerTeam.spotAttempts += spotRolls.length;
-        spotAttempts = observerTeam.spotAttempts
+        spotAttempts = observerTeam.spotAttempts;
     
         if (observerUnit.teamIDs.length === 1) {
             outputCard.body.push("(" + observerTeam.name + " given a Hold Order)");
@@ -5759,10 +5746,8 @@ log("SNAFU: " + snafu)
                 sound = "Katyusha";
             }
         }
-        PlaySound(sound);
 
         let add = " ";
-        let snafuRoll;
 
         let snafuText = "";
         if (artilleryTeams.length > 1) {
@@ -5770,36 +5755,33 @@ log("SNAFU: " + snafu)
         }
 
         if (snafu === true) {
-            snafuRoll = randomInteger(6) + randomInteger(6);
-log("Snafu Roll: " + snafuRoll)
 
-            snafuText += '[🎲](#" class="showtip" title="' + snafuRoll + ')' + " [B][U]SNAFU[/u][/b]<br>";
+            snafuText += '[🎲](#" class="showtip" title="' + hittip + ')' + " [B][U]SNAFU[/u][/b]<br>";
             if (snafuRoll === 2) {
                 snafuText += "Counterbattery Fire destroys" + add + "the Artillery Battery before it fires";
-                artilleryTeams[0].kill();
+                //artilleryTeams[0].kill();
                 success = false;
             } else if (snafuRoll === 3) {
                 snafuText += "Counterbattery Fire suppressed" + add + "the Artillery Battery before it fires";
                 artilleryTeams[0].Suppress();
                 success = false;
-            } else if (snafuRoll > 3 && snafuRoll < 6 && success === true) {
-                snafuText += "Unable to Coordinate Barrage, Scatters";
+            } else if (snafuRoll > 3 && snafuRoll < 7) {
+                snafuText += "Barrage Scatters";
+                success = true;
                 targetHex = ScatterBarrage(barrageTeam);
-            } else if (snafuRoll > 5 && snafuRoll < 9) {
+            } else if (snafuRoll > 6 && snafuRoll < 11) {
                 snafuText += "Artillery Battery Unavailable This Turn";
                 success = false;
-            } else if (snafuRoll > 8 && snafuRoll < 11 && success === true) {
-                snafuText += "Unable to Coordinate Barrage, Scatters";
-                targetHex = ScatterBarrage(barrageTeam);
-            } else if (snafuRoll === 11 && success === true) {
-                snafuText += "Counterbattery Fire suppressed" + add + "the Artillery Battery before it fires";
+            } else if (snafuRoll === 11) {
+                snafuText += "Counterbattery Fire suppressed" + add + "the Artillery Battery after it fires";
+                success = true;
                 artilleryTeams[0].Suppress();
-            } else if (snafuRoll === 12 && success === true) {
-                snafuText += "Counterbattery Fire destroys" + add + "the Artillery Battery before it fires";
+            } else if (snafuRoll === 12) {
+                snafuText += "Counterbattery Fire destroys" + add + "the Artillery Battery after it fires";
+                success = true;
                 artilleryTeams[0].kill();
             }
         }
-
         if (success === false || targetHex === "Offboard") {
             let fail;
             if (observerTeam.spotAttempts < 3 && observerTeam.unitID !== artilleryUnit.id) {
@@ -5819,6 +5801,8 @@ log("Snafu Roll: " + snafuRoll)
             PrintCard();
             return
         } else {
+            PlaySound(sound);
+
             let text = ["","1st","2nd","3rd"];
             let text2 = ["","","+1 to Roll Needed to Hit","+2 to Roll Needed to Hit"];
         
@@ -6189,7 +6173,7 @@ log(marker);
 
 
     const SwapLeader = (unit) => {
-        if (unit.teamIDs.length < 2) {return text}; 
+        if (unit.teamIDs.length < 2) {return}; 
         let oldLeader = TeamArray[unit.teamIDs[0]];
         let newLeader;
         let closestDist = Infinity;
