@@ -2278,6 +2278,9 @@ log(hex)
                     };
                     if (temp.terrain.length === 0) {
                         temp.terrain.push("Open Ground");
+                    } else if (temp.terrain.length > 1 && temp.terrain.includes("Open Ground")) {
+                        let index = temp.terrain.indexOf("Open Ground");
+                        temp.terrain = temp.terrain.splice(index,1);
                     }
                     hexMap[key] = temp;
                 }
