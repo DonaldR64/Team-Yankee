@@ -729,11 +729,14 @@
     });
 
     on("change:attrs sheet:opened", function() { 
-        getAttrs(["teams","type","nation","tactical","terrain","country","road","cross","counterattack","assault","airmove"], function(values) {
+        getAttrs(["teams","type","nation","counterattack","assault"], function(values) {
             let nationImage;
             let nation = values.nation;
-
+            let assaultV = values.assault;
+            let counterV = values.counterattack;
             let type = values.type;
+            let teams = values.teams;
+            
             let aplus = "+";
             let rplus = "+";
             let cplus = "+";
@@ -748,16 +751,13 @@
                 assault = "";
                 counterattack = "";
             }
-            let assaultV = values.assault;
-            let counterV = values.counterattack;
-
+        
             if (assaultV === "-") {
                 aplus = "";
             }
             if (counterV === "-") {
                 cplus = "";
             }
-
 
             if (nation === "Soviet") {
                 nationImage = "https://s3.amazonaws.com/files.d20.io/images/324272729/H0Ea79FLkZIn-3riEhuOrA/thumb.png?1674441877";
@@ -784,31 +784,14 @@
                 nationImage = "https://s3.amazonaws.com/files.d20.io/images/366073450/MaE7Hz3ruNZ-2LrDfZQicA/thumb.png?1699036295";       
             }
 
-            let tact = values.tactical;
-            let ter = values.terrain;
-            let count = values.country;
-            let road = values.road;
-            let cross = values.cross;
-
-            let am = values.airmove;
-            if (type === "Aircraft") {
-                am = "Unlimited";
-            }
-
             let move = "Other";
             if (type === "Aircraft" || type === "Helicopter") {
                 move = "Aircraft";
             } 
 
             let teamtext = "";
-
             if (type === "Infantry") {
-                tact = '8';
-                ter = '8';
-                count = '12';
-                road = '12';
-                cross = "AUTO";
-                teamtext = "Teams: " + value.teams;
+                teamtext = "Teams: " + teams;
             }
 
             setAttrs({
@@ -820,17 +803,10 @@
                 "movementtype": move,
                 "assaultname": assault,
                 "counterattackname": counterattack,
-                "tactical": tact,
-                "terrain": ter,
-                "country": count,
-                "road": road,
-                "cross": cross,
-                "airmove": am,
                 "teamtext": teamtext,
             })
         });    
     });  
-
 
 
 
