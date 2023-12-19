@@ -1,5 +1,5 @@
 const TY = (() => { 
-    const version = '5.12.19';
+    const version = '4.11.18';
     if (!state.TY) {state.TY = {}};
     //Constants and Persistent Variables
 
@@ -7,14 +7,15 @@ const TY = (() => {
     const rowLabels = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","AA","BB","CC","DD","EE","FF","GG","HH","II","JJ","KK","LL","MM","NN","OO","PP","QQ","RR","SS","TT","UU","VV","WW","XX","YY","ZZ","AAA","BBB","CCC","DDD","EEE","FFF","GGG","HHH","III","JJJ","KKK","LLL","MMM","NNN","OOO","PPP","QQQ","RRR","SSS","TTT","UUU","VVV","WWW","XXX","YYY","ZZZ"];
 
     let TerrainArray = {};
-    let TeamArray = {}; //Individual Vehicles or Squads
+    let TeamArray = {}; //Individual Platoons or Squads
     let UnitArray = {}; //Units of Teams - Company or Battery
-    let FormationArray = {}; //Companies or Battalions
+    let FormationArray = {};
     let SmokeArray = [];
     let FoxholeArray = [];
-    let CheckArray = []; //used by Rally and Morale checks
+    let CheckArray = []; //used by Remount, Rally and Morale checks
     let RangedInArray = {};
     let unitCreationInfo = {};
+
 
     let unitIDs4Saves = {}; //used during shooting routines
     let AssaultIDs = [[],[]]; //array of teams (IDs) in a CC, updated when charge/move
@@ -42,23 +43,23 @@ const TY = (() => {
     };
 
     const Visibility = {
-        Good: 140,
-        Moderate: 60,
-        Bad: 30,
-        Night: 8,
-        "Infra-Red": 16,
-        "Thermal Imaging": 20,
-        "2nd Gen Thermal Imaging": 60,
+        Good: 70,
+        Moderate: 30,
+        Bad: 15,
+        Night: 4,
+        "Infra-Red": 8,
+        "Thermal Imaging": 10,
+        "2nd Gen Thermal Imaging": 30,
     }
 
-    const blastR = [0,2,4]; //Blast sizes for Mortar,Normal Art, Salvo
+    const blastR = [0,1,2]; //Blast sizes for Mortar,Normal Art, Salvo
 
     const artilleryTypes = ["Artillery","Salvo","Mortar"];
 
     let specialInfo = {
         "Air Assault": "An Air Assault Unit may only be held in Reserve if all the Units deployed on table are Air Assault Units",
-        "Accurate": 'If no movement, Shooting over Effective Range penalty reduced by 1',
-        "Advanced Stabiliser": 'Tactical Speed is 14 hexes. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 10 hexes',
+        "Accurate": 'No Penalties for Long Range if Shooter did not Move',
+        "Advanced Stabiliser": 'Tactical Speed is 7 hexes. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 5 hexes',
         "Amphibious": "Treat Impassable Water as Difficult Terrain",
         "Anti-Helicopter": "Can shoot at Helicopters with a ROF of 1",
         "Applique Armour": 'Front and Side Armour is 13 against HEAT weapons',
@@ -81,10 +82,10 @@ const TY = (() => {
         "HQ": "Always In Command and ignores Morale Checks",
         "Hunter-Killer": "Hunter-Killer Helicopters can use terrain for Concealment and are Gone to Ground unless they Shoot",
         "Independent": "Independent Teams can use the Mistaken Target rule to reassign hits to nearby Units, but cannot Charge into Contact or take an Objective",        
-        "Infra-Red": "Can see out to a distance of 800m (16 hexes) at night",
+        "Infra-Red": "Can see out to a distance of 800m (8 hexes) at night",
         "Jump Jet": "Enters the table on a score of 3+",
         "Large Gun": 'Cannot be placed in Buildings and cannot be placed from Ambush within 4 hexes of enemy',
-        "Laser Rangefinder": 'Reduce Penalty for Range by 1',
+        "Laser Rangefinder": 'No Penalties for Long Range',
         "Laser Guided Projectiles": "Must be guided by an Observer, using it for LOS",
         "Limited 1": "Each time the Unit  shoots, one of its Teams may shoot this weapon rather than its usual weapons",
         "Mine Clearing Device": "Team can attempt to clear Minefields",
@@ -110,11 +111,11 @@ const TY = (() => {
         "Smoke Bombardment": "Once per game, the weapon can fire a Smoke Bombardment",
         "Sneak and Peek": 'A Team with Sneak and Peek can move 5 hexes if it is not firing its Main Gun',
         "Spearhead": "Special Rules for Deployment (page 93)",
-        "Stabiliser": 'Tank can move 14 hexes at Tactical, gaining a +1 penalty To Hit. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 10 hexes',
+        "Stabiliser": 'Tank can move 7 hexes at Tactical, gaining a +1 penalty To Hit. Machineguns cannot Shoot and the Team cannot Assault if it moves more than 5 hexes',
         "Swingfire": "Team firing Swingfire Missiles can remain Gone to Ground",
         "Tandem Warhead": "Tandem Warhead HEAT weapons are unaffected by ERA Armour",
-        "Thermal Imaging": "Visibility to 1km (20 hexes) at night. No To Hit penalties for Night and Smoke",
-        "2nd Gen Thermal Imaging": "Visibility to 3km (60 hexes) at night. No To Hit penalties for Night and Smoke",
+        "Thermal Imaging": "Visibility to (10 hexes) at night. No To Hit penalties for Night and Smoke",
+        "2nd Gen Thermal Imaging": "Visibility to 3km (30 hexes) at night. No To Hit penalties for Night and Smoke",
         "Tractor": "A Tractor Team can tow a single Gun Team as a Passenger, placing the Gun Team behind it",
         "Unarmoured": "An Unarmoured Tank Team cannot Charge into Contact and must Break Off if Assaulted",
     };
@@ -838,8 +839,6 @@ const TY = (() => {
                     name = name.replace(")","]");
                     AttributeSet(char.id,"weapon"+i+"name",name);
                 }
-                let type = attributeArray["weapon"+i+"type"];
-
                 let fp = attributeArray["weapon"+i+"fp"];
                 if (fp === "AUTO") {
                     fp = 1;
@@ -860,21 +859,25 @@ const TY = (() => {
                     moving = parseInt(moving) || 0;
                 }
 
-                let effRange = parseInt(attributeArray["weapon"+i+"Erange"]);
-                let maxRange = parseInt(attributeArray["weapon"+i+"Mrange"]);
-
-                let minRange = 1;
-                if (type.includes("Missile")) {
-                    minRange = effRange;
-                    effRange = maxRange;
+                let rangeText = attributeArray["weapon"+i+"range"];
+                rangeText = rangeText.split("-");
+                let minRange = 0;
+                let maxRange = rangeText[0].replace(/[^\d]/g, "");
+                if (rangeText.length > 1) {
+                    minRange = rangeText[0].replace(/[^\d]/g, "");
+                    maxRange = rangeText[1].replace(/[^\d]/g, "");
                 }
-        
+                minRange = parseInt(minRange) || 0;
+                maxRange = parseInt(maxRange) || 1;
+                let type = attributeArray["weapon"+i+"type"];
+                if (!type || type === "") {
+                    type = "Small Arms";
+                }
                 let at = parseInt(attributeArray["weapon"+i+"at"]) || 0;
 
                 let weapon = {
                     name: name,
                     minRange: minRange,
-                    effRange: effRange,
                     maxRange: maxRange,
                     halted: halted,
                     moving: moving,
@@ -910,7 +913,6 @@ const TY = (() => {
                 atWeapon = {
                     name: "Improvised AT Weapon",
                     minRange: 1,
-                    effRange: 1,
                     maxRange: 1,
                     halted: 1,
                     moving: 1,
@@ -920,6 +922,13 @@ const TY = (() => {
                     type: "LAW/MAW"
                 }
             }
+
+if (type === "Infantry") {
+    log(charName)
+    log("AT Weapon")
+    log(atWeapon)
+}
+
             
             //update sheet with info
             let specials = attributeArray.special || " "
@@ -3206,7 +3215,6 @@ log("Type: " + interHex.type)
             weapon = {
                 name: "Copperhead Projectile",
                 minRange: 16,
-                effRange: artWeapon.maxRange,
                 maxRange: artWeapon.maxRange,
                 halted: 1,
                 moving: 1,
@@ -3219,7 +3227,6 @@ log("Type: " + interHex.type)
             weapon = {
                 name: "Krasnopol Projectile",
                 minRange: 16,
-                effRange: artWeapon.maxRange,
                 maxRange: artWeapon.maxRange,
                 halted: 1,
                 moving: 1,
