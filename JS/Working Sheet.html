@@ -733,7 +733,7 @@
     });
 
     on("change:attrs sheet:opened", function() { 
-        getAttrs(["teams","type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","weapon1notes","weapon2notes","airmove","mainteam"], function(values) {
+        getAttrs(["teams","type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","airmove"], function(values) {
             let nationImage;
             let nation = values.nation;
 
@@ -798,8 +798,6 @@
                 nationImage = "https://s3.amazonaws.com/files.d20.io/images/366073450/MaE7Hz3ruNZ-2LrDfZQicA/thumb.png?1699036295";       
             }
 
-            let main = (values.mainteam === "1") ? true:false;
-
             let tact = parseInt(values.tactical);
             let ter = parseInt(values.terrain);
             let count = parseInt(values.country);
@@ -813,7 +811,7 @@
 
             let tactDisplay = tact.toString();
             if (combined.includes("Stabiliser")) {
-                let second = tact + 2;
+                let second = tact + 4;
                 tactDisplay += ' / ' + second ;
             }
 
@@ -849,7 +847,6 @@
                 "road": road,
                 "cross": cross,
                 "airmove": am,
-                "main": main,
                 "teamtext": teamtext,
             })
         });    
