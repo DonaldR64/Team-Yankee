@@ -85,8 +85,8 @@
                 <option value="2">2+</option>
             </select>
             <br>
-            <label for="attr_remount">Rally:</label>
-            <select name="attr_remount">
+            <label for="attr_rally">Rally:</label>
+            <select name="attr_rally">
                 <option value="" selected disabled hidden>Choose here</option>
                 <option value="4">4+</option>
                 <option value="3">3+</option>
@@ -149,7 +149,7 @@
 
         <div class="col">
                 <h3>Movement</h3>  
-                <label>Tactical:</label><input type="number" name="attr_tactical">
+                <label>Tactical:</label><input type="text" name="attr_tactical">
                 <label>Terrain Dash:</label><input type="number" name="attr_terrain">
                 <label>Cross Country Dash:</label><input type="number" name="attr_country">
                 <label>Road Dash:</label><input type="number" name="attr_road">
@@ -530,7 +530,7 @@
             <div class="info">
               <h2>Courage: <span name="attr_courage"></span>+</h2>
               <h3>Morale: <span name="attr_morale"></span>+</h3>
-              <h3>Rally: <span name="attr_remount"></span><span name="attr_rplus"></span></h3>      
+              <h3>Rally: <span name="attr_rally"></span><span name="attr_rplus"></span></h3>      
             </div>  
           </section>
 
@@ -728,25 +728,12 @@
         });
     });
 
-    on("sheet:opened", function() {
-        setAttrs({sheetTab:"display"});
-    });
-
     on("change:attrs sheet:opened", function() { 
-        getAttrs(["teams","type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","airmove"], function(values) {
+        getAttrs(["teams","type","nation","tactical","terrain","country","road","cross","counterattack","assault","airmove"], function(values) {
             let nationImage;
             let nation = values.nation;
 
-            let special = values.special;
-            if (!special) {special = " "};
-            let w1Notes = values.weapon1notes;
-            if (!w1Notes) {w1Notes = " "};
-            let w2Notes = values.weapon2notes;
-            if (!w2Notes) {w2Notes = " "};
-            let combined = special + "," + w1Notes + "," + w2Notes;
-
             let type = values.type;
-            let ralName = "Remount: ";
             let aplus = "+";
             let rplus = "+";
             let cplus = "+";
@@ -755,7 +742,6 @@
             let counterattack = "Counterattack: ";
 
             if (type === "Aircraft" || type === "Helicopter") {
-                ralName = "";
                 aplus = "";
                 rplus = "";
                 cplus = "";
@@ -798,21 +784,15 @@
                 nationImage = "https://s3.amazonaws.com/files.d20.io/images/366073450/MaE7Hz3ruNZ-2LrDfZQicA/thumb.png?1699036295";       
             }
 
-            let tact = parseInt(values.tactical);
-            let ter = parseInt(values.terrain);
-            let count = parseInt(values.country);
-            let road = parseInt(values.road);
+            let tact = values.tactical;
+            let ter = values.terrain;
+            let count = values.country;
+            let road = values.road;
             let cross = values.cross;
 
             let am = values.airmove;
             if (type === "Aircraft") {
                 am = "Unlimited";
-            }
-
-            let tactDisplay = tact.toString();
-            if (combined.includes("Stabiliser")) {
-                let second = tact + 4;
-                tactDisplay += ' / ' + second ;
             }
 
             let move = "Other";
@@ -824,21 +804,20 @@
 
             if (type === "Infantry") {
                 tact = '8';
-                tactDisplay = '8';
                 ter = '8';
                 count = '12';
                 road = '12';
                 cross = "AUTO";
-                teamtext = "&#8226; Teams: " + value.teams + " &#8226;";
+                teamtext = "Teams: " + value.teams;
             }
 
             setAttrs({
+                "sheetTab": "display",
                 "nationimage": nationImage,
                 "aplus": aplus,
                 "cplus": cplus,
                 "rplus": rplus,
                 "movementtype": move,
-                "tacticaldisplay": tactDisplay,
                 "assaultname": assault,
                 "counterattackname": counterattack,
                 "tactical": tact,
