@@ -516,7 +516,7 @@
           <section class="header f-center">
             <h1><span name="attr_character_name"></span></h1>
             <h3><span>&#8226; </span><span name="attr_unittype"></span><span> </span><span name="attr_type"></span><span> Unit &#8226;</span></h3>
-            <h3><span>&#8226; </span>Teams: <span name="attr_teams"></span><span> &#8226;</span></h3>
+            <h3><span name="attr_teamtext"></span></h3>
             <h3><span name="attr_specialText"></span></h3>
           </section>
 
@@ -733,7 +733,7 @@
     });
 
     on("change:attrs sheet:opened", function() { 
-        getAttrs(["type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","weapon1notes","weapon2notes","airmove","mainteam"], function(values) {
+        getAttrs(["teams","type","nation","tactical","terrain","country","road","cross","counterattack","assault","special","weapon1notes","weapon2notes","airmove","mainteam"], function(values) {
             let nationImage;
             let nation = values.nation;
 
@@ -821,13 +821,17 @@
             if (type === "Aircraft" || type === "Helicopter") {
                 move = "Aircraft";
             } 
+
+            let teamtext = "";
+
             if (type === "Infantry") {
-                tact = '4';
-                tactDisplay = '4';
-                ter = '4';
-                count = '6';
-                road = '6';
+                tact = '8';
+                tactDisplay = '8';
+                ter = '8';
+                count = '12';
+                road = '12';
                 cross = "AUTO";
+                teamtext = "&#8226; Teams: " + value.teams + " &#8226;";
             }
 
             setAttrs({
@@ -846,6 +850,7 @@
                 "cross": cross,
                 "airmove": am,
                 "main": main,
+                "teamtext": teamtext,
             })
         });    
     });  
