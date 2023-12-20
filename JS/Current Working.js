@@ -644,7 +644,7 @@ const TY = (() => {
             this.hqUnit = false;
             this.artillery = false;
             this.type = "";
-            this.size = "";
+            this.size = 0;
 
 
             UnitArray[id] = this;
@@ -724,7 +724,6 @@ const TY = (() => {
                 newTeamIDs.push(id);
             }
             let unitLeader = TeamArray[this.teamIDs[0]];
-            let cR = (this.size > 7) ? 8:6;
 
             this.teamIDs = newTeamIDs;
             this.size = size;
@@ -752,20 +751,9 @@ const TY = (() => {
                 team.maxTact = false;
                 team.fired = false;
                 team.aaFired = false;
-
-                let dist = team.hex.distance(unitLeader.hex);
-                if  (dist > cR) {
-                    team.token.set({
-                        aura1_color: Colours.yellow,
-                    });
-                } else {
-                    let c = "transparent";
-                    if (i===0) {c = Colours.green}
-                    team.token.set({
-                        aura1_color: c,
-                    });
-                }
             }
+            unitLeader.checkCommand();
+
         }
 
         suppress() {
@@ -1183,6 +1171,46 @@ const TY = (() => {
                 return true;
             }
         }
+
+        checkCommand() {
+            let unit = UnitArray[this.unitID];
+            let unitLeader = TeamArray[unit.teamIDs[0]];
+            let cR = (unit.size > 7) ? 8:6
+
+            if (this.id === unitLeader.id) {
+                for (let i=1;i<unit.teamIDs.length;i++) {
+                    let team2 = TeamArray[unit.teamIDs[i]];
+                    let dist = this.hex.distance(team2.hex);
+                    if (dist > cR) {
+                        team2.token.set({
+                            aura1_color: Colours.yellow,
+                        });
+                    } else {
+                        team2.token.set({
+                            aura1_color: "transparent",
+                        });
+                    }
+                }
+            } else {
+                let dist = this.hex.distance(unitLeader.hex);
+                if (dist > cR) {
+                    this.token.set({
+                        aura1_color: Colours.yellow,
+                    });
+                } else {
+                    this.token.set({
+                        aura1_color: "transparent",
+                    });
+                }
+            }
+        }
+
+
+
+
+
+
+
 
         Suppress() {
             let result = {
@@ -6898,22 +6926,6 @@ log("Charge Dist: " + chargeDist)
                 if (!team) {return};
 
                 let unit = UnitArray[team.unitID];
-                let unitLeader;
-                if (unit) {
-                    unitLeader = TeamArray[unit.teamIDs[0]];
-                    let cR = (unit.size > 7) ? 8:6;
-                    let dist = newHex.distance(unitLeader.hex);
-                    if  (dist > cR) {
-                        team.token.set({
-                            aura1_color: Colours.yellow,
-                        });
-                    } else {
-                        team.token.set({
-                            aura1_color: "transparent",
-                        });
-                    }
-                } 
-
                 let oldHexLabel = team.hexLabel;
 
                 let moveBack = false;
@@ -6947,7 +6959,7 @@ log("Charge Dist: " + chargeDist)
                 }
                 hexMap[newHexLabel].teamIDs.push(tok.id);
                 if (unit) {
-                    unit.IC();
+                    team.checkCommand();
                 }
                 //let theta = oldHex.angle(newHex);
                 //tok.set("rotation",theta);
