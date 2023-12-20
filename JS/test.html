@@ -606,7 +606,7 @@
             <h3>Weapons</h3>
             <div class="weaponinfo">
                 <span style="font-weight:bold;" >Weapon</span>
-                <span style="font-weight:bold;" >Eff. Range</span>
+                <span style="font-weight:bold;" name="attr_weapon1header"></span>
                 <span style="font-weight:bold;" >Max. Range</span>
                 <span style="font-weight:bold;" >Halted</span>
                 <span style="font-weight:bold;" >Moving</span>
@@ -737,10 +737,10 @@
             let type = values.type;
             let teams = values.teams;
             let w1type = values.weapon1type;
-            let w1h = "Standard";
+            let w1h = "Eff. Range";
 
             if (w1type.includes("Missile")) {
-                w1h = "Missile";
+                w1h = "Min. Range";
             }
 
 
