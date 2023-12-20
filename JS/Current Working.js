@@ -638,12 +638,28 @@ const TY = (() => {
             this.inReserve = false;
             this.linkedUnitID = "";
             this.limited = 0;
+            this.hqUnit = false;
+            this.artillery = false;
+            this.type = "";
+            this.size = "";
             UnitArray[id] = this;
         }
 
         add(team) {
             if (this.teamIDs.includes(team.id) === false) {
-                this.teamIDs.push(team.id);
+                if (team.special.includes("Leader")) {
+                    this.teamIDs.unshift(team.id);
+                } else {
+                    this.teamIDs.push(team.id);
+                }
+                if (team.special.includes("HQ")) {
+                    this.hqUnit = true;
+                }
+                if (team.artillery === true) {
+                    this.artillery = true;
+                }
+                this.type = team.type;
+                this.size += parseInt(team.token.get("bar1_value")) || 1;
                 team.unitID = this.id;
                 team.formationID = this.formationID;
             }
@@ -671,12 +687,18 @@ const TY = (() => {
                 delete UnitArray[this.id];
             } else if (teamIDs.length > 0 && index === 0) {
                 let auraC = team.token.get("aura1_color");
-                let newLeader = this.teamIDs[0];
+                let newLeader = CentreTeam(this);
+                let old_index = this.teamIDs.indexOf(newLeader.id);
+                this.teamIDs.splice(0, 0, this.teamIDs.splice(old_index, 1)[0]);
+                if (!auraC || auraC === "transparent") {
+                    auraC = (this.order === "") ? Colours.green:Colours.black;
+                };
+                newLeader.name = PromotedName(newLeader,team);
                 newLeader.token.set({
-                    tint_color: "transparent",
+                    name: newLeader.name,
                     aura1_color: auraC,
-                })
-                newLeader.inCommand = true;
+                    tint_color: "transparent",
+                });
             } 
         }
 
@@ -2545,10 +2567,6 @@ log(hex)
         }
     }
 
-
-
-
-
     const UnitCreation2 = (msg) => {
 
         let Tag = msg.content.split(";");
@@ -2562,141 +2580,73 @@ log(hex)
         if (!formation) {
             formation = new Formation(nation,formationID,Tag[2]);
         }
-log(formation)
         let unitNumber = formation.unitIDs.length;
-
+    
         SetupCard("Unit Creation","",nation);
-
+    
         let unitMarker = Nations[nation].unitmarkers[unitNumber];
-
-        //NATO - Unit is the Company, each token a Platoon and commandable
-        //WARPACT - Unit is the Company, but only lead token in Co is Commandable, larger unit is formation, not tracked in game
-        plts = ["1st","2nd","3rd","4th","5th"];
-
-        if (player === 1) {
-            //NATO
-            for (let i=0;i<teamIDs.length;i++) {
-                let unit = new Unit(nation,stringGen(),unitName + "/" + plts[i] + " Plt");
-                formation.add(unit);
-
-                let team = new Team(teamIDs[i],unit.id);
-                if (!team) {continue};
-                let cm = "status_" + companyMarkers[i];
-                if (team.special.includes("HQ")) {
-                    unit.name = unitName + "/HQ";
-                    cm = Nations[nation].flag
-                } else if (formation.id === state.TY.supportID[player]) {
-                    cm = "";
-                    unitMarker = Nations[nation].supportmarker;
-                }
-
-                unit.add(team);
-                let name = NameAndRank(team,i);    
-                team.name = name;
-                let hp = parseInt(team.starthp);
+    
+        //each token a vehicle or squad of X teams
+        //NATO - Unit is the Platoon
+        //WARPACT - Unit is the Company
+    
+        let unit = new Unit(nation,stringGen(),unitName);
+        formation.add(unit);
+    
+        let teams = [];
+        for (let i=0;i<teamIDs.length;i++) {
+            let team = new Team(teamIDs[i],unit.id);
+            if (!team) {continue};
+            unit.add(team);
+        }
+        //check if unit has leader
+        let leader = TeamArray[unit.teamIDs[0]];
+        if (leader.special.includes("HQ") === false && leader.special.includes("Independent") === false && leader.special.includes("Leader") === false) {
+            MakeLeader(leader);
+        }
+        for (let i=0;i<unit.teamIDs.length;i++) {
+            let team = TeamArray[unit.teamIDs[i]];
+            let name = NameAndRank(team,i);
+            team.name = name;
+            let hp = parseInt(team.teams) || 1;
+            if (formation.id === state.TY.supportID[player]) {
+                unitMarker = Nations[nation].supportmarker;
+            }
+            if (team.special.includes("HQ")) {
+                unitMarker = Nations[nation].flag;
+            }
+            team.token.set({
+                name: name,
+                tint_color: "transparent",
+                showname: true,
+                statusmarkers: unitMarker,
+            });
+            if (team.type === "Infantry" && hp > 1) {
+                team.token.set({
+                    bar1_value: hp,
+                    bar1_max: hp,
+                    compact_bar: "standard",
+                    showplayers_bar1: true,
+                    playersedit_bar1: true,
+                });
+            } 
+            if (i===0) {
                 let r = (team.type === "Infantry") ? 20:0.1;
                 team.token.set({
-                    name: name,
-                    tint_color: "transparent",
                     aura1_color: Colours.green,
                     aura1_radius: r,
                     showplayers_aura1: true,
-                    showname: true,
-                    statusmarkers: unitMarker,
-                });
-                team.token.set(cm,true);
-
-
-                if (team.type === "Infantry" && hp > 1) {
-                    team.token.set({
-                        bar1_value: hp,
-                        bar1_max: hp,
-                        compact_bar: "standard",
-                        showplayers_bar1: true,
-                        playersedit_bar1: true,
-                    });
-                } 
+                })
             }
-        } else if (player === 0) {
-            //organize tokens into units
-            //HQ for battalion HQ, then main (tank or infantry) organized into co of 3, then non in singles
-            //unitName is now Battalion Name and companyNumber is really Battalion Number
-
-            //sorts large battalion into companys of tokens
-            let sortedArray = [];
-            let companyArray = [];
-            for (let i=0;i<teamIDs.length;i++) {
-                let id = teamIDs[i];
-                let token = findObjs({_type:"graphic", id: id})[0];
-                let char = getObj("character", token.get("represents")); 
-                if (!char) {sendChat("","No Character?"); return};
-                companyArray.push(id);
-                if (Attribute(char,"special").includes("HQ") || companyArray.length >= 3) {
-                    sortedArray.push(companyArray);
-                    companyArray = [];
-                }
-            }
-            if (companyArray.length > 0) {
-                sortedArray.push(companyArray);
-            }
-
-            for (let i=0;i<sortedArray.length;i++) {
-                let companyArray = sortedArray[i];
-                let unit = new Unit(nation,stringGen(),unitName + "/" + plts[i] + " Co");
-                formation.add(unit);
-                let num = 0
-                for (let j=0;j<companyArray.length;j++) {
-                    let id = companyArray[j];
-                    let team = new Team(id,unit.id);
-                    if (!team) {continue};
-                    let cm = "status_" + companyMarkers[i];
-                    if (team.special.includes("HQ")) {
-                        unit.name = unitName + "/HQ";
-                        cm = Nations[nation].flag
-                    } else if (formation.id === state.TY.supportID[player]) {
-                        cm = "";
-                        unitMarker = Nations[nation].supportmarker;
-                    }
-    
-                    unit.add(team);
-                    let name = NameAndRank(team,num);    
-                    num++;
-                    team.name = name;
-                    let hp = parseInt(team.starthp);
-                    let r = (team.type === "Infantry") ? 20:0.1;
-                    let colour = (j===0) ? Colours.green:"transparent";
-                    team.token.set({
-                        name: name,
-                        tint_color: "transparent",
-                        aura1_color: colour,
-                        aura1_radius: r,
-                        showplayers_aura1: true,
-                        showname: true,
-                        statusmarkers: unitMarker,
-                    });
-                    team.token.set(cm,true);
-                    if (team.type === "Infantry" && hp > 1) {
-                        team.token.set({
-                            bar1_value: hp,
-                            bar1_max: hp,
-                            compact_bar: "standard",
-                            showplayers_bar1: true,
-                            playersedit_bar1: true,
-                        });
-                    } 
-
-                }
-            }            
         }
-
+    
         if (state.TY.nations[player].includes(nation) === false) {
             state.TY.nations[player].push(nation);
         }
         sendChat("","Unit(s) Added");
     }
 
-
-    const NameAndRank = (team,i,note) => {
+    const NameAndRank = (team,i) => {
         let name = team.characterName.replace(team.nation + " ","");
         let unit = UnitArray[team.unitID];
         let formation = FormationArray[team.formationID];
@@ -2709,12 +2659,24 @@ log(formation)
         } else if (team.type === "Infantry" || team.type === "Gun") {
             name += " "+ letter + "/" + (i+1);
         } 
-        if (note === "Promoted") {
-            name = Ranks[Nations[team.nation].ranks][2] + Name(Nations[team.nation].names);
-        }      
+        let rank;
         if (team.special.includes("HQ")) {
-            name = Ranks[Nations[team.nation].ranks][1] + Name(Nations[team.nation].names);
-        }    
+            rank = Math.min(i,1);
+            unit.hqUnit = true;
+            name = Ranks[Nations[team.nation].ranks][rank] + Name(Nations[team.nation].names);
+        } else {
+            if (team.type === "Aircraft" || team.special.includes("Independent")) {
+                rank = 2;
+                unit.aircraft = true;
+                if (WarsawPact.includes(team.nation)) {rank=3};
+                name = Ranks[Nations[team.nation].ranks][rank] + Name(Nations[team.nation].names);
+            }  else if (i === 0) {
+                rank = 2;
+                if (WarsawPact.includes(team.nation) && unit.artillery === true) {rank=3};
+                if (team.special.includes("Passengers")) {rank++}
+                name = Ranks[Nations[team.nation].ranks][rank] + Name(Nations[team.nation].names);
+            } 
+        }
         return name;
     }
 
@@ -2762,13 +2724,12 @@ log(formation)
         }
         outputCard.body.push("Elevation: " + elevation + " Metres");
         outputCard.body.push("[hr]");
-        if (team.inCommand === true) {
-            outputCard.body.push("Team is In Command");
-        } else {
-            outputCard.body.push("Team is NOT In Command");
-        }
         if (team.suppressed === true) {
-            outputCard.body.push("[#ff0000]Team is Suppressed[/#]");
+            if (team.type === "Tank") {
+                outputCard.body.push("[#ff0000]Team is Suppressed[/#]");
+            } else {
+                outputCard.body.push("[#ff0000]Team is Pinned[/#]");
+            }
         }
         if (team.order === "") {
             outputCard.body.push("No Order this Turn");
@@ -2777,15 +2738,6 @@ log(formation)
         }
         if (team.specialorder !== "") {
             outputCard.body.push("Special Order: " + team.specialorder);
-        }
-        if (state.TY.passengers[team.id]) {
-            outputCard.body.push("[hr]");
-            outputCard.body.push("[U]Passengers[/u]");
-            let passengers = state.TY.passengers[team.id];
-            for (let i=0;i<passengers.length;i++) {
-                let passengerTeam = TeamArray[passengers[i]];
-                outputCard.body.push(passengerTeam.name);
-            }
         }
         PrintCard();
     }
@@ -3526,67 +3478,70 @@ log("Type: " + interHex.type)
             AddAbility(abilityName,action,char.id);
         }
 
-        if (type !== "Aircraft") {
-            if (type === "Infantry") {
-                action = "!Order;?{Order|Tactical|Dash|Hold|Assault}";
-            } else if (type === "Gun") {
-                if (team.tactical === 0) {
-                    action = "!Order;?{Order|Dash|Hold}";
-                } else {
+        if (team.special.includes("HQ") || team.special.includes("Independent") ||  team.special.includes("Leader")) {
+            if (type !== "Aircraft") {
+                if (type === "Infantry") {
+                    action = "!Order;?{Order|Tactical|Dash|Hold|Assault}";
+                } else if (type === "Gun") {
+                    if (team.tactical === 0) {
+                        action = "!Order;?{Order|Dash|Hold}";
+                    } else {
+                        action = "!Order;?{Order|Tactical|Dash|Hold}";
+                    }
+                } else if (type === "Tank") {
+                    action = "!Order;?{Order|Tactical|Dash|Hold|Assault}";
+                } else if (type === "Unarmoured Tank") {
                     action = "!Order;?{Order|Tactical|Dash|Hold}";
+                } else if (type === "Helicopter") {
+                    action = "!Order;?{Order|Tactical|Hold}";
                 }
+                abilityName = "Order";
+                AddAbility(abilityName,action,char.id);
+            }
+
+            let specOrders;
+            if (type === "Infantry") {
+                specOrders = "!SpecialOrders;?{Special Order|Mount|Blitz Move|Dig In|Shoot and Scoot|Clear Minefield"
+            } else if (type === "Gun") {
+                specOrders = "!SpecialOrders;?{Special Order|Dig In"
             } else if (type === "Tank") {
-                action = "!Order;?{Order|Tactical|Dash|Hold|Assault}";
+                specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Shoot and Scoot|Follow Me|Cross Here";
+                if (special.includes("Mine")) {
+                    specOrders += "|Clear Minefield";
+                }
+                if (special.includes("Passengers")) {
+                    specOrders += "|Dismount";
+                }
             } else if (type === "Unarmoured Tank") {
-                action = "!Order;?{Order|Tactical|Dash|Hold}";
+                specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Shoot and Scoot|Follow Me|Cross Here";
+                if (special.includes("Passengers")) {
+                    specOrders += "|Dismount";
+                }
             } else if (type === "Helicopter") {
-                action = "!Order;?{Order|Tactical|Hold}";
+                specOrders = "!SpecialOrders;?{Special Order|";
+                if (special.includes("Passengers")) {
+                    specOrders += "Land/Take Off|";
+                }
+                specOrders += "Blitz Move|Shoot and Scoot";
             }
-            abilityName = "Order";
-            AddAbility(abilityName,action,char.id);
+
+            specOrders += "}";
+
+            if (type !== "Aircraft" && type !== "System Unit") {
+                abilityName = "Special Order";
+                AddAbility(abilityName,specOrders,char.id);
+            }
+
+            if (type === "Tank" || type === "Infantry") {
+                abilityName = "Call Artillery";
+                AddAbility(abilityName,"!CreateBarrages",char.id);
+            }
+
+
         }
-
-        let specOrders;
-        if (type === "Infantry") {
-             specOrders = "!SpecialOrders;?{Special Order|Mount|Blitz Move|Dig In|Shoot and Scoot|Clear Minefield"
-        } else if (type === "Gun") {
-            specOrders = "!SpecialOrders;?{Special Order|Dig In"
-        } else if (type === "Tank") {
-            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Shoot and Scoot|Follow Me|Cross Here";
-            if (special.includes("Mine")) {
-                specOrders += "|Clear Minefield";
-            }
-            if (special.includes("Passengers")) {
-                specOrders += "|Dismount";
-            }
-        } else if (type === "Unarmoured Tank") {
-            specOrders = "!SpecialOrders;?{Special Order|Blitz Move|Shoot and Scoot|Follow Me|Cross Here";
-            if (special.includes("Passengers")) {
-                specOrders += "|Dismount";
-            }
-        } else if (type === "Helicopter") {
-            specOrders = "!SpecialOrders;?{Special Order|";
-            if (special.includes("Passengers")) {
-                specOrders += "Land/Take Off|";
-            }
-            specOrders += "Blitz Move|Shoot and Scoot";
-        }
-
-        specOrders += "}";
-
-        if (type !== "Aircraft" && type !== "System Unit") {
-            abilityName = "Special Order";
-            AddAbility(abilityName,specOrders,char.id);
-        }
-
         if (team.cross > 1) {
             abilityName = "Cross";
             AddAbility(abilityName,"!Cross",char.id);
-        }
-
-        if (type === "Tank" || type === "Infantry") {
-            abilityName = "Call Artillery";
-            AddAbility(abilityName,"!CreateBarrages",char.id);
         }
 
         let types = {
@@ -6792,15 +6747,6 @@ log("Charge Dist: " + chargeDist)
         }
     }
 
-    const Test = (msg) => {
-        let id = msg.selected[0]._id;
-        let team = TeamArray[id];
-        let unit = UnitArray[team.unitID];
-        cTeam = CentreTeam(unit);
-        sendChat("","Central Team: " + cTeam.name)
-    }
-
-
     const SizeHex = (msg) => {
         let tokenIDs = [];
         for (let i=0;i<msg.selected.length;i++) {
@@ -7185,7 +7131,7 @@ log("Charge Dist: " + chargeDist)
 
     on('ready', () => {
         log("===> Team Yankee V2 <===");
-        log("===> Alternate Activation / Platoons <===");
+        log("===> Alternate Activation / Squads <===");
         log("===> Software Version: " + version + " <===");
         LoadPage();
         BuildMap();
