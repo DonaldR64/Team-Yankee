@@ -294,13 +294,6 @@ input[type="hidden"][name="attr_nation"]:is([value="Canada"]) ~ .header :is(h1,h
   align-items: center;
 }
 
-.toggleheader1:not([value="Standard"]) ~ .wh1,
-.toggleheader1:not([value="Missile"]) ~ .mh1 {
-    display: none;
-}
-
-
-
 .armvehicle{
   grid-area: armvehicle;
   display: grid;
