@@ -4036,7 +4036,6 @@ log("Same had 2")
                 let curUnit = UnitArray[state.TY.currentUnitID];
                 if (curUnit) {
                     GTG(curUnit);
-                    curUnit.IC();
                 }
             }
             let assaultFlag = false;
