@@ -1834,7 +1834,7 @@ log(hit)
             Soviet: ["Ivanov","Smirnov","Petrov","Sidorov","Popov","Vassiliev","Sokolov","Novikov","Volkov","Alekseev","Lebedev","Pavlov","Kozlov","Orlov","Makarov","Nikitin","Zaitsev","Golubev","Tarasov","Ilyin","Gusev","Titov","Kuzmin","Kiselyov","Belov"],
             USA: ["Smith","Johnson","Williams","Brown","Jones","Wright","Miller","Davis","Wilson","Anderson","Thomas","Taylor","Moore","Jackson","Martin","Lee","Thompson","White","Harris","Clark","Lewis","Robinson","Walker","Young","Allen"],
             UK: ["Smith","Jones","Williams","Taylor","Davies","Brown","Wilson","Evans","Thomas","Johnson","Roberts","Walker","Wright","Robinson","Thompson","White","Hughes","Edwards","Green","Lewis","Wood","Harris","Martin","Jackson","Clarke"],
-            Israel: ["Cohen","Levy","Mizrahi","Peretz","Bitton","Dahan","Agbaria","Avaraham","Friedman","Yosef","Amar","Katz","Mhamid","Azoulay","Malkah","Khatib","Zoabi","Jabarin","Vaknin","Weiss","Gabay","Shapiro","Chided","Ohayon","Lavyan"],
+            Israel: ["Cohen","Levy","Mizrahi","Peretz","Biton","Dohan","Avraham","Friedman","Malka","Katz","David","Yosef","Chen","Azoulai","Malka","Ben David","Edri","Moshe","Levine","Weiss","Gabbai","Shapiro","Tal","Ohayon","Lavyan"],
             Arabic: ["Khaled","Mohamed","Al numan","Ahmed","Ali","Hussein","Hassan","Ibrahim","Mahmoud","Samaan","Alzuhur","Saleh","Alththania","Allah","Mostafa","Suleiman","Yousef","Aldaman","Khalil","Khalaf","El din","Ismail","Sheik","Hamoud","Omar"],
         
         
