@@ -5091,7 +5091,7 @@ log("In Create Barrages")
             return;
         }
         if (observerTeam.spotAttempts > 2) {
-            outputCard.body.push("This Platoon has no further Spot Attempts remaining");
+            outputCard.body.push("This Team has no further Spot Attempts remaining");
             PrintCard();
             return;
         }
