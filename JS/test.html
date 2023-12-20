@@ -160,11 +160,12 @@
 
     <div class="row">
         <h3>Weapons</h3>
-
+        <span>Place Missiles as Weapon 5</span>
     <div class="weapons">
         <table>
           <thead>
             <tr>
+              <th>Equipped</th>
               <th>Name</th>
               <th>Group</th>
               <th>Eff. Range</th>
@@ -178,6 +179,10 @@
           </thead>
           <tbody>
             <tr>
+                <td><select name="attr_weapon1equipped">
+                    <option value = "Off">Off</option>
+                    <option value = "Equipped">Equipped</option>
+                </select></td>
                 <td><input type="text" name="attr_weapon1name"></td>
                 <td>
                     <select name="attr_weapon1type">
@@ -240,6 +245,10 @@
                 <td><input type="text" name="attr_weapon1notes"></td>
             </tr>
             <tr>
+                <td><select name="attr_weapon2equipped">
+                    <option value = "Off">Off</option>
+                    <option value = "Equipped">Equipped</option>
+                </select></td>
                 <td><input type="text" name="attr_weapon2name"></td>
                 <td>
                     <select name="attr_weapon2type">
@@ -302,6 +311,10 @@
                 <td><input type="text" name="attr_weapon2notes"></td>
             </tr>
             <tr>
+                <td><select name="attr_weapon3equipped">
+                    <option value = "Off">Off</option>
+                    <option value = "Equipped">Equipped</option>
+                </select></td>
                 <td><input type="text" name="attr_weapon3name"></td>
                 <td>
                     <select name="attr_weapon3type">
@@ -364,6 +377,10 @@
                 <td><input type="text" name="attr_weapon3notes"></td>
             </tr>
             <tr>
+                <td><select name="attr_weapon4equipped">
+                    <option value = "Off">Off</option>
+                    <option value = "Equipped">Equipped</option>
+                </select></td>
                 <td><input type="text" name="attr_weapon4name"></td>
                 <td>
                     <select name="attr_weapon4type">
@@ -426,6 +443,10 @@
                 <td><input type="text" name="attr_weapon4notes"></td>
             </tr>
             <tr>
+                <td><select name="attr_weapon5equipped">
+                    <option value = "Off">Off</option>
+                    <option value = "Equipped">Equipped</option>
+                </select></td>
                 <td><input type="text" name="attr_weapon5name"></td>
                 <td>
                     <select name="attr_weapon5type">
@@ -604,9 +625,10 @@
 
           <section class="weapon">
             <h3>Weapons</h3>
-            <div class="weaponinfo">
+            <input type="hidden" name="attr_weapon1equipped" class="weapon1-status" value="Off">
+            <div class="weapon1">                
                 <span style="font-weight:bold;" >Weapon</span>
-                <span style="font-weight:bold;" name="attr_weapon1header"></span>
+                <span style="font-weight:bold;" >Eff. Range</span>
                 <span style="font-weight:bold;" >Max. Range</span>
                 <span style="font-weight:bold;" >Halted</span>
                 <span style="font-weight:bold;" >Moving</span>
@@ -621,6 +643,9 @@
                 <h4><span name="attr_weapon1at"></span></h4>
                 <h4><span name="attr_weapon1fp"></span></h4>
                 <h4><span name="attr_weapon1notes"></span></h4>
+            </div>
+            <input type="hidden" name="attr_weapon2equipped" class="weapon2-status" value="Off">
+            <div class="weapon2">                
                 <h4><span name="attr_weapon2name"></span></h4>
                 <h4><span name="attr_weapon2Erange"></span></h4>
                 <h4><span name="attr_weapon2Mrange"></span></h4>
@@ -629,6 +654,9 @@
                 <h4><span name="attr_weapon2at"></span></h4>
                 <h4><span name="attr_weapon2fp"></span></h4>
                 <h4><span name="attr_weapon2notes"></span></h4>
+            </div>
+            <input type="hidden" name="attr_weapon3equipped" class="weapon3-status" value="Off">
+            <div class="weapon3">                
                 <h4><span name="attr_weapon3name"></span></h4>
                 <h4><span name="attr_weapon3Erange"></span></h4>
                 <h4><span name="attr_weapon3Mrange"></span></h4>
@@ -637,6 +665,9 @@
                 <h4><span name="attr_weapon3at"></span></h4>
                 <h4><span name="attr_weapon3fp"></span></h4>
                 <h4><span name="attr_weapon3notes"></span></h4>
+            </div>
+            <input type="hidden" name="attr_weapon4equipped" class="weapon4-status" value="Off">
+            <div class="weapon4">                
                 <h4><span name="attr_weapon4name"></span></h4>
                 <h4><span name="attr_weapon4Erange"></span></h4>
                 <h4><span name="attr_weapon4Mrange"></span></h4>
@@ -644,7 +675,18 @@
                 <h4><span name="attr_weapon4moving"></span></h4>
                 <h4><span name="attr_weapon4at"></span></h4>
                 <h4><span name="attr_weapon4fp"></span></h4>
-                <h4><span name="attr_weapon4notes"></span></h4>    
+                <h4><span name="attr_weapon4notes"></span></h4>
+            </div>
+            <input type="hidden" name="attr_weapon5equipped" class="weapon5-status" value="Off">
+            <div class="weapon5">    
+                <span style="font-weight:bold;" >Weapon</span>
+                <span style="font-weight:bold;" >Min. Range</span>
+                <span style="font-weight:bold;" >Max. Range</span>
+                <span style="font-weight:bold;" >Halted</span>
+                <span style="font-weight:bold;" >Moving</span>
+                <span style="font-weight:bold;" >Antitank</span>
+                <span style="font-weight:bold;" >Firepower</span>
+                <span style="font-weight:bold;" >Notes</span>            
                 <h4><span name="attr_weapon5name"></span></h4>
                 <h4><span name="attr_weapon5Erange"></span></h4>
                 <h4><span name="attr_weapon5Mrange"></span></h4>
@@ -652,8 +694,8 @@
                 <h4><span name="attr_weapon5moving"></span></h4>
                 <h4><span name="attr_weapon5at"></span></h4>
                 <h4><span name="attr_weapon5fp"></span></h4>
-                <h4><span name="attr_weapon5notes"></span></h4>   
-            </div>         
+                <h4><span name="attr_weapon5notes"></span></h4>
+            </div>
           </section>
         </main>
       </div>
@@ -729,20 +771,13 @@
     });
 
     on("change:attrs sheet:opened", function() { 
-        getAttrs(["teams","type","nation","counterattack","assault","weapon1type"], function(values) {
+        getAttrs(["teams","type","nation","counterattack","assault"], function(values) {
             let nationImage;
             let nation = values.nation;
             let assaultV = values.assault;
             let counterV = values.counterattack;
             let type = values.type;
-            let teams = values.teams;
-            let w1type = values.weapon1type;
-            let w1h = "Eff. Range";
-
-            if (w1type.includes("Missile")) {
-                w1h = "Min. Range";
-            }
-
+            let teams = values.teams;          
 
             let aplus = "+";
             let rplus = "+";
@@ -811,7 +846,6 @@
                 "assaultname": assault,
                 "counterattackname": counterattack,
                 "teamtext": teamtext,
-                "weapon1header": w1h,
             })
         });    
     });  
