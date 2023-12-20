@@ -15,6 +15,9 @@ const TY = (() => {
     let CheckArray = []; //used by Rally and Morale checks
     let RangedInArray = {};
     let unitCreationInfo = {};
+    const lastStandCount = {"Infantry": 3,"Gun": 2,"Tank": 2,"Unarmoured Tank": 2,"Aircraft": 1,};
+
+
 
     let unitIDs4Saves = {}; //used during shooting routines
     let AssaultIDs = [[],[]]; //array of teams (IDs) in a CC, updated when charge/move
@@ -721,7 +724,7 @@ const TY = (() => {
                 newTeamIDs.push(id);
             }
             let unitLeader = TeamArray[this.teamIDs[0]];
-            let cR = (unit.size > 7) ? 8:6;
+            let cR = (this.size > 7) ? 8:6;
 
             this.teamIDs = newTeamIDs;
             this.size = size;
@@ -756,8 +759,10 @@ const TY = (() => {
                         aura1_color: Colours.yellow,
                     });
                 } else {
+                    let c = "transparent";
+                    if (i===0) {c = Colours.green}
                     team.token.set({
-                        aura1_color: "transparent",
+                        aura1_color: c,
                     });
                 }
             }
@@ -812,6 +817,7 @@ const TY = (() => {
                 let equipped = attributeArray["weapon"+i+"equipped"];
                 if (equipped === "Off") {continue};
                 let name = attributeArray["weapon"+i+"name"];
+                if (name === undefined || name === "") {continue};
                 if (name.includes("(") || name.includes(")")) {
                     name = name.replace("(","[");
                     name = name.replace(")","]");
@@ -3195,7 +3201,6 @@ log("Type: " + interHex.type)
             let curUnit = UnitArray[state.TY.currentUnitID];
             if (curUnit) {
                 GTG(curUnit);
-                curUnit.IC();
             }
         }
 
@@ -4009,7 +4014,7 @@ log("Same had 2")
                 pageInfo.page.set("dynamic_lighting_enabled",false);
             }
 
-            StartStep("Morale");
+            StartStep("Rally");
         }
         if (currentStep === "Artillery and Air") {
             SetupCard("Artillery and Air","Turn: " + state.TY.turn,"Neutral");
@@ -4059,7 +4064,7 @@ log("Same had 2")
     }
 
     const StartStep = (pass) => {
-        if (pass === "Morale") {
+        if (pass === "Rally") {
             CheckArray = [];
             for (let p=0;p<2;p++) {
                 _.each(UnitArray,unit => {
@@ -4081,13 +4086,54 @@ log("Same had 2")
             };
             if (CheckArray.length > 0) {
                 SetupCard("Morale Checks","","Neutral");
+                ButtonInfo("Start Rally Checks","!RallyChecks");
+                PrintCard();            
+            } else {
+                StartStep("Unit Morale");
+            }
+        }
+    
+        if (pass === "Unit Morale") {
+            CheckArray = [];
+            let keys = Object.keys(UnitArray);
+            for (let i=0;i<keys.length;i++) {
+                let unit = UnitArray[keys[i]];
+                if (unit.name === "Barrages") {continue};
+                let unitLeader = TeamArray[unit.teamIDs[0]];
+                if (!unitLeader) {
+                    log("Error in Unit Morale Unit Leader")
+                    log(unit)
+                    continue;
+                }
+                if ( unitLeader.special.includes("HQ") || unitLeader.special.includes("Independent")) {continue};
+                let count = 0;
+                let ids = unit.teamIDs;
+                for (let j=0;j<ids.length;j++) {
+                    let team = TeamArray[ids[j]];
+                    if (team.type === "Tank") {
+                        if (team.suppressed === true) {
+                            continue;
+                        }
+                    }
+                    count += parseInt(team.token.get("bar1_value")) || 1;
+                }
+                if (count < lastStandCount[unit.type]) {
+                    CheckArray.push(unit);
+                }
+            }
+            if (CheckArray.length > 0) {
+                SetupCard("Unit Morale Checks","","Neutral");
                 ButtonInfo("Start Morale Checks","!MoraleChecks");
                 PrintCard();            
             } else {
                 StartStep("Final");
             }
         }
-    
+
+
+
+
+
         if (pass === "Final") {
             SetupCard("Turn: " + state.TY.turn,"Starting Step","Neutral");
             ClearSmoke("Smokescreens");
@@ -4143,20 +4189,39 @@ log("Same had 2")
     }
 
 
-    const MoraleChecks = () => {
+    const RallyChecks = () => {
         let team = CheckArray.shift();
         if (team) {
             let location = team.location;
             sendPing(location.x,location.y, Campaign().get('playerpageid'), null, true); 
             SetupCard(team.name,"Rally",team.nation);
-            outputCard.body.push("Roll Against: " + team.morale);
-            ButtonInfo("Roll","!RollD6;Rally;" + team.id + ";" + team.morale);
+            outputCard.body.push("Roll Against: " + team.rally);
+            ButtonInfo("Roll","!RollD6;Rally;" + team.id + ";" + team.rally);
+            PrintCard();
+        } else {
+            StartStep("Unit Morale");
+        }
+    }
+    
+    const MoraleChecks = () => {
+        let unit = CheckArray.shift();
+        if (unit) {
+            SetupCard(unit.name,"Unit Morale",unit.nation);
+            let unitLeader = TeamArray[unit.teamIDs[0]];
+            let location = unitLeader.location;
+            let needed = unitLeader.morale;
+            sendPing(location.x,location.y, Campaign().get('playerpageid'), null, true); 
+            outputCard.body.push("Roll Against: " + needed);
+            ButtonInfo("Roll","!RollD6;UnitMorale;" + unit.id + ";" + needed);
             PrintCard();
         } else {
             StartStep("Final");
         }
     }
-    
+
+
+
+
     
     const BreakOff = (msg) => {
         let defendingPlayer = msg.content.split(";")[1];
@@ -4232,6 +4297,39 @@ log("Same had 2")
                 let part1 = "Done";
                 if (CheckArray.length > 0) {
                     part1 = "Next Team/Unit";
+                } 
+                ButtonInfo(part1,"!RallyChecks");
+                PrintCard();
+            } else if (type === "UnitMorale") {
+                let unitID = Tag[2];
+                let needed = parseInt(Tag[3]);
+                let unit = UnitArray[unitID];
+                let roll = randomInteger(6);
+                let unitLeader = TeamArray[unit.teamIDs[0]];
+                if (!unitLeader) {
+                    log("ERROR with Unit Leader of unit: " + unit.name)
+                    return;
+                }
+                let reroll = CommandReroll(unitLeader);
+
+                SetupCard(unit.name,"Needing: " + needed + "+",unit.nation);
+                outputCard.body.push(DisplayDice(roll,unit.nation,24));
+                if (roll < needed && reroll > -1) {
+                    outputCard.body.push("Commander Reroll: " + DisplayDice(reroll,team.nation,24));
+                }
+                if (roll >= needed || reroll >= needed) {
+                    outputCard.body.push("Success!");
+                    outputCard.body.push("Unit continues to fight");
+                    outputCard.body.push("It will test each round")
+                } else {
+                    outputCard.body.push("Failure! Unit Flees the Field!");
+                    outputCard.body.push("(Any associated Transports Should also be Removed)");
+                    //remove stuff
+                }
+
+                let part1 = "Done";
+                if (CheckArray.length > 0) {
+                    part1 = "Next Unit";
                 } 
                 ButtonInfo(part1,"!MoraleChecks");
                 PrintCard();
@@ -6979,6 +7077,9 @@ log("Charge Dist: " + chargeDist)
                 break;
             case '!AdvanceStep':
                 AdvanceStep();
+                break;
+            case '!RallyChecks':
+                RallyChecks();
                 break;
             case '!MoraleChecks':
                 MoraleChecks();
