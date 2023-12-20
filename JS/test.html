@@ -551,7 +551,7 @@
             <div class="info">
               <h2>Courage: <span name="attr_courage"></span>+</h2>
               <h3>Morale: <span name="attr_morale"></span>+</h3>
-              <h3>Rally: <span name="attr_rally"></span><span name="attr_rplus"></span></h3>      
+              <h3><span name="attr_rallyname"></span><span name="attr_rally"></span><span name="attr_rplus"></span></h3>      
             </div>  
           </section>
 
@@ -785,6 +785,7 @@
 
             let assault = "Assault: ";
             let counterattack = "Counterattack: ";
+            let rname = "Rally: ";
 
             if (type === "Aircraft" || type === "Helicopter") {
                 aplus = "";
@@ -792,6 +793,7 @@
                 cplus = "";
                 assault = "";
                 counterattack = "";
+                rname = "";
             }
         
             if (assaultV === "-") {
@@ -846,6 +848,7 @@
                 "assaultname": assault,
                 "counterattackname": counterattack,
                 "teamtext": teamtext,
+                "rallyname": rname,
             })
         });    
     });  
