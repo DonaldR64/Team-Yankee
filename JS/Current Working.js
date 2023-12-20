@@ -809,8 +809,9 @@ const TY = (() => {
 
             for (let i=1;i<6;i++) {
                 let art = false;
+                let equipped = attributeArray["weapon"+i+"equipped"];
+                if (equipped === "Off") {continue};
                 let name = attributeArray["weapon"+i+"name"];
-                if (!name || name == " " || name == "") {continue};
                 if (name.includes("(") || name.includes(")")) {
                     name = name.replace("(","[");
                     name = name.replace(")","]");
@@ -842,7 +843,7 @@ const TY = (() => {
                 let maxRange = parseInt(attributeArray["weapon"+i+"Mrange"]);
 
                 let minRange = 1;
-                if (type.includes("Missile")) {
+                if (type.includes("Missile") || type === "SAM") {
                     minRange = effRange;
                     effRange = maxRange;
                 }
@@ -878,10 +879,15 @@ const TY = (() => {
                 };
 
                 if (weapon.type === "LAW/MAW") {
-                    atWeapon = weapon;
+                    if (atWeapon === undefined) {
+                        atWeapon = weapon;
+                    } else {
+                        if (weapon.at > atWeapon.at) {
+                            atWeapon = weapon;
+                        }
+                    }
                 }
                 weaponArray.push(weapon);
-                
             }
 
             if (atWeapon === undefined) {
@@ -900,8 +906,7 @@ const TY = (() => {
             }
             
             //update sheet with info
-            let specials = attributeArray.special || " "
-log("Specials: " + specials)
+            let specials = attributeArray.special || " ";
             let specialText = "";
 
 
@@ -925,7 +930,6 @@ log("Specials: " + specials)
                 if (a1>b1) {return 1};
                 return 0;
             });
-log(infoArray)
             for (let i=0;i<10;i++) {
                 let specName = infoArray[i];
                 if (!specName || specName === "") {continue}
@@ -961,8 +965,7 @@ log(infoArray)
             }
 
             let special = infoArray.toString() || " "
-log("Special: " + special)
-log("Special Text: " + specialText)
+
             if (specialText === "") {
                 DeleteAttribute(char.id,"specialText");
             } else {
