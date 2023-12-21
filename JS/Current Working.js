@@ -1328,9 +1328,10 @@ log(hit)
                 }
 
                 if (weapon.notes.includes("HEAT") === false && weapon.notes.includes("Krasnopol") === false && weapon.notes.includes("NLOS") === false) {
-                    if (range > 16) {
-                        saveNeeded++;
-                        save.tip += "<br>+1 Armour for Long Range<br>";
+                    let rangeBonus = Math.ceil((range - parseInt(hit.weapon.effRange))/hit.weapon.effRange);
+                    if (rangeBonus > 0) {
+                        saveNeeded += rangeBonus;
+                        save.tip += "<br>Range Bonus to Armour: +" + rangeBonus + "<br>";
                     }
                 };
 
@@ -1445,7 +1446,7 @@ log(hit)
                     save.tip += "<br>Firepower Roll: " + fpRoll + " vs. " + weapon.fp + "+";
                     let noRerollWeapons = ["Guided","Guided AA","Anti-helicopter","Dedicated AA"];
                     let notes = weapon.notes.split(",");
-                    if (((shooterType === "Infantry" && findCommonElements(noRerollWeapons,notes) === false) || weapon.type === "AA MG") && fpRoll >= weapon.fp) {
+                    if ((shooterType === "Infantry" && findCommonElements(noRerollWeapons,notes) === false) || (weapon.name.includes("AA") && fpRoll >= weapon.fp)) {
                         fpRoll = randomInteger(6);
                         save.tip += "<br>Rerolled: " + fpRoll;
                     }
@@ -4659,18 +4660,23 @@ log(weapons)
                 let toHit = parseInt(target.hit);
                 let toHitTips = "<br>Base: " + toHit;
                 let los = eta[0].los;
-                let excl = false;
+                let effRange = parseInt(weapon.effRange);
+                let rangePenalty = Math.ceil((los.distance - effRange)/effRange);
 
-                if (weapon.notes.includes("Laser Rangefinder") || weapon.notes.includes("Guided") || (weapon.notes.includes("Accurate") && sTeam.moved === false) || weapon.notes.includes("NLOS")) {
-                    excl = true;
+                if (weapon.notes.includes("Laser Rangefinder") || (weapon.notes.includes("Accurate") && sTeam.moved === false)) {
+                    rangePenalty = Math.max(rangePenalty - 1,0);
                 }
+                if (weapon.notes.includes("Guided") ||  weapon.notes.includes("NLOS")) {
+                    rangePenalty = 0;
+                }
+
                 if (weapon.notes.includes("Radar") && (target.type === "Aircraft" || (target.type === "Helicopter" && target.landed() === false))) {
-                    excl = true;
+                    rangePenalty = 0;
                 }
 
-                if (los.distance > 16) {
-                    toHit++;
-                    toHitTips += "<br>Long Range +1";
+                if (rangePenalty > 0) {
+                    toHit += rangePenalty;
+                    toHitTips += "<br>Range: +" + rangePenalty;
                 }
 
                 if (state.TY.turn === 1 && target.gonetoground === true) {
@@ -4752,7 +4758,7 @@ log(weapons)
 
                 if (target.type === "Aircraft") {
                     //allowable weapons should be screened out above
-                    if (weapon.type === "AA MG" && weapon.notes.includes("Dedicated AA") === false) {
+                    if (weapon.type === "Vehicle MG" && weapon.notes.includes("Dedicated AA") === false) {
                         if (rof === 1) {
                             toHit += 1;
                             toHitTips.push("+1 as ROF 1 Weapon vs. Air");
@@ -4770,7 +4776,7 @@ log(weapons)
                 }
                 if (target.type === "Helicopter" && target.landed() === false) {
                     //allowable weapons should be screened out above
-                    if ((weapon.type === "AA MG" && weapon.notes.includes("Dedicated AA") === false) || sTeam.type === "Infantry" || (weapon.notes.includes("Guided") && weapon.notes.includes("Guided AA") === false) || (weapon.notes.includes("Anti-Helicopter") && sTeam.type !== "Aircraft")) {
+                    if ((weapon.type === "Vehicle MG" && weapon.notes.includes("Dedicated AA") === false) || sTeam.type === "Infantry" || (weapon.notes.includes("Guided") && weapon.notes.includes("Guided AA") === false) || (weapon.notes.includes("Anti-Helicopter") && sTeam.type !== "Aircraft")) {
                         if (rof === 1) {
                             toHit += 1;
                             toHitTips.push("+1 as ROF 1 Weapon vs. Air");
@@ -6903,7 +6909,7 @@ log("Charge Dist: " + chargeDist)
                         if (team.moved === false) {
                             team.moved = true;
                             let dist = team.hex.distance(team.prevHex);
-                            if (dist > 5) {
+                            if (dist > 10) {
                                 team.maxTact = true;
                             }
                         }
