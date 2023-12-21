@@ -1047,7 +1047,7 @@ const TY = (() => {
 
             this.suppressed = (token.get("tint_color") === Colours.red) ? true:false;
             this.fired = this.queryCondition("Fired");
-            this.aaFired = this.queryCondition("AA Fire");
+            this.aaFired = this.queryCondition("AAFire");
             this.moved = ((this.queryCondition("Tactical") || this.queryCondition("Dash")) === true) ? true:false;
             this.gonetoground = this.queryCondition("GTG");
 
@@ -3630,16 +3630,9 @@ log("Type: " + interHex.type)
             errorMsg.push("Only one Special Order per turn");
         }
         
-        if (specialorder === "Blitz Move" || specialorder === "Dig In" || specialorder === "Clear Minefield" || specialorder === "Cross Here") {
+        if (specialorder === "Blitz Move" || specialorder === "Dig In" || specialorder === "Cross Here") {
             if (unitLeader.moved === true || state.TY.step === "Assault") {
                 errorMsg.push(specialorder + " Order must be given before movement");
-            }
-        }
-
-     ///alter below as rest of unit can dig in    
-        if (specialorder === "Dig In") {
-            if (unitLeader.queryCondition("Spot") === true && noun === "Team") {
-                errorMsg.push("This Platoon Called in Artillery and so cannot Dig In");
             }
         }
 
@@ -3727,22 +3720,6 @@ log("Type: " + interHex.type)
                     outputCard.body.push("Teams remain where they are")
                 }
                 break;
-            case "Clear Minefield":
-
-///fix
-                if (team.player === 0) {
-                    outputCard.body.push('The Platoon is ordered to clear a Minefield within 2 Hexes');
-                    outputCard.body.push("That Platoon counts as having Dashed, and cannot Shoot or Assault");
-                    outputCard.body.push("The Minefield can be removed immediately");
-                    outputCard.body.push("Other Platoons may be given the same order");   
-                } else {
-                    outputCard.body.push('The Platoon clears a Minefield within 2 Hexes');
-                    outputCard.body.push("That Platoon counts as having Dashed, and cannot Shoot or Assault");
-                    outputCard.body.push("The Minefield can be removed immediately");
-                }
-                condition = "Dash";
-                targetTeam.moved = true;
-                break;
             case "Land/Take Off":
                 if (targetTeam.landed() === true) {
                     outputCard.body.push("The Helicopters Take Off and may now move");
@@ -3768,7 +3745,7 @@ log("Type: " + interHex.type)
         if (unit.type !== "Infantry" && unit.type !== "Gun") {return};
         _.each(unit.teamIDs,id => {
             let team = TeamArray[id];
-            if (team.type === "Infantry" || team.type === "Gun") {
+            if ((team.type === "Infantry" || team.type === "Gun") && team.queryCondition("Spot") === false) {
                 RemoveRangedInMarker(team.unitID);
                 let hex = hexMap[team.hexLabel];
                 if (hex.terrain.includes("Building") === false && hex.terrain.includes("Foxholes") === false && hex.terrain.includes("Offboard") === false) {
