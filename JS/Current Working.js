@@ -161,44 +161,44 @@ const TY = (() => {
     const companyMarkers = ["Red-01::2006626","Red-02::2006628","Red-03::2006629","Red-04::2006631","Red-05::2006633"];
 
     //Types: Flat = 0, Short = 1, Tall = 2, Building = 3
-    //Dash: Road = 0,Country = 1,Terrain = 2, Tank Obstacle = 3, Impassable = 4
+    //Dash: Country = 0, Terrain = 1, Road = 2, Tank Obstacle = 3, Impassable = 4
 
     const TerrainInfo = {
-        "#00ff00": {name: "Woods",height: 20,bp: false,type: 2,group: "Woods",dash: 2},
-        "#20124d": {name: "Ruins",height: 0,bp: true,type: 1,group: "Rough",dash: 2},
-        "#000000": {name: "Hill 1",height: 25,bp: false,type: 0,group: "Hill",dash: 1},
-        "#434343": {name: "Hill 2",height: 25,bp: false,type: 0,group: "Hill",dash: 1},
-        "#666666": {name: "Hill 3",height: 25,bp: false,type: 0,group: "Hill",dash: 1},
-        "#c0c0c0": {name: "Hill 4",height: 25,bp: false,type: 0,group: "Hill",dash: 1},
-        "#d9d9d9": {name: "Hill 5",height: 25,bp: false,type: 0,group: "Hill",dash: 1},
-        "#00ffff": {name: "Stream",height: 0,bp: false,type: 0,group: "Water",dash: 2},
-        "#b6d7a8": {name: "Scrub",height: 0,bp: false,type: 1,group: "Crops",dash: 2},
-        "#980000": {name: "Low Embankment",height: 5,bp: false,type: 0,group: "Hill",dash: 2},
-        "#ffffff": {name: "Ridgeline",height: 5,bp: true,type: 1,group: "Hill",dash: 1},
-        "#ffff00": {name: "Road",height: 0,bp: false,type: 0,group: "Road",dash: 0},
+        "#00ff00": {name: "Woods",height: 20,bp: false,type: 2,group: "Woods",dash: 1},
+        "#20124d": {name: "Ruins",height: 0,bp: true,type: 1,group: "Rough",dash: 1},
+        "#000000": {name: "Hill 1",height: 25,bp: false,type: 0,group: "Hill",dash: 0},
+        "#434343": {name: "Hill 2",height: 25,bp: false,type: 0,group: "Hill",dash: 0},
+        "#666666": {name: "Hill 3",height: 25,bp: false,type: 0,group: "Hill",dash: 0},
+        "#c0c0c0": {name: "Hill 4",height: 25,bp: false,type: 0,group: "Hill",dash: 0},
+        "#d9d9d9": {name: "Hill 5",height: 25,bp: false,type: 0,group: "Hill",dash: 0},
+        "#00ffff": {name: "Stream",height: 0,bp: false,type: 0,group: "Water",dash: 1},
+        "#b6d7a8": {name: "Scrub",height: 0,bp: false,type: 1,group: "Crops",dash: 1},
+        "#980000": {name: "Low Embankment",height: 5,bp: false,type: 0,group: "Hill",dash: 0},
+        "#ffffff": {name: "Ridgeline",height: 5,bp: true,type: 1,group: "Hill",dash: 0},
+        "#ffff00": {name: "Road",height: 0,bp: false,type: 0,group: "Road",dash: 2},
     }
 
     const MapTokenInfo = {
-        "woods": {name: "Woods",height: 20,bp: false,type: 2,group: "Woods",dash: 2},
-        "ruins": {name: "Ruins",height: 0,bp: true,type: 1,group: "Rough",dash: 2},
-        "building 1": {name: "Buildings - Height 1",height: 10,bp: true,type: 3,group: "Building",dash: 2},
-        "building 2": {name: "Buildings - Height 2",height: 20,bp: true,type: 3,group: "Building",dash: 2},
-        "building 3": {name: "Buildings - Height 3",height: 30,bp: true,type: 3,group: "Building",dash: 2},
-        "rubble": {name: "Rubble",height: 0,bp: true,type: 1,group: "Rough",dash: 2},
+        "woods": {name: "Woods",height: 20,bp: false,type: 2,group: "Woods",dash: 1},
+        "ruins": {name: "Ruins",height: 0,bp: true,type: 1,group: "Rough",dash: 1},
+        "building 1": {name: "Buildings - Height 1",height: 10,bp: true,type: 3,group: "Building",dash: 1},
+        "building 2": {name: "Buildings - Height 2",height: 20,bp: true,type: 3,group: "Building",dash: 1},
+        "building 3": {name: "Buildings - Height 3",height: 30,bp: true,type: 3,group: "Building",dash: 1},
+        "rubble": {name: "Rubble",height: 0,bp: true,type: 1,group: "Rough",dash: 1},
         //"anti-tank ditch": {name: "Anti-Tank Ditch",height: 0,bp: true,type: 0,group: "Trench",dash: 3},
         //"wall": {name: "Wall",height: 0,bp: true,type: 1,group: "Obstacle",dash: 2},
-        "hedge": {name: "Hedge",height: 0,bp: false,type: 1,group: "Obstacle",dash: 2},
+        "hedge": {name: "Hedge",height: 0,bp: false,type: 1,group: "Obstacle",dash: 1},
         //"bocage": {name: "Bocage",height: 0,bp: true,type: 2,group: "Obstacle",dash: 2},
         //"dragon's teeth": {name: "Dragon's Teeth",height: 0,bp: true,type: 1,group: "Obstacle",dash: 3},
         //"road block": {name: "Road Block",height: 0,bp: true,type: 1,group: "Obstacle",dash: 3},
-        "crater": {name: "Craters",height: 0,bp: true,type: 0,group: "Rough",dash: 2},        
-        "crops": {name: "Crops",height: 0,bp: false,type: 1,group: "Crops",dash: 2},
-        "foxholes": {name: "Foxholes",height: 0,bp: false,type: 0,group: "Foxholes",dash: 2}, //bp tracked in LOS, and in hexMap
-        "smoke": {name: "Smoke",height: 0,bp: false,type: 0,group: "Smoke",dash: 1},
-        "smokescreen": {name: "SmokeScreen",height: 30,bp:false,type: 0,group: "Smoke",dash: 1},
-        "rangedin": {name: "rangedin",height: 0,bp:false,type: 0,group: "Marker",dash: 1},
-        "scrub": {name: "Scrub",height: 0,bp: false,type: 1,group: "Crops",dash: 2},
-        "stream": {name: "Stream",height: 0,bp: false,type: 0,group: "Water",dash: 2},
+        "crater": {name: "Craters",height: 0,bp: true,type: 0,group: "Rough",dash: 1},        
+        "crops": {name: "Crops",height: 0,bp: false,type: 1,group: "Crops",dash: 1},
+        "foxholes": {name: "Foxholes",height: 0,bp: false,type: 0,group: "Foxholes",dash: 1}, //bp tracked in LOS, and in hexMap
+        "smoke": {name: "Smoke",height: 0,bp: false,type: 0,group: "Smoke",dash: 0},
+        "smokescreen": {name: "SmokeScreen",height: 30,bp:false,type: 0,group: "Smoke",dash: 0},
+        "rangedin": {name: "rangedin",height: 0,bp:false,type: 0,group: "Marker",dash: 0},
+        "scrub": {name: "Scrub",height: 0,bp: false,type: 1,group: "Crops",dash: 1},
+        "stream": {name: "Stream",height: 0,bp: false,type: 0,group: "Water",dash: 1},
 
     
     }
@@ -708,6 +708,7 @@ const TY = (() => {
         }
 
         resetflags() {
+            if (this.name === "Barrages") {return};
             let newTeamIDs = [];
             let conditions = ["Dash","Tactical","Hold","Assault","Fired","AAFire","Spot"];
             let size = 0;
@@ -752,7 +753,15 @@ const TY = (() => {
                 team.fired = false;
                 team.aaFired = false;
             }
-            unitLeader.checkCommand();
+            if (unitLeader) {
+                unitLeader.checkCommand();
+                if (unitLeader.token.get("aura1_color") === Colours.black) {
+                    unitLeader.token.set("aura1_color",Colours.green)
+                }
+            } else {
+                log("No Unit Leader for:")
+                log(unit)
+            }
 
         }
 
@@ -991,7 +1000,14 @@ const TY = (() => {
             this.specialorder = "";
             this.inCommand = (token.get("aura1_color") === Colours.lightblue) ? false:true;
 
-            this.tactical = parseInt(attributeArray.tactical);
+            let initialTactical = attributeArray.tactical.split("/");
+            let tactical = parseInt(initialTactical[0]);
+            let maxTactical = tactical;
+            if (initialTactical[1]) {
+                maxTactical = parseInt(initialTactical[1]);
+            }
+            this.tactical = tactical;
+            this.maxTactical = maxTactical;
             this.terraindash = parseInt(attributeArray.terrain);
             this.countrydash = parseInt(attributeArray.country);
             this.roaddash = parseInt(attributeArray.road);
@@ -2527,7 +2543,7 @@ log(hex)
         let unitType = Attribute(refChar,"unittype"); //Core, Support or Core/Support
         if (!unitType || unitType === "") {
             unitType = "Core";
-            AttributeSet(refChar,"unittype",unitType);
+            AttributeSet(refChar.id,"unittype",unitType);
         }
 
 
@@ -3195,33 +3211,30 @@ log("Type: " + interHex.type)
         let order = Tag[1];
         let team = TeamArray[teamID];
         let unit = UnitArray[team.unitID];
-        let targetName = unit.name;
+        if (team.id !== TeamArray[unit.teamIDs[0]].id) {
+            team = TeamArray[unit.teamIDs[0]];
+        }
         let errorMsg = "";
-        let unitActivation = true;
-        let targetArray = [];
         let suppressionFlag = false;
         let spottedFlag = false;
-        let extraLine = "";
         let roadFlag = false;
-        let noun = (team.special.includes("Team")) ? "Team":"Platoon";
-        let verb = " has ";
-        let noun2 = "It";
         let tactical = parseInt(team.tactical);
-
+        let maxTactical = parseInt(team.maxTactical);
+        let max = false;
+        if (maxTactical > tactical) {max = true};
 
         _.each(unit.teamIDs,id => {
             let team2 = TeamArray[id];
-            if (hexMap[team2.hexLabel].dash === 0) {
+            if (hexMap[team2.hexLabel].dash === 2) {
+                log(team2.name)
+                log(team2.hexLabel)
                 roadFlag = true;
             }
-            if (team2.inCommand === true) {
-                targetArray.push(team2);
-                if (team2.suppressed === true) {
-                    suppressionFlag = true;
-                }
-                if(team2.queryCondition("Spot") === true) {
-                    spottedFlag = true;
-                }
+            if (team2.suppressed === true) {
+                suppressionFlag = true;
+            }
+            if(team2.queryCondition("Spot") === true) {
+                spottedFlag = true;
             }
         });
 
@@ -3234,48 +3247,17 @@ log("Type: " + interHex.type)
 
         ClearSmoke(unit.id);
 
-        if (teamID !== unit.teamIDs[0]) {
-            if (team.token.inCommand === true) {
-                teamID = unit.teamIDs[0];
-                team = TeamArray[teamID];
-                if (unit.teamIDs.length > 1) {
-                    noun = "Platoons";
-                    verb = " have ";
-                    noun2 = "They";
-                }
-            } else {
-                unitActivation = false;
-                targetArray = [team];
-                targetName = team.name;
-                suppressionFlag = team.suppressed;
-                outputCard.body.push("Out of Command " + noun);
-                outputCard.body.push("[hr]");
-                if (order === "Assault") {
-                    errorMsg = "Out of Command Platoons cannot Assault";
-                };
-                if (order === "Tactical" || order === "Hold") {
-                    extraLine = "Firing suffers an additional +1 Penalty";
-                };
-                if (order === "Dash") {
-                    if (spottedFlag === false) {
-                        extraLine = noun + " must move towards the Unit Leader";
-                    } 
-                };
-            };
-        };
+        if (order === "Dash" && unit.specialorder.includes("Blitz")) {errorMsg = noun + " cannot Dash due to Blitz"};
+        if (order !== "Hold" && unit.specialorder.includes("Dig In")) {errorMsg = noun + " cannot execute " + order + " due to Dig In Special Order"};
 
-        if (order === "Dash" && team.specialorder.includes("Blitz")) {errorMsg = noun + " cannot Dash due to Blitz"};
-        if (order !== "Hold" && team.specialorder.includes("Dig In")) {errorMsg = noun + " cannot execute " + order + " due to Dig In Special Order"};
-        if ((order === "Tactical" || order === "Dash" || order === "Assault") && spottedFlag === true && noun !== "Platoons") {errorMsg = "The " + noun + " Spotted and so must take a Hold Order"};
-
-        if (team.activated() === true) {
-            errorMsg = noun + verb + "already been activated";
+        if (unit.order !== "" || team.token.get("aura1_color") === Colours.black) {
+            errorMsg = "Unit has already been activated";
         }    
         if (order === "Assault" && team.suppressed === true && (team.type === "Infantry" || team.type === "Gun")) {
-            errorMsg = noun + verb + "Suppressed, cannot Assault";
+            errorMsg = "Unit is Pinned, cannot Assault";
         }
 
-        SetupCard(targetName,"",team.nation);
+        SetupCard(unit.name,"",team.nation);
 
         if (errorMsg !== "") {
             outputCard.body.push(errorMsg);
@@ -3286,91 +3268,82 @@ log("Type: " + interHex.type)
         let two = ""
 
         if (order.includes("Tactical")) {
-            
-            if (team.type === "Helicopter") {
+            if (unit.type === "Helicopter") {
                 outputCard.body.push("The Helicopter can move up to " + team.airmove + " hexes, and may fire at a Moving ROF");
                 outputCard.body.push("Alternately the Helicopter can move off table and Loiter");
             } else {
-                outputCard.body.push("The " + noun + " can move up to " + tactical + " hexes, and may fire at a Moving ROF");
-                two = noun2 +  ' may not move into contact with enemy units';
+                if (max === true) {
+                    outputCard.body.push("Teams may move up to " + maxTactical + " hexes");
+                    outputCard.body.push("Only Stabilised Weapons can fire if the Team moves more than 10 hexes");
+                    outputCard.body.push("Teams fire at a Moving ROF");
+                } else {
+                    outputCard.body.push("The Unit can move up to " + tactical + " hexes, and may fire at a Moving ROF");
+                }
+                two = 'Teams may not move into contact with enemy Teams';
                 if (suppressionFlag === true) {
-                    if (team.type === "Infantry" || team.type === "Gun") {
-                        two = noun2 + " cannot move closer to enemy teams";
+                    if (unit.type ===  "Tank") {
+                        two = "Any suppressed Tanks cannot move closer to [U]visible[/u] enemy teams and will fire with a penalty of 1";
                     } else {
-                        if (noun = "Platoons") {
-                            two = "Any suppressed Platoons cannot move closer to [U]visible[/u] enemy teams";
-                        } else {
-                            two = "It cannot move closer to [U]visible[/u] enemy teams";
-                        }
+                        two = "Teams cannot move closer to enemy teams and will fire with a penalty of 1";
                     }
                 } 
                 outputCard.body.push(two);
                 if (spottedFlag === true) {
-                    outputCard.body.push(noun + " that Called Artillery must remain Stationary");
+                    outputCard.body.push("Teams that Called Artillery must remain Stationary and in Formation");
                 }
             }    
         } else if (order.includes("Dash")) {
             if (state.TY.darkness === true) {
                 outputCard.body.push("Darkness limits speed to Terrain Dash Speed of " + team.terraindash + " Hexes");
             } else {
-                outputCard.body.push("The " + noun + ' can move at Dash Speed, but may not fire');
+                outputCard.body.push('The Unit can move at Dash Speed, but may not fire');
                 outputCard.body.push("Terrain Dash - " + team.terraindash + " Hexes");
                 outputCard.body.push("Country Dash - " + team.countrydash + " Hexes");
                 if (roadFlag === true) {
                     outputCard.body.push("Road Dash - " + team.roaddash + " Hexes");
                 }
             }
-            two = noun2 + ' cannot move within 4 hexes of [U]visible[/u] enemies';
+            two = 'Teams cannot move within 4 hexes of [U]visible[/u] enemies';
             if (suppressionFlag === true) {
-                if (team.type === "Infantry" || team.type === "Gun") {
-                    two = noun2 + " cannot move closer to [U]visible[/u] enemy teams";
+                if (unit.type ===  "Tank") {
+                    two = "Any suppressed Tanks cannot move closer to [U]visible[/u] enemy teams";
                 } else {
-                    if (noun === "Platoons") {
-                        two = "Any suppressed Platoons cannot move closer to [U]visible[/u] enemy teams";
-                    } else {
-                        two = "The " + noun + " cannot move closer to [U]visible[/u] enemy teams";
-                    }
+                    two = "Teams cannot move closer to enemy teams";
                 }
             } 
             outputCard.body.push(two);
             if (spottedFlag === true) {
-                outputCard.body.push("Teams that Called Artillery must remain Stationary");
+                outputCard.body.push("Teams that Called Artillery must remain Stationary and in Formation");
             }
         } else if (order.includes("Hold")) {
-            outputCard.body.push("The " + noun + " stay in place. " + noun2 + verb + "Gone to Ground if not Firing");
-            outputCard.body.push("If not firing " + noun2.toLowerCase() + " will go on Overwatch");
+            outputCard.body.push("The Teams stay in place.<br>They are Gone to Ground and on Overwatch if they don't Fire.");
             if (suppressionFlag === true) {
-                if (team.type === "Infantry" || team.type === "Gun") {
-                    outputCard.body.push(noun2 + " will fire at a Moving ROF");
+                if (team.type ===  "Tank") {
+                    two = "Any suppressed Tanks will fire at a Moving ROF";
                 } else {
-                    if (noun === "Platoons") {
-                        outputCard.body.push("Any suppressed Platoons will fire at a Moving ROF");
-                    } else {
-                        outputCard.body.push("The " + noun + " will fire at a Moving ROF");
-                    }
+                    two = "Teams will fire at a Moving ROF";
                 }
             } 
         } else if (order === "Assault") {
-            let assaultMove = Math.min(5,tactical);
-            outputCard.body.push(noun + ' can move up to ' + assaultMove + ' hexes, and may fire at a Moving ROF');
-            outputCard.body.push('For Firing: ' + noun +  ' must target an enemy within 4 hexes of the Platoon it will charge into');
-            outputCard.body.push("(Charges are done during the Assault Step)");
+            let assaultMove = Math.min(10,tactical);
+            outputCard.body.push('Teams can move up to ' + assaultMove + ' hexes, and may fire at a Moving ROF');
+            outputCard.body.push('For Firing, they must target an enemy within 4 hexes of the Team they will charge into');
+            outputCard.body.push("(Charges by eligible Teams are completed during the Assault Step)");
             if (spottedFlag === true) {
-                outputCard.body.push("Platoons that Called Artillery must remain Stationary and cannot Assault");
+                outputCard.body.push("Platoons that Called Artillery must remain Stationary and cannot Assault. As well, they must remain in Formation");
             }
         } 
 
         team.token.set("aura1_color",Colours.black);
-        if (unitActivation === true) {
-            unit.order = order;
-            state.TY.currentUnitID = unit.id;
-        }
+        unit.order = order;
+        state.TY.currentUnitID = unit.id;
 
-        outputCard.body.push(extraLine);
-        for (let i=0;i<targetArray.length;i++) {
-            targetArray[i].order = order;
-            targetArray[i].addCondition(order);
-        }
+        _.each(unit.teamIDs,teamID => {
+            let team2 = TeamArray[teamID];
+            team2.order = order;
+            team2.addCondition(order);
+        })
+
         PrintCard();
     }
 
