@@ -3824,14 +3824,8 @@ log("Type: " + interHex.type)
         let firstNation;
         let lastPlayer = state.TY.playerSteps[state.TY.playerSteps.length - 1] || 2;
         let secondLastPlayer = state.TY.playerSteps[state.TY.playerSteps.length - 2] || 3;
-log(step)
-log("LAst: " + lastPlayer)
-log("2nd Last: " + secondLastPlayer)
-
-
         if (state.TY.gametype === "Meeting Engagement") {
             if (lastPlayer === secondLastPlayer && step !== "Assault") {
-log("Same had 2")
                 firstNation = (state.TY.nations[0][0] === lastPlayer) ? state.TY.nations[1][0]:state.TY.nations[0][0];
             } else {
                 let roll = randomInteger(2) - 1;
@@ -4086,10 +4080,6 @@ log("Same had 2")
             }
         }
 
-
-
-
-
         if (pass === "Final") {
             SetupCard("Turn: " + state.TY.turn,"Starting Step","Neutral");
             ClearSmoke("Smokescreens");
@@ -4175,10 +4165,6 @@ log("Same had 2")
         }
     }
 
-
-
-
-    
     const BreakOff = (msg) => {
         let defendingPlayer = msg.content.split(";")[1];
         SetupCard("Break Off","",state.TY.nations[defendingPlayer]);
@@ -5140,7 +5126,7 @@ log("In Create Barrages")
         let observerTeam = TeamArray[observerID];
         SetupCard(observerTeam.name,"Artillery",observerTeam.nation);
         if (state.TY.step !== "Artillery and Air" && observerTeam.type !== "Helicopter") {
-            outputCard.body.push("Call Artillery/Airstrike only in Artillery and Air Phase");
+            outputCard.body.push("Call Artillery/Airstrikes only in Artillery and Air Phase");
             PrintCard();
             return;
         }
@@ -5190,15 +5176,15 @@ log(ai)
         let two = ai.two;
         if (two === true) {
             newToken.set({
-                aura2_radius: 200,
+                aura2_radius: (blastR[2]*100),
                 aura2_color: "#d9d9d9",
             });
         }
         if (two === "Salvo Only") {
-            newToken.set("aura1_radius",200);
+            newToken.set("aura1_radius",blastR[1]*100);
         }
         if (two === "Mortar Only") {
-            newToken.set("aura1_radius",0);
+            newToken.set("aura1_radius",blastR[0]*100);
         }
         if (unitIDs.length === 0) {
             outputCard.body.push("No Available Weapons");
@@ -5428,7 +5414,7 @@ log(weapon)
                 artTeam = TeamArray[artIDs[j]];
                 let dist = artTeam.hex.distance(barrageTeam.hex);
                 if (hexMap[artTeam.hexLabel].terrain.includes("Offboard") ){
-                    dist += 50; //5km off map
+                    dist += 100; //5km off map
                 }
                 if (dist > artTeam.artilleryWpn.maxRange || dist < artTeam.artilleryWpn.minRange) {
                     oor = true;
@@ -5507,7 +5493,7 @@ log(weapon)
                 let dist = team.hex.distance(barrageTeam.hex);
                 if (hexMap[team.hexLabel].terrain.includes("Offboard") ){
                     offboard = true;
-                    dist += 50; //5km off map
+                    dist += 100; //5km off map
                 }  
                 if (dist > team.artilleryWpn.maxRange || dist < team.artilleryWpn.minRange) {
                     continue;
@@ -5797,7 +5783,7 @@ log(weapon)
             }
 
             if (ammoType === "Smoke Bombardment") {
-                SmokeScreen(targetHex,(num*6),direction,artilleryUnit.id);
+                SmokeScreen(targetHex,(num*2),direction,artilleryUnit.id);
                 state.TY.smokeScreens[artilleryUnit.player].push(artilleryUnit.id); //tracks that unit fired its one smoke bombardment
                 outputCard.body.push("Smoke Screen successfully placed");
                 RemoveBarrageToken();
@@ -5805,8 +5791,9 @@ log(weapon)
                 return;
             } else if (ammoType === "Minelets") {
                 let s = "";
-                if (num > 1) {s = "s"};
-                outputCard.body.push("Place " + num + ' Minefield Marker' + s + ' within 2 hexes of the Ranged In Target');
+                let mines = Math.floor(num/3);
+                if (mines > 1) {s = "s"};
+                outputCard.body.push("Place " + mines + ' Minefield Marker' + s + ' within 2 hexes of the Ranged In Target');
                 state.TY.minelets[currentPlayer].push(artilleryUnit.id);
                 PrintCard();
                 return;
@@ -5818,9 +5805,9 @@ log(weapon)
                 if (observerLOS.los === false) {
                     outputCard.body.push("+1 to Roll Needed to Hit due to Spotter LOS");
                 }
-                if (artilleryTeams[0].special.includes("Small Battery")) {
+                if (num < 3) {
                     outputCard.body.push("Hits Will be Rerolled Due to Size of Battery");
-                } else if (num > 1) {
+                } else if (num > 4) {
                     outputCard.body.push("Misses Will be Rerolled Due to Size of Battery");
                 }
                 if (observerTeam.spotAttempts < 3 && observerTeam.unitID !== artilleryUnit.id) {
@@ -5854,12 +5841,12 @@ log(weapon)
             let tip = "";
             for (let j=0;j<totalTeams;j++) {
                 let roll = randomInteger(6);
-                if (artilleryTeams[0].special.includes("Small Battery") && roll >= neededToHit) {
+                if (num < 3 && roll >= neededToHit) {
                     //reroll hits if only 1 or 2 guns
                     roll = randomInteger(6);
                 }
-                if (num > 1 && roll < neededToHit) {
-                    //reroll misses if 5+ guns ie 2+ tokens
+                if (num > 4 && roll < neededToHit) {
+                    //reroll misses if 5+ guns
                     roll = randomInteger(6);
                 }
                 tip +=  "To Hit: " + roll + " vs. " + neededToHit + "+";
