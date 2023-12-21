@@ -3618,60 +3618,32 @@ log("Type: " + interHex.type)
         let team = TeamArray[teamID];
         let unit = UnitArray[team.unitID];
         let unitLeader = TeamArray[unit.teamIDs[0]];
+
         SetupCard(unit.name,specialorder,team.nation);
         let errorMsg = [];
 
         let roll = randomInteger(6);
         let stat = 1;
 
-        let targetTeam,targetName,noun;
-        let targetArray = [];
-
-        if (team.id !== unitLeader.id) {
-            if (specialorder === "Clear Minefield" || specialorder === "Land/Take Off" || team.special.includes("HQ") || specialorder === "Dig In") {
-                targetArray.push(team);
-                targetTeam = team;
-                targetName = team.name;
-                noun = "Team";
-            } else {
-                errorMsg = "That Special Order must be issued by the Unit Leader";
-            }
-        } else {
-            if (specialorder === "Clear Minefield") {
-                targetArray.push(team);
-                targetTeam = team;
-                targetName = team.name;
-                noun = "Team";
-            } else {
-                targetTeam = unitLeader;
-                targetName = unit.name;
-                noun = "Unit";
-                _.each(unit.teamIDs,id => {
-                    let tm = TeamArray[id];
-                    if (tm.inCommand === true && tm.suppressed === false && tm.queryCondition("Spot") === false) {
-                        targetArray.push(tm);
-                    }
-                });
-            }
-        }
-
-        if (targetTeam.specialorder !== "") {
+        if (unitLeader.specialorder !== "") {
             errorMsg.push("Only one Special Order per turn");
         }
         
         if (specialorder === "Blitz Move" || specialorder === "Dig In" || specialorder === "Clear Minefield" || specialorder === "Cross Here") {
-            if (targetTeam.moved === true || state.TY.step === "Assault") {
+            if (unitLeader.moved === true || state.TY.step === "Assault") {
                 errorMsg.push(specialorder + " Order must be given before movement");
             }
         }
+
+     ///alter below as rest of unit can dig in    
         if (specialorder === "Dig In") {
-            if (targetTeam.queryCondition("Spot") === true && noun === "Team") {
+            if (unitLeader.queryCondition("Spot") === true && noun === "Team") {
                 errorMsg.push("This Platoon Called in Artillery and so cannot Dig In");
             }
         }
 
         if (specialorder === "Shoot and Scoot") {
-            if (targetTeam.moved === true) {
+            if (unitLeader.moved === true) {
                 errorMsg.push("Unit has Moved and so cannot be given a Shoot and Scoot Order");
             }
             if (state.TY.step  !== "Assault") {
@@ -3679,8 +3651,8 @@ log("Type: " + interHex.type)
             }
         }
 
-        if (targetTeam.fired === true && specialorder !== "Shoot and Scoot") {
-            errorMsg.push(noun + " has Fired this turn, cannot be given that Order");
+        if (unitLeader.fired === true && specialorder !== "Shoot and Scoot") {
+            errorMsg.push("Unit has Fired this turn, cannot be given that Order");
         }
 
         if (errorMsg.length > 0) {
@@ -3690,12 +3662,13 @@ log("Type: " + interHex.type)
             PrintCard();
             return;
         }
+
         let line = DisplayDice(roll,unitLeader.nation,24) + " vs. ";
         if (specialorder === "Cross Here" || specialorder === "Clear Minefield" || specialorder === "Land/Take Off") {
             line = "Auto";
         } else {
             if (specialorder === "Follow Me") {
-                stat = unitLeader.motivation;
+                stat = unitLeader.courage;
                 line += stat + "+  ";
             } else {
                 stat = unitLeader.skill;
@@ -3714,67 +3687,48 @@ log("Type: " + interHex.type)
         switch (specialorder) {
             case "Blitz Move":
                 if (roll >= stat) {
-                    if (team.player === 1) {
-                        outputCard.body.push("The Platoon may immediately Move up to 2 hexes");
-                        outputCard.body.push("It may make a normal Tactical Move, but if Hold are not considered to have Moved and can shoot at a Halted ROF");
-                    } else {
-                        outputCard.body.push("The Platoon Leader and any Platoons that are In Command may immediately Move up to 2 hexes");
-                        outputCard.body.push("Platoons may make a normal Tactical Move, but if Hold are not considered to have Moved and can shoot at a Halted ROF");
-                    }
+                    outputCard.body.push("Teams may immediately Move up to 4 hexes");
+                    outputCard.body.push("They may make a normal Tactical Move, but if Hold are not considered to have Moved and can shoot at a Halted ROF");
                 } else {    
-                    outputCard.body.push("Platoon(s) cannot Dash and automatically suffer a +1 to hit penalty as if they had Moved Out of Command");
+                    outputCard.body.push("Teams cannot Dash and automatically suffer a +1 to hit penalty as if they had Moved Out of Command");
                     specialorder = "Failed Blitz";
                 }
                 break;
             case "Cross Here":
-                if (team.player === 1) {
-                    outputCard.body.push("Any Platoons (including the Unit Leader) from the Unit rolling to Cross Difficult Terrain within 3 hexes of where the Unit Leader crosses improve their chance of crossing safely, reducing the score they need to pass a Cross Test by 1.");
-                } else {
-                    outputCard.body.push("The Platoon improves its chance of crossing safely, reducing the score needed to pass a Cross Test by 1.");
-                }
+                outputCard.body.push("Any Teams (including the Unit Leader) from the Unit rolling to Cross Difficult Terrain within 3 hexes of where the Unit Leader crosses improve their chance of crossing safely, reducing the score they need to pass a Cross Test by 1.");
                 break;
             case "Dig In":
                 let line;
                 if (roll >= stat) {
-                    if (noun === "Team") {
-                        line = "The Team Digs In"
-                    } else {
-                        line = "In Command Teams that did not Call Artillery Dig In";
-                    } 
+                    line = "Teams that did not Call Artillery Dig In";
                     outputCard.body.push(line);
-                    DigIn(targetArray);
+                    DigIn(unit);
                 } else {
-                    outputCard.body.push("The " + noun + " failed to Dig In");
+                    outputCard.body.push("The Unit failed to Dig In");
                     specialorder = "Failed Dig In";
                 }
-                outputCard.body.push(noun + " can fire at a moving ROF");
+                outputCard.body.push("Teams can fire at a moving ROF");
                 outputCard.body.push("If Teams do not Shoot or Assault, they are Gone to Ground");
                 break;
             case "Follow Me":
                 if (roll >= stat) {
-                    if (team.player === 0) {
-                        outputCard.body.push("In Command Platoons may immediately Move directly forward up to an additional 2 hexes, remaining In Command.")
-                    } else {
-                        outputCard.body.push("The Platoon may immediately Move directly forward up to an additional 2 hexes")
-                    }
+                    outputCard.body.push("Teams may immediately Move directly forward up to an additional 4 hexes")
                 } else {
-                    outputCard.body.push("Platoon(s) remain where they are")
+                    outputCard.body.push("Teams remain where they are")
                     specialorder = "Failed Follow Me";
                 }
-                outputCard.body.push("Platoon(s) may not fire");
+                outputCard.body.push("Teams may not fire");
                 break;
             case "Shoot and Scoot":
                 if (roll >= stat) {
-                    if (team.player === 0) {
-                        outputCard.body.push("The Leader and any Platoons that are In Command and did not Move in the Movement Step may immediately Move up to 2 hexes");
-                    } else {
-                        outputCard.body.push("The Platoon may immediately Move up to 2 hexes");
-                    }
+                    outputCard.body.push("The Platoon may immediately Move up to 4 hexes");
                 } else {
                     outputCard.body.push("Teams remain where they are")
                 }
                 break;
             case "Clear Minefield":
+
+///fix
                 if (team.player === 0) {
                     outputCard.body.push('The Platoon is ordered to clear a Minefield within 2 Hexes');
                     outputCard.body.push("That Platoon counts as having Dashed, and cannot Shoot or Assault");
@@ -3795,7 +3749,7 @@ log("Type: " + interHex.type)
                         team.removeCondition("Land/Take Off");
                     })
                 } else {
-                    outputCard.body.push('The Helicopters land. They may not land within 4 hexes of an enemy team');
+                    outputCard.body.push('The Helicopters land. They may not land within 8 hexes of an enemy team');
                     outputCard.body.push('Passengers may embark/disembark the following turn');
                     condition = "Land/Take Off";
                 }
@@ -3809,9 +3763,11 @@ log("Type: " + interHex.type)
         PrintCard();
     }
 
-    const DigIn = (array) => {
-        _.each(array,team => {
-            if (team.token.get("layer") !== "walls" && (team.type === "Infantry" || team.type === "Gun")) {
+    const DigIn = (unit) => {
+        if (unit.type !== "Infantry" && unit.type !== "Gun") {return};
+        _.each(unit.teamIDs,id => {
+            let team = TeamArray[id];
+            if (team.type === "Infantry" || team.type === "Gun") {
                 RemoveRangedInMarker(team.unitID);
                 let hex = hexMap[team.hexLabel];
                 if (hex.terrain.includes("Building") === false && hex.terrain.includes("Foxholes") === false && hex.terrain.includes("Offboard") === false) {
@@ -3913,8 +3869,8 @@ log("Same had 2")
                 return;
             }
             if (state.TY.gametype === "Meeting Engagement") {
-                _.each(TeamArray,team => {
-                    DigIn([team])
+                _.each(UnitArray,unit => {
+                    DigIn(unit)
                 })
                 _.each(UnitArray,unit => {
                     GTG(unit);
@@ -6764,11 +6720,7 @@ log("Charge Dist: " + chargeDist)
     const PlaceInFoxholes = (msg) => {
         let unit = UnitArray[TeamArray[msg.selected[0]._id].unitID];
         if (unit) {
-            let array = [];
-            _.each(unit.teamIDs,id=>{
-                array.push(TeamArray[id]);
-            })
-            DigIn(array);
+            DigIn(unit);
         }
     }
 
