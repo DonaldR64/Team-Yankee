@@ -5653,13 +5653,6 @@ log(weapon)
 
         observerTeam.spotAttempts += spotRolls.length;
         spotAttempts = observerTeam.spotAttempts;
-    
-        if (observerUnit.teamIDs.length === 1) {
-            outputCard.body.push("(" + observerTeam.name + " given a Hold Order)");
-            observerTeam.addCondition("Hold");
-            observerTeam.order = "Hold";
-            observerTeam.token.set("aura1_color",Colours.black);
-        }
 
         let sound;
         if (weapon.type === "Mortar") {
