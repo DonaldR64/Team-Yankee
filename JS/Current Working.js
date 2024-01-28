@@ -1,5 +1,5 @@
 const TY = (() => { 
-    const version = '5.12.19';
+    const version = '2024-01-28';
     if (!state.TY) {state.TY = {}};
     //Constants and Persistent Variables
 
@@ -1865,7 +1865,6 @@ log(hit)
     const teamHeight = (team) => {
         //height of token based on terrain, with additional based on type
         let hex = hexMap[team.hexLabel];
-log(hex)
         let height = parseInt(hex.elevation);
         if (team.type === "Infantry" && hex.terrain.includes("Building")) {
             height = parseInt(hex.height) - 5;
@@ -2755,6 +2754,8 @@ log(hex)
         PrintCard();
     }
 
+
+
     const LOS = (id1,id2,special) => {
         if (!special) {special = " "};
         let team1 = TeamArray[id1];
@@ -2816,17 +2817,16 @@ log(hex)
         let teamLevel = Math.min(team1Height,team2Height);
         team1Height -= teamLevel;
         team2Height -= teamLevel;
-    log("Team1 H: " + team1Height)
-    log("Team2 H: " + team2Height)
-    
+    //log("Team1 H: " + team1Height)
+    //log("Team2 H: " + team2Height)
+
         let interHexes = team1.hex.linedraw(team2.hex); //hexes from shooter (hex 0) to target (hex at end)
         let team1Hex = hexMap[team1.hexLabel];
         let team2Hex = hexMap[team2.hexLabel];
-        let sameTerrain = findCommonElements(team1Hex.terrainIDs,team2Hex.terrainIDs);
         let lastElevation = team1Height;
+        let sameTerrain = findCommonElements(team1Hex.terrainIDs,team2Hex.terrainIDs);
 
-        let hexesWithBuild = 0;
-        let hexesWithTall = 0;
+        let blockedLOS = false;
         let concealed = false;
         let bulletproof = false;
         let smoke = false;
@@ -2879,21 +2879,6 @@ log(hex)
             }
         }
 
-
-        let fKeys = Object.keys(TeamArray);
-
-        if ((team2Hex.bp === true || team2Hex.foxholes === true) && team2.type === "Infantry") {
-            //this catches foxholes, craters and similar
-            concealed = true;
-            bulletproof = true;
-        }
-    
-        if (team2Hex.terrain.includes("Ridgeline") && sameTerrain === false && team1Height < team2Height) {
-            //on a ridgeline with shooter below, ie hulldown
-            concealed = true;
-            bulletproof = true;
-        }
-
         let air1 = false;
         if (team1.type === "Aircraft" || (team1.type === "Helicopter" && team1.landed() === false)) {
             air1 = true;
@@ -2904,13 +2889,13 @@ log(hex)
         }
 
 
-log(interHexes)        
-log("Air1: " + air1)
-log("Air2: " + air2)
+//log(interHexes)        
+//log("Air1: " + air1)
+//log("Air2: " + air2)
         if (air1 === true && air2 === true) {
-log("Both Air")
+//log("Both Air")
             if (team2.special.includes("Hunter-Killer")) {
-                let st = Math.max(interHexes.length - (2 + 1),0); //2 hexes before target plus target hex
+                let st = Math.max(interHexes.length - (1 + 1),0); //Hex before target plus target hex
                 for (let i=st;i<interHexes.length;i++) {
                     let qrs = interHexes[i];
                     let interHex = hexMap[qrs.label()];
@@ -2921,8 +2906,8 @@ log("Both Air")
                 }
             }
         } else if (air1 === true && air2 === false) {
-log("Shooter is Air")
-            let st = Math.max(interHexes.length - (2 + 1),0); //2 hexes before target plus target hex
+//log("Shooter is Air")
+            let st = Math.max(interHexes.length - (1 + 1),0); //Hexes before target plus target hex
             for (let i=st;i<interHexes.length;i++) {
                 let qrs = interHexes[i];
                 let interHex = hexMap[qrs.label()];
@@ -2932,44 +2917,45 @@ log("Shooter is Air")
                 if (interHex.smoke === true || interHex.smokescreen) {smoke = true};
             }
         } else if (air1 === false && air2 === true) {
-log("Target is Air")
-            let en = Math.min(interHexes.length,(2 + 1)); //2 hexes from shooter plus shooters hex
+////log("Target is Air")
+            let en = Math.min(interHexes.length,(1 + 1)); //Hexes from shooter plus shooters hex
             for (let i=0;i<en;i++) {
                 let qrs = interHexes[i];
-log(qrs.label())
+//log(qrs.label())
                 let interHex = hexMap[qrs.label()];
                 if (interHex.type > 1) {
                     concealed = true;
                 }                
                 if (interHex.smoke === true) {smoke = true};
-log(concealed)
+//log(concealed)
             }
             if (team2.special.includes("Hunter-Killer")) {
-log("HK")
-                let st = Math.max(interHexes.length - (2 + 1),0); //2 hexes before target plus target hex
+//log("HK")
+                let st = Math.max(interHexes.length - (1 + 1),0); //Hexes before target plus target hex
                 for (let i=st;i<interHexes.length;i++) {
                     let qrs = interHexes[i];
-log(qrs.label())                    
+//log(qrs.label())                    
                     let interHex = hexMap[qrs.label()];
-log(interHex)
+//log(interHex)
                     if (interHex.type > 1) {
                         concealed = true;
                     }
                     if (interHex.smoke === true || interHex.smokescreen) {smoke = true};
-log(concealed)
+//log(concealed)
                 }
             }
         } else if (air1 === false && air2 === false) {
-log("Neither is Air")
-            for (let i=0;i<interHexes.length;i++) {
+//log("Neither is Air")
+            //run through intervening hexes
+            for (let i=1;i<interHexes.length - 1;i++) {
                 let qrs = interHexes[i];
                 let qrsLabel = qrs.label();
                 let interHex = hexMap[qrsLabel];
-log(i + ": " + qrsLabel)
-log(interHex.terrain)
-log("Type: " + interHex.type)
+//log(i + ": " + qrsLabel)
+//log(interHex.terrain)
+//log("Type: " + interHex.type)
                 if (interHex.smoke === true || interHex.smokescreen === true) {smoke = true};
-                if (interHex.smokescreen === true && distanceT1T2 > 2) { ///6mm change
+                if (interHex.smokescreen === true && distanceT1T2 > 2) { //2 Hex range through smokescreen
                     los = false;
                     break;
                 }
@@ -2982,10 +2968,10 @@ log("Type: " + interHex.type)
                 } else if (team1Height <= team2Height) {
                     B = i * team2Height / distanceT1T2;
                 }
-    log("InterHex Height: " + interHexHeight);
-    log("InterHex Elevation: " + interHexElevation);
-    log("Last Elevation: " + lastElevation);
-    log("B: " + B)
+    //log("InterHex Height: " + interHexHeight);
+    //log("InterHex Elevation: " + interHexElevation);
+    //log("Last Elevation: " + lastElevation);
+   // log("B: " + B)
                 if (interHexElevation < lastElevation && lastElevation > team1Height && lastElevation > team2Height) {
                     los = false;
                     losReason = "Terrain Drops off at " + qrsLabel;
@@ -2995,56 +2981,41 @@ log("Type: " + interHex.type)
                 lastElevation = interHexElevation;
 
                 if (interHexHeight + interHexElevation >= B) {
-    log("Terrain higher than B")
-                    //distances set to 1 for 6mm scale
-                    if (i>0) {
-                        if (interHex.type === 3) {
-                            hexesWithBuild++;
-                        }
-                        if (hexesWithBuild > 1) {
-                            los = false;
-                            losReason = "> 1 hexes into Building";
-                            break;
-                        }
-                        if (hexesWithBuild > 0 && interHex.type < 3) {
-                            los = false;
-                            losReason = "Other side of Building";
-                            break;
-                        }
-
-
-                        if (interHex.type === 2) {
-                            hexesWithTall++;
-                        }
-                        if (hexesWithTall > 1) {
-                            los = false;
-                            losReason = "> 1 hexes through Tall terrain";
-                            break;
-                        }
-                        if (hexesWithTall > 0 && interHex.type < 2) {
-                            los = false;
-                            losReason = "Other side of Tall Terrain";
-                            break;
-                        }
-
-                        if (interHex.type > 1) {
-                            concealed = true;
-                        }
-                        if (interHex.type == 1 && special !== "Overhead") {
-                            concealed = true;
-                        }
-                        if (interHex.bp === true && special !== "Overhead") {
-                            bulletproof = true;
-                        }
+    //log("LOS goes through Terrain")
+                    if (interHex.type === 3 || interHex.type === 2) {
+                        losReason = "LOS blocked by Terrain";
+                        los = false;
+                        break;
+                    }
+                    if (interHex.type == 1 && special !== "Overhead") {
+                        concealed = true;
                     }
                 } else {
-    log("Terrain less than B")
+    //log("Terrain less than B")
 
                 }
             }
+            //terrain the target is in
+            if (team2Hex.type > 0) {
+                concealed = true;
+            }
+            if ((team2Hex.bp === true || team2Hex.foxholes === true) && team2.type === "Infantry") {
+                //this catches foxholes, craters and similar
+                concealed = true;
+                bulletproof = true;
+            }
+        
+            if (team2Hex.terrain.includes("Ridgeline") && sameTerrain === false && team1Height < team2Height) {
+                //on a ridgeline with shooter below, ie hulldown
+                concealed = true;
+                bulletproof = true;
+//log("Hull Down")
+            }
+
+
             if (team2.type === "Infantry" && team2.moved === false) {
                 concealed = true //infantry teams that didnt move are concealed to all but Aircraft
-        log("Infantry didnt move = Concealed")
+        //log("Infantry didnt move = Concealed")
             }
         }
     
@@ -3067,6 +3038,9 @@ log("Type: " + interHex.type)
         }
         return result;
     }
+
+
+
 
     
     const TestLOS = (msg) => {
